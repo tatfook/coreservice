@@ -35,6 +35,16 @@ const World = class extends Controller {
     console.log(params.worldName);
     return this.success(ok);
   }
+
+  async createStatus() {
+    const params = this.validate({
+      uuid: 'string'
+    });
+
+    let result = this.ctx.service.world.getCreateWorldStatus(params.uuid || 0);
+
+    return this.success(result);
+  }
 };
 
 module.exports = World;

@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const base32 = require('base32');
+const uuid = require('uuid/v1');
 const Service = require('egg').Service;
 
 class World extends Service {
@@ -15,6 +16,11 @@ class World extends Service {
   async generateDefaultWorld(worldName) {
     let userInfo = this.ctx.state.user;
     let token = this.ctx.state.token;
+    let curUUID = uuid();
+    let curStatus = { [curUUID]: { status: false, createTime: Date.now() + 15 * 1000 } };
+
+    this.app.git.createStatus.push(curStatus);
+
     if (!userInfo || !userInfo.username) {
       console.log('未认证');
       return false;
@@ -22,27 +28,17 @@ class World extends Service {
 
     let baseWorldName = this.base32(worldName);
 
-    let {
-      gitlabToken,
-      gitlabUsername
-    } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
+    let { gitlabToken, gitlabUsername } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
 
     if (!gitlabToken) {
       console.log('未找gitlab token');
       return false;
     }
 
-    let result = await this.app.git.isProjectExist(
-      gitlabToken,
-      gitlabUsername,
-      baseWorldName
-    );
+    let result = await this.app.git.isProjectExist(gitlabToken, gitlabUsername, baseWorldName);
 
     if (!result) {
-      let result = await this.app.gitGateway.createProject(
-        userInfo.username,
-        baseWorldName
-      );
+      let result = await this.app.gitGateway.createProject(userInfo.username, baseWorldName);
 
       if (!result) {
         console.log('创建GIT项目失败', result);
@@ -73,32 +69,29 @@ class World extends Service {
       });
     });
 
-    let success = await new Promise((resolve, reject) => {
+    new Promise((resolve, reject) => {
       let index = 0;
       let self = this;
 
       async function upload() {
         if (index == tree.length) {
           resolve(true);
+
+          if (curStatus[curUUID]) {
+            console.log('sync files finish!');
+            curStatus[curUUID].status = true;
+          }
+
           return true;
         }
 
         let item = tree[index];
         if (item && item.path && item.content) {
           if (item.path == 'tag.xml') {
-            item.content = item.content.replace(
-              'name="DefaultName"',
-              `name="${worldName || ''}"`
-            );
+            item.content = item.content.replace('name="DefaultName"', `name="${worldName || ''}"`);
           }
 
-          await self.app.git.writeFile(
-            gitlabToken,
-            gitlabUsername,
-            baseWorldName,
-            item.path,
-            item.content
-          );
+          await self.app.git.writeFile(gitlabToken, gitlabUsername, baseWorldName, item.path, item.content);
 
           index++;
           upload();
@@ -110,14 +103,14 @@ class World extends Service {
       upload();
     });
 
-    if (success) {
-      const archiveUrl = this.getArchiveUrl(userInfo.username, worldName);
-      return { archiveUrl };
-    } else {
-      //return this.ctx.throw(400, '写入世界文件失败！');
-      console.log('写世界文件失败');
-      return false;
-    }
+    const archiveUrl = this.getArchiveUrl(userInfo.username, worldName);
+    return { statusUUID: curUUID, archiveUrl };
+  }
+
+  getCreateWorldStatus(uuid) {
+    let status = this.app.git.getCreateStatus(uuid);
+
+    return { status };
   }
 
   async removeProject(worldName) {
@@ -129,13 +122,13 @@ class World extends Service {
     }
 
     let baseWorldName = this.base32(worldName);
-    let projectPath = `${userInfo.username || ''}/${baseWorldName}`
+    let projectPath = `${userInfo.username || ''}/${baseWorldName}`;
 
     try {
-      let result = await this.app.gitGateway.removeProject(projectPath)
-	  return true;
+      let result = await this.app.gitGateway.removeProject(projectPath);
+      return true;
     } catch (error) {
-      return false
+      return false;
     }
   }
 
