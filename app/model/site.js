@@ -42,7 +42,7 @@ module.exports = app => {
 		},
 
 		sitename: {
-			type: STRING(48),
+			type: STRING(256),
 			allowNull: false,
 		},
 
@@ -56,7 +56,7 @@ module.exports = app => {
 		},
 
 		description: {
-			type: STRING(128),
+			type: STRING(1024),
 		},
 
 		extra: {

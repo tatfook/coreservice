@@ -29,7 +29,7 @@ const ProxyUser = class extends Controller {
 		if (!user) return this.success({error:{id:-1, message:"用户名密码错误"}});
 		user = user.get({plain:true});
 
-		const data = await axios.post(config.keepworkBaseURL + "user/login", {username, password}).then(res => res.data).catch(e => {
+		const data = await axios.get(config.keepworkBaseURL + `user/login?username=${username}&password=${password}`).then(res => res.data).catch(e => {
 			console.log("登录wikicraft失败", e);
 		});
 		if (!data || data.error.id != 0) return this.success(data);
@@ -52,7 +52,7 @@ const ProxyUser = class extends Controller {
 		let user = await this.model.users.getByName(username);
 		if (user) return this.success({error:{id:-1, message:"用户已存在"}});
 
-		const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
+		const data = await axios.post(config.keepworkBaseURL + `user/login?register=${username}&password=${password}`).then(res => res.data).catch(e => {
 			console.log("创建wikicraft用户失败", e);
 		});
 		if (!data || data.error.id != 0) return this.success(data);
