@@ -55,13 +55,21 @@ const Convert = class extends Controller {
 	async users() {
 		const usersModel = this.ctx.model.users;
 
-		let datas = await axios.get(this.keepworkApiUrlPrefix() + "user/export").then(res => res.data);
+		let datas = await axios.get(this.keepworkApiUrlPrefix() + "user/export").then(res => res.data).catch(e => console.log(e));
 		datas = _.uniqBy(datas, 'username');
 		datas = _.uniqBy(datas, '_id');
+		const cellphone = {};
 
 		let list = [];
 		for (let i = 0; i < datas.length; i++) {
 			let data = datas[i];
+			if (data.cellphone) {
+				if (cellphone[data.cellphone]) {
+					data.cellphone = null;
+				} else {
+					cellphone[data.cellphone] = true;
+				}
+			}
 			list.push(this.convertUser(data));
 
 			if (list.length == 300) {
@@ -99,15 +107,15 @@ const Convert = class extends Controller {
 
 	async sites() {
 		const sitesModel = this.ctx.model.sites;
-		const datas = await axios.get(this.keepworkApiUrlPrefix() + "website/export").then(res => res.data);
-		const compare = (s1, s2) => s1.userId == s2.userId && s1.sitename == s2.sitename;
+		let datas = await axios.get(this.keepworkApiUrlPrefix() + "website/export").then(res => res.data);
+		const compare = (s1, s2) => s1.username == s2.username && s1.sitename == s2.sitename;
+		datas = _.uniqWith(datas, compare);
 		let list = [];
 		for (let i = 0; i < datas.length; i++) {
 			let data = datas[i];
 			const site = await this.convertSite(data);
 			if (site) list.push(site);
 			if (list.length == 300) {
-				list = _.uniqWith(list, compare);
 				await sitesModel.bulkCreate(list);
 				list = [];
 			}
@@ -117,6 +125,8 @@ const Convert = class extends Controller {
 			list = _.uniqWith(list, compare);
 			await sitesModel.bulkCreate(list);
 		}
+
+		console.log(datas.length);
 
 		return this.success(datas);
 	}

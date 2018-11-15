@@ -61,7 +61,7 @@ module.exports = app => {
 		},
 
 		description: {
-			type: STRING(128),
+			type: STRING(512),
 		},
 
 		extra: {
