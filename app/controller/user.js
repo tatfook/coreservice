@@ -65,15 +65,15 @@ const User = class extends Controller {
 	async login() {
 		const config = this.app.config.self;
 		const util = this.app.util;
-		const params = this.validate({
+		const {username, password} = this.validate({
 			"username":"string",
 			"password":"string",
 		});
 
 		let user = await this.model.users.findOne({
 			where: {
-				username: params.username,
-				password: this.app.util.md5(params.password),
+				[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}],
+				password: this.app.util.md5(password),
 			},
 		});
 		
