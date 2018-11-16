@@ -134,7 +134,8 @@ const Project = class extends Controller {
 		await this.model.members.create({userId, memberId: userId, objectType: ENTITY_TYPE_PROJECT, objectId: project.id});
 
 		if (params.type == PROJECT_TYPE_PARACRAFT) {
-			this.createWorld(project);
+			const ok = await this.createWorld(project);
+			if (!ok) return this.fail(9);
 			//const ok = await this.createWorld(project);
 			//if (!ok) {
 				//await this.model.projects.destroy({where:{id:project.id}});
