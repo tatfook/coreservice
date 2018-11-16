@@ -35,7 +35,7 @@ module.exports = app => {
 		},
 
 		email: {
-			type: STRING(24),
+			type: STRING(64),
 			unique: true,
 		},
 

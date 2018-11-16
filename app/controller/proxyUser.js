@@ -89,11 +89,32 @@ const ProxyUser = class extends Controller {
 		}}).then(res => res.data).catch(e => {
 			console.log("获取wikicraft用户失败", e);
 		});
-		if (!data || data.error.id != 0) return this.success(data);
+		if (!data || data.error.id != 0) return this.success(data ||{error:{id:-1, message:"内部错误"}});
 
 		this.formatUserInfo(data.data, user);
 
 		return this.success(data);
+	}
+
+	async changepw() {
+		const {userId} = this.authenticated();
+		const config = this.app.config.self;
+		const {oldpassword, newpassword} = this.validate({oldpassword:"string", newpassword:"string"});
+		const data = await axios.post(config.keepworkBaseURL + `user/changepw`, {oldpassword, newpassword}, {headers:{
+			"Content-Type":"application/json",
+			"Authorization":"Bearer " + this.ctx.state.token,
+		}}).then(res => {
+			console.log(res);
+			return res.data;
+		}).catch(e => {
+			console.log("修改失败", e);
+		});
+		console.log(data);
+		if (!data || data.error.id != 0) return this.success(data || {error:{id:-1, message:"修改失败"}});
+
+		await this.model.users.update({password:this.app.util.md5(newpassword)}, {where:{id:userId}});
+		
+		return  this.success({error:{id:0, message:"OK"}});
 	}
 
 	// getBaseInfoByName

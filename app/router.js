@@ -127,6 +127,7 @@ module.exports = app => {
 
 	const convert = controller.convert;
 	router.get(`${prefix}converts`, convert.convert);
+	router.get(`${prefix}converts/userEmail`, convert.userEmail);
 	router.get(`${prefix}converts/users`, convert.users);
 	router.get(`${prefix}converts/sites`, convert.sites);
 	router.get(`${prefix}converts/groups`, convert.groups);
@@ -155,6 +156,7 @@ module.exports = app => {
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
 	router.all("/api/wiki/models/user/register", controller.proxyUser.register);
 	router.all("/api/wiki/models/user/getProfile", controller.proxyUser.profile);
+	router.all("/api/wiki/models/user/changepw", controller.proxyUser.changepw);
 	router.all("/api/wiki/models/user/getBaseInfoByName", controller.proxyUser.getBaseInfoByName);
 	router.all("/api/wiki/models/oauth_app/agreeOauth", controller.proxyOauthApp.agreeOauth);
 	router.all("/api/wiki/models/oauth_app/getTokenByCode", controller.proxyOauthApp.getTokenByCode);

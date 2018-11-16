@@ -9,7 +9,7 @@ module.exports = app => {
 	//});
 	
 	const models = {
-		users:"users", 
+		//users:"users", 
 		sites:"sites", 
 		packages:"packages", 
 		projects:"projects",

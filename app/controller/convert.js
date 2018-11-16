@@ -42,6 +42,7 @@ const Convert = class extends Controller {
 			sex: data.sex,
 			description: data.introduce,
 			portrait: data.portrait,
+			email: data.email,
 			cellphone: data.cellphone ? data.cellphone : null,
 			realname: (data.realNameInfo && data.realNameInfo.cellphone) ? data.realNameInfo.cellphone : null,
 			extra: {
@@ -50,6 +51,25 @@ const Convert = class extends Controller {
 		};
 
 		return user;
+	}
+
+	async userEmail() {
+		const usersModel = this.ctx.model.users;
+
+		let datas = await axios.get(this.keepworkApiUrlPrefix() + "user/export").then(res => res.data).catch(e => console.log(e));
+		datas = _.uniqBy(datas, 'email');
+		for (let i = 0; i < datas.length; i++) {
+			let {_id, email} = datas[i];
+			if (email && _id) {
+				try {
+					await usersModel.update({email}, {where:{id:_id}});
+				} catch(e) {
+
+				}
+			}
+		}
+
+		return this.success("OK");
 	}
 
 	async users() {
