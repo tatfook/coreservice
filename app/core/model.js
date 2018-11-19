@@ -12,7 +12,7 @@ module.exports = app => {
 		users:"users", 
 		sites:"sites", 
 		packages:"packages", 
-		//projects:"projects",
+		projects:"projects",
 		favorites: "favorites",
 	};
 
@@ -37,7 +37,11 @@ module.exports = app => {
 		if (!modelName) return;
 		
 		inst = inst.get({plain:true});
-		await app.api[tableName + "Upsert"](inst);
+
+		const apiName = tableName + "Upsert";
+		if (!app.api[apiName]) return ;
+
+		await app.api[apiName](inst);
 	});
 
 	app.model.afterBulkUpdate(async (options) => {
@@ -45,8 +49,11 @@ module.exports = app => {
 		const tableName = model.getTableName();
 		const list = await getList(options);
 
+		const apiName = tableName + "Upsert";
+		if (!app.api[apiName]) return ;
+
 		for (let i = 0; i < list.length; i++) {
-			await app.api[tableName + "Upsert"](list[i]);
+			await app.api[apiName](list[i]);
 		}
 	});
 
@@ -54,6 +61,10 @@ module.exports = app => {
 		const {model} = options;
 		const tableName = model.getTableName();
 		const list = await getList(options);
+
+		const apiName = tableName + "Destroy";
+		if (!app.api[apiName]) return ;
+
 		setTimeout(async() => {
 			for (let i = 0; i < list.length; i++) {
 				await app.api[tableName + "Destroy"](list[i]);
