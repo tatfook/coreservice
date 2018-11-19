@@ -65,10 +65,11 @@ const User = class extends Controller {
 	async login() {
 		const config = this.app.config.self;
 		const util = this.app.util;
-		const {username, password} = this.validate({
+		let {username, password} = this.validate({
 			"username":"string",
 			"password":"string",
 		});
+		username = username.toLowerCase();
 
 		let user = await this.model.users.findOne({
 			where: {

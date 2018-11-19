@@ -1,5 +1,6 @@
 const joi = require("joi");
 const _ = require("lodash");
+const worlds = require("./worlds.js");
 
 const {
 	ENTITY_TYPE_USER,
@@ -28,11 +29,10 @@ const Project = class extends Controller {
 		console.log(data ? `创建世界成功:${worldName}` : `创建世界失败:${worldName}`);
 		if (!data) {
 			await this.model.projects.destroy({where:{id:projectId}});
-			//await this.model.projects.update({where:{id:projectId}});
 			return false;
 		};
 		await this.model.worlds.upsert({worldName, projectId, userId});
-		await this.model.projects.update({status:2}, {where:{id:projectId}});
+		//await this.model.projects.update({status:2}, {where:{id:projectId}});
 
 		return true;
 	}
@@ -50,13 +50,13 @@ const Project = class extends Controller {
 	}
 
 	async status() {
-		const {id} = this.validate({id:"int"});
+		//const {id} = this.validate({id:"int"});
 
-		let project = await this.model.projects.findOne({where:{id}});
-		if (!project) return this.success(0);
-		project = project.get({plain:true});
+		//let project = await this.model.projects.findOne({where:{id}});
+		//if (!project) return this.success(0);
+		//project = project.get({plain:true});
 
-		return this.success(project.status);
+		return this.success(2);
 	}
 
 	async setProjectUser(list) {
@@ -119,7 +119,7 @@ const Project = class extends Controller {
 		const params = this.validate({type:"int"});
 
 		params.userId = userId;
-		params.status = params.type == PROJECT_TYPE_PARACRAFT ? 1 : 2; // 1 - 创建中  2 - 创建完成
+		//params.status = params.type == PROJECT_TYPE_PARACRAFT ? 1 : 2; // 1 - 创建中  2 - 创建完成
 		delete params.star;
 		delete params.stars;
 		delete params.visit;
@@ -262,6 +262,45 @@ const Project = class extends Controller {
 
 	async world() {
 		//const {id} = this.validate()
+	}
+
+	async importProject() {
+		for (let i = 0; i < worlds.length; i++) {
+			const world = worlds[i];
+			const {userid, worldsName, _id} = world;
+			let project = null;
+			try {
+				project = await this.model.projects.create({
+					userId:userid, 
+					name: worldsName, 
+					type: PROJECT_TYPE_PARACRAFT,
+					privilege: 165,
+				});
+				project = project.get({plain:true});
+			} catch(e) {
+				console.log(e);
+				continue;
+			}
+			
+			try {
+				await this.model.worlds.create({
+					//id: _id,
+					userId: userid,
+					worldName: worldsName,
+					projectId: project.id,
+					fileSize: world.filesTotals,
+					giturl: world.giturl,
+					commitId: world.commitId,
+					download: world.download,
+					revision: world.revision,
+					archiveUrl: world.giturl ? (world.giturl + '/repository/archive.zip?ref=' + world.commitId) : "",
+				});
+			} catch(e) {
+				console.log(e);
+			}
+		}
+		//console.log(worlds.length);
+		return this.success(worlds);
 	}
 }
 

@@ -83,7 +83,7 @@ class World extends Service {
 
   base32(text) {
     if (text) {
-      let notLetter = text.match(/[^a-zA-Z0-9]/g);
+      let notLetter = text.match(/[^a-zA-Z]/g);
 
       if (notLetter) {
         text = base32.encode(text);

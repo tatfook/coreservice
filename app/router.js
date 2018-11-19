@@ -99,6 +99,7 @@ module.exports = app => {
 	router.resources(`${prefix}tags`, tag);
 
 	const project = controller.project;
+	router.get(`${prefix}projects/import`, project.importProject);
 	router.get(`${prefix}projects/:id/status`, project.status);
 	router.get(`${prefix}projects/join`, project.join);
 	router.post(`${prefix}projects/search`, project.search);
@@ -127,6 +128,7 @@ module.exports = app => {
 
 	const convert = controller.convert;
 	router.get(`${prefix}converts`, convert.convert);
+	router.get(`${prefix}converts/siteFile`, convert.convertSiteFile);
 	router.get(`${prefix}converts/userEmail`, convert.userEmail);
 	router.get(`${prefix}converts/users`, convert.users);
 	router.get(`${prefix}converts/sites`, convert.sites);

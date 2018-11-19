@@ -14,10 +14,11 @@ const ProxyUser = class extends Controller {
 	// 登录
 	async login() {
 		const config = this.config.self;
-		const {username, password} = this.validate({
+		let {username, password} = this.validate({
 			username: "string",
 			password: "string",
 		});
+		username = username.toLowerCase();
 
 		let user = await this.model.users.findOne({
 			where: {
@@ -104,12 +105,12 @@ const ProxyUser = class extends Controller {
 			"Content-Type":"application/json",
 			"Authorization":"Bearer " + this.ctx.state.token,
 		}}).then(res => {
-			console.log(res);
+			//console.log(res);
 			return res.data;
 		}).catch(e => {
 			console.log("修改失败", e);
 		});
-		console.log(data);
+		//console.log(data);
 		if (!data || data.error.id != 0) return this.success(data || {error:{id:-1, message:"修改失败"}});
 
 		await this.model.users.update({password:this.app.util.md5(newpassword)}, {where:{id:userId}});

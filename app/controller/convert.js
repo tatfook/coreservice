@@ -4,6 +4,9 @@ const joi = require("joi");
 const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
+
+const sites = require("./sites.js");
+
 const {
 	ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
@@ -105,6 +108,19 @@ const Convert = class extends Controller {
 		return this.success(datas);
 	}
 
+	async convertSiteFile() {
+		const compare = (s1, s2) => s1.username == s2.username && (s1.sitename || s1.name) == (s2.sitename || s2.name);
+		const datas = _.uniqWith(sites, compare);
+		for (let i = 0; i < datas.length; i++) {
+			const data = datas[i];
+			const site = await this.convertSite(data);
+			if (!site) continue;
+			delete site.id;
+
+			await this.model.sites.upsert(site);
+		}
+	}
+
 	async convertSite(data) {
 		const usersModel = this.ctx.model.users;
 		let user = await usersModel.findOne({where:{username:data.username}});
@@ -113,7 +129,7 @@ const Convert = class extends Controller {
 			id: data._id,
 			userId: user.id,
 			username: user.username,
-			sitename: data.name,
+			sitename: data.name || data.sitename,
 			visibility: data.visibility == "public" ? 0 : 1,
 			description: data.desc,
 			extra: {
