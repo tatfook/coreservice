@@ -5,7 +5,7 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 
-const sites = require("./sites.js");
+//const sites = require("./sites.js");
 
 const {
 	ENTITY_TYPE_USER,
