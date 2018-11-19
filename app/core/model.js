@@ -12,7 +12,7 @@ module.exports = app => {
 		users:"users", 
 		sites:"sites", 
 		packages:"packages", 
-		//projects:"projects",
+		projects:"projects",
 		favorites: "favorites",
 	};
 
