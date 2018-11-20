@@ -369,8 +369,11 @@ const User = class extends Controller {
 		const {id} = this.validate({id:'int'});
 		const user = await this.model.users.getById(id);
 		if (!user) this.throw(400);
-		
-		user.siteCount = await this.model.sites.getCountByUserId(id);
+
+		const rank = await this.model.userRanks.getByUserId(id);
+		user.rank = rank;
+
+		return this.success(user);
 	}
 
 	async sites() {

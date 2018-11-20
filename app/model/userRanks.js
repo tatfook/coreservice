@@ -58,8 +58,8 @@ module.exports = app => {
 	//model.sync({force:true});
 	
 	model.getByUserId = async function(userId) {
-		let rank = await app.model.projectRanks.findOne({where:{userId}});
-		if (!rank) rank = await app.model.projectRanks.create({userId});
+		let rank = await app.model.userRanks.findOne({where:{userId}});
+		if (!rank) rank = await app.model.userRanks.create({userId});
 
 		return rank && rank.get({plain:true});
 	}
