@@ -53,24 +53,22 @@ const ProxyUser = class extends Controller {
 		let user = await this.model.users.getByName(username);
 		if (user) return this.success({error:{id:-1, message:"用户已存在"}});
 
-		const data = await axios.post(config.keepworkBaseURL + `user/login?register=${username}&password=${password}`).then(res => res.data).catch(e => {
+		const data = await axios.post(config.keepworkBaseURL + `user/register`, {username, password}, {headers:{
+			"Content-Type":"application/json",
+		}}).then(res => res.data).catch(e => {
 			console.log("创建wikicraft用户失败", e);
 		});
-		if (!data || data.error.id != 0) return this.success(data);
+		if (!data || data.error.id != 0) return this.success(data || {error:-1, message:"wikicraft用户创建失败"});
 		
 		user = await this.model.users.create({username, password:this.app.util.md5(password)});
 		if (!user) return this.success({error:{id:-1, message:"服务器内部错误"}});
 
-		const ok = await this.app.api.createGitUser(user);
-		if (!ok) {
-			await this.model.users.destroy({where:{id:user.id}});
-			return this.success({error:{id:-1, message:"创建git用户失败"}});
-		}
-		await this.app.api.createGitProject({
-			username: user.username,
-			sitename: '__keepwork__',
-			visibility: 'public',
-		});
+		//const ok = await this.app.api.createGitUser(user);
+		//await this.app.api.createGitProject({
+			//username: user.username,
+			//sitename: '__keepwork__',
+			//visibility: 'public',
+		//});
 
 		this.formatUserInfo(data.data.userinfo, user);
 		return this.success(data);
@@ -86,6 +84,7 @@ const ProxyUser = class extends Controller {
 		if (!user) return this.success({error:{id:-1, message:"用户不存在"}});
 
 		const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
+			"Content-Type":"application/json",
 			"Authorization":"Bearer " + this.ctx.state.token,
 		}}).then(res => res.data).catch(e => {
 			console.log("获取wikicraft用户失败", e);
@@ -116,6 +115,68 @@ const ProxyUser = class extends Controller {
 		await this.model.users.update({password:this.app.util.md5(newpassword)}, {where:{id:userId}});
 		
 		return  this.success({error:{id:0, message:"OK"}});
+	}
+
+	async batchChangePwd() {
+		const {list=[]} = this.validate();
+		const config = this.config.self;
+		
+		const token = this.app.util.jwt_encode({roleId:10, username:"xiaoyao", userId:3}, config.secret);
+		const auth = "Bearer " + token;
+		console.log(auth);
+		for (let i = 0; i < list.length; i++) {
+			const item = list[i];
+			const md5password = this.app.util.md5(item.password);
+			const user = await this.model.users.findOne({where:{username: item.username}});
+			if (!user) {
+				item.result = "用户不存在";
+				continue;
+			};
+			let result = await axios.post(config.keepworkBaseURL + 'tabledb/query', {
+				tableName:"user",
+				page:1,
+				pageSize:10,
+				query: {
+					username: item.username,
+				}
+			}, {
+				headers: {
+					"Content-Type":"application/json",
+					"Authorization": auth,
+				}
+			}).then(res => res.data).catch(e => console.log(e));
+
+			if (!result || !result.data || result.data.total != 1) {
+				item.result = "旧用户不存在";
+				continue;
+			}
+			const oldUser = result.data.data[0];
+			if (md5password != user.password && md5password != oldUser.password) {
+				item.password = "密码错误";
+				continue;
+			}
+			const newpassword = this.app.util.md5(item.newpassword || item.password);
+			result = await axios.post(config.keepworkBaseURL + 'tabledb/upsert', {
+				tableName:"user",
+				query: {
+					_id: oldUser._id,
+					password: newpassword,
+				}
+			}, {
+				headers: {
+					"Content-Type":"application/json",
+					"Authorization": auth,
+				}
+			}).then(res => res.data).catch(e => console.log(e));
+			if (!result || !result.error || result.error.id != 0) {
+				item.result = "设置旧密码失败";
+				continue;
+			}
+
+			await this.model.users.update({password: newpassword}, {where:{id:user.id}});
+			item.result = "密码修改成功";
+		}
+		return this.success(list);
 	}
 
 	// getBaseInfoByName

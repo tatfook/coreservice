@@ -3,6 +3,7 @@ const {
 	ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
 	ENTITY_TYPE_PAGE,
+	ENTITY_TYPE_PROJECT,
 } = require("../core/consts.js");
 
 module.exports = app => {
@@ -56,6 +57,23 @@ module.exports = app => {
 	});
 
 	//model.sync({force:true});
+
+	model.__hook__ = async function(data, oper) {
+		const {userId, objectId, objectType} = data;
+		if (data.objectType == ENTITY_TYPE_PROJECT) {
+			// 获取项目收藏量
+			const rank = await app.model.projectRanks.getByProjectId(objectId);
+			const favorite = await app.model.favorites.count({where: {objectId, objectType}});
+			await app.model.projectRanks.update({favorite}, {where:{projectId: objectId}});
+		} else if (data.objectType == ENTITY_TYPE_USER) {
+			const rank1 = await app.model.userRanks.getByUserId(userId);
+			const rank2 = await app.model.userRanks.getByUserId(objectId);
+			const follow = await app.model.favorites.count({where:{userId, objectType}});
+			const fans = await app.model.favorites.count({where: {objectId, objectType}});
+			await app.model.userRanks.update({follow}, {where:{userId}});
+			await app.model.userRanks.update({fans}, {where:{userId: objectId}});
+		}
+	}
 
 	model.getById = async function(id, userId) {
 		const where = {id};

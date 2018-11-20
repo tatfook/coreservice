@@ -62,6 +62,13 @@ module.exports = app => {
 
 	//model.sync({force:true});
 
+	model.getByProjectId = async function(projectId) {
+		let rank = await app.model.projectRanks.findOne({where:{projectId}});
+		if (!rank) rank = await app.model.projectRanks.create({projectId});
+
+		return rank && rank.get({plain:true});
+	}
+
 	app.model.projectRanks = model;
 
 	return model;
