@@ -29,6 +29,16 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		site: {
+			type:INTEGER,
+			defaultValue: 0,
+		},
+
+		world: {
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		follow: {
 			type: INTEGER,
 			defaultValue: 0,
