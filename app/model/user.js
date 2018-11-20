@@ -92,7 +92,9 @@ module.exports = app => {
 	model.getByName = async function(username) {
 		const data = await app.model.users.findOne({
 			where: {username},
-			exclude: ["password"],
+			attributes: {
+				exclude: ["password"],
+			},
 		});
 
 		return data && data.get({plain:true});
@@ -113,7 +115,9 @@ module.exports = app => {
 	model.getById = async function(userId) {
 		const data = await app.model.users.findOne({
 			where: {id:userId},
-			exclude: ["password"],
+			attributes: {
+				exclude: ["password"],
+			},
 		});
 
 		return data && data.get({plain:true});
