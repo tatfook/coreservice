@@ -2,8 +2,7 @@ const joi = require("joi");
 const _ = require("lodash");
 //const worlds = require("./worlds.js");
 
-const {
-	ENTITY_TYPE_USER,
+const { ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
 	ENTITY_TYPE_PAGE,
 	ENTITY_TYPE_PROJECT,
@@ -301,6 +300,29 @@ const Project = class extends Controller {
 		}
 		//console.log(worlds.length);
 		return this.success(worlds);
+	}
+
+	async importProjectCover() {
+		const worlds = await this.model.worlds.findAll({limit:100000});
+
+		for (let i = 0; i < worlds.length; i++) {
+			const world = worlds[i].get({plain:true});
+
+			if (!world.archiveUrl || !world.giturl) continue;
+			const previewUrl = world.giturl + "/raw/master/preview.jpg";
+			const project = await this.model.projects.getById(world.projectId);
+
+			const extra = project.extra;
+
+			if (!extra.imageUrl) {
+				extra.imageUrl = previewUrl;
+				await this.model.projects.update({extra}, {where: {id: world.projectId}});
+			}
+		}
+
+		console.log(worlds.length);
+
+		return this.success("OK");
 	}
 }
 
