@@ -63,12 +63,12 @@ const ProxyUser = class extends Controller {
 		user = await this.model.users.create({username, password:this.app.util.md5(password)});
 		if (!user) return this.success({error:{id:-1, message:"服务器内部错误"}});
 
-		//const ok = await this.app.api.createGitUser(user);
-		//await this.app.api.createGitProject({
-			//username: user.username,
-			//sitename: '__keepwork__',
-			//visibility: 'public',
-		//});
+		const ok = await this.app.api.createGitUser(user);
+		await this.app.api.createGitProject({
+			username: user.username,
+			sitename: '__keepwork__',
+			visibility: 'public',
+		});
 
 		this.formatUserInfo(data.data.userinfo, user);
 		return this.success(data);
