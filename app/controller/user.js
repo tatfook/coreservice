@@ -371,7 +371,10 @@ const User = class extends Controller {
 		if (!user) this.throw(400);
 
 		const rank = await this.model.userRanks.getByUserId(id);
+		const contributions = await this.model.contributions.getByUserId(id);
+
 		user.rank = rank;
+		user.contributions = contributions;
 
 		return this.success(user);
 	}
@@ -387,6 +390,24 @@ const User = class extends Controller {
 		const joinSites = await this.model.sites.getJoinSites(userId, 0);
 
 		return this.success(sites.concat(joinSites));
+	}
+	
+	// 增加用户活跃度
+	async addContributions() {
+		const {userId} = this.authenticated();
+		const {id, count=1} = this.validate({id:"int", count:"int_optional"});
+		
+		await this.model.contributions.addContributions(userId, count);
+
+		return this.success("OK");
+	}
+
+	// 获取用户的活跃度
+	async contributions() {
+		const {id} = this.validate({id:'int'});
+		const data = await this.model.contributions.getByUserId(id);
+
+		return this.success(data);
 	}
 }
 

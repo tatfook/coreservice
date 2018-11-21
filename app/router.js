@@ -16,6 +16,8 @@ module.exports = app => {
 
 	const user = controller.user;
 	router.post(`${prefix}users/search`, user.search);
+	router.post(`${prefix}users/:id/contributions`, user.addContributions);
+	router.get(`${prefix}users/:id/contributions`, user.contributions);
 	router.get(`${prefix}users/:id/detail`, user.detail);
 	router.get(`${prefix}users/:id/sites`, user.sites);
 	router.get(`${prefix}users/tokeninfo`, user.tokeninfo);

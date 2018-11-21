@@ -68,7 +68,7 @@ module.exports = app => {
 	model.getByUserId = async function(userId) {
 		const date = new Date();
 		const year = date.getFullYear();
-		const datas = await app.model.contributions.findALl({where:{
+		const datas = await app.model.contributions.findAll({where:{
 			userId,
 			year: {
 				[app.Sequelize.Op.in]: [year, year-1],

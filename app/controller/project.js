@@ -1,6 +1,6 @@
 const joi = require("joi");
 const _ = require("lodash");
-//const worlds = require("./worlds.js");
+const worlds = require("./worlds.js");
 
 const { ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
@@ -303,20 +303,29 @@ const Project = class extends Controller {
 	}
 
 	async importProjectCover() {
-		const worlds = await this.model.worlds.findAll({limit:100000});
+		//const worlds = await this.model.worlds.findAll({limit:100000});
 
 		for (let i = 0; i < worlds.length; i++) {
-			const world = worlds[i].get({plain:true});
+			//const world = worlds[i].get({plain:true});
+			const world = worlds[i];
+			const {userid, worldsName, _id} = world;
 
-			if (!world.archiveUrl || !world.giturl) continue;
-			const previewUrl = world.giturl + "/raw/master/preview.jpg";
-			const project = await this.model.projects.getById(world.projectId);
+			if (!world.preview) continue;
+			let previewUrl = world.preview;
+			try {
+				previewUrl = JSON.parse(world.preview)[0].previewUrl;
+			} catch(e) {
+				previewUrl = world.preview;
+			}
 
+			let project = await this.model.projects.findOne({where:{userId:userid, name: worldsName}});
+			if (!project) continue;
+			project = project.get({plain:true});
 			const extra = project.extra;
 
 			if (!extra.imageUrl) {
 				extra.imageUrl = previewUrl;
-				await this.model.projects.update({extra}, {where: {id: world.projectId}});
+				await this.model.projects.update({extra}, {where: {id: project.id}});
 			}
 		}
 
