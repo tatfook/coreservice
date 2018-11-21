@@ -65,7 +65,6 @@ const ProxyUser = class extends Controller {
 
 		const ok = await this.app.api.createGitUser(user);
 		if (!ok) console.log("创建git用户失败");
-
 		await this.app.api.createGitProject({
 			username: user.username,
 			sitename: '__keepwork__',
