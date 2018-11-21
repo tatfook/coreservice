@@ -87,6 +87,13 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.__hook__ = async function(data, oper) {
+		if (oper == "create" && data.objectType == ENTITY_TYPE_PROJECT) {
+			// ISSUE创建  活跃度加1
+			await app.model.contributions.addContributions(data.userId);
+		}
+	}
+
 	model.getById = async function(id, userId) {
 		const where = {id};
 
