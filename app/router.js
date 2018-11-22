@@ -43,6 +43,7 @@ module.exports = app => {
 	router.resources(`${prefix}sites`, site);
 
 	const page = controller.page;
+	router.post(`${prefix}pages/save`, page.save);
 	router.get(`${prefix}pages/visit`, page.visit);
 	router.resources(`${prefix}pages`, page);
 
@@ -148,6 +149,7 @@ module.exports = app => {
 	router.resources(`${prefix}trades`, trade);
 
 	const world = controller.world;
+	router.post(`${prefix}worlds/save`, world.save);
 	router.get(`${prefix}worlds/test`, world.test);
 	router.get(`${prefix}worlds/testDelete`, world.testDelete);
 	router.resources(`${prefix}worlds`, world);

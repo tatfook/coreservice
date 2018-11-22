@@ -87,6 +87,16 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.getById = async function(id, userId) {
+		const where = {id};
+
+		if (userId) where.userId = userId;
+
+		const data = await app.model.sites.findOne({where: where});
+
+		return data && data.get({plain:true});
+	}
+
 	model.getByProjectId = async function(projectId) {
 		const world = await app.model.worlds.findOne({where:{projectId}});
 		
