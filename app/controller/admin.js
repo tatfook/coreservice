@@ -9,16 +9,44 @@ const Admin = class extends Controller {
 
 		this.resource = this.ctx.model[resourceName];
 
-		if (!this.model) this.ctx.throw(400, "args error");
+		if (!this.resource) this.ctx.throw(400, "args error");
 
-		this.authenticated();
-		const roleId = this.getUser().roleId;
-		
-		if (roleId != 10) this.ctx.throw(400, "no privlige");
+		this.adminAuthenticated();
 
-		return;
+		return params;
 	}
 	
+	async login() {
+		const config = this.app.config.self;
+		const util = this.app.util;
+		let {username, password} = this.validate({
+			"username":"string",
+			"password":"string",
+		});
+		username = username.toLowerCase();
+
+		let user = await this.model.admins.findOne({
+			where: {
+				[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}],
+				password: this.app.util.md5(password),
+			},
+		});
+
+		if (!user) return this.fail(1);
+		user = user.get({plain:true});
+
+		const tokenExpire = 3600 * 24 * 2;
+		const token = util.jwt_encode({
+			userId: user.id, 
+			roleId: user.roleId,
+			username: user.username
+		}, config.adminSecret, tokenExpire);
+
+		user.token = token;
+
+		return this.success(user);
+	}
+
 	async index() {
 		this.parseParams();
 		const {ctx} = this;

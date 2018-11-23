@@ -90,6 +90,9 @@ module.exports = {
 
 	PROJECT_TYPE_SITE: 0,      // 网站项目
 	PROJECT_TYPE_PARACRAFT: 1, // paracraft 项目
+
+	// 管理员角色
+	ADMIN_ROLE_SUPER: 10,      // 超级管理员
 }
 
 

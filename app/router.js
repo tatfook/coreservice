@@ -142,6 +142,7 @@ module.exports = app => {
 	router.get(`${prefix}converts/site_groups`, convert.siteGroups);
 
 	const admin = controller.admin;
+	router.post(`${prefix}admins/login`, admin.login);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const trade = controller.trade;
