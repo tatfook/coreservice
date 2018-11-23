@@ -308,7 +308,7 @@ const Project = class extends Controller {
 		for (let i = 0; i < worlds.length; i++) {
 			//const world = worlds[i].get({plain:true});
 			const world = worlds[i];
-			const {userid, worldsName, _id} = world;
+			const {userid, worldsName, _id, commitId="master"} = world;
 
 			if (!world.preview) continue;
 			let previewUrl = world.preview;
@@ -323,10 +323,11 @@ const Project = class extends Controller {
 			project = project.get({plain:true});
 			const extra = project.extra;
 
-			if (!extra.imageUrl) {
-				extra.imageUrl = previewUrl;
-				await this.model.projects.update({extra}, {where: {id: project.id}});
-			}
+			previewUrl = previewUrl.replace(/http:/, "https:");
+		   	const archiveUrl = previewUrl.replace(/\/raw\/.*$/, "") + '/repository/archive.zip?ref=' + commitId; 
+			await this.model.worlds.update({extra:{coverUrl: previewUrl}, archiveUrl}, {where:{userId:userid, worldName: worldsName}});
+			extra.imageUrl = previewUrl;
+			await this.model.projects.update({extra}, {where: {id: project.id}});
 		}
 
 		console.log(worlds.length);
