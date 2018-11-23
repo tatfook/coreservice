@@ -4,8 +4,10 @@ const Controller = require("../core/controller.js");
 
 const Admin = class extends Controller {
 	parseParams() {
-		const params = this.ctx.params || {};
+		const params = this.validate();
 		const resourceName = params["resources"] || "";
+
+		delete params.resources;
 
 		this.resource = this.ctx.model[resourceName];
 
@@ -47,22 +49,31 @@ const Admin = class extends Controller {
 		return this.success(user);
 	}
 
-	async index() {
-		this.parseParams();
-		const {ctx} = this;
+	async search() {
+		const query = this.parseParams();
 
-		const query = ctx.query || {};
-		const list = await this.resource.findAll({where:query});
+		this.formatQuery(query);
+
+		const list = await this.resource.findAndCount({...this.queryOptions, where:query});
+
+		this.success(list);
+	}
+
+	async index() {
+		const query = this.parseParams();
+
+		this.formatQuery(query);
+
+		const list = await this.resource.findAll({...this.queryOptions, where:query});
 
 		this.success(list);
 	}
 
 	async show() {
-		this.parseParams();
-		const {ctx} = this;
-		const id = _.toNumber(ctx.params.id);
+		const params = this.parseParams();
+		const id = _.toNumber(params.id);
 
-		if (!id) ctx.throw(400, "args error");
+		if (!id) this.throw(400, "args error");
 
 		const data = await this.resource.findOne({where:{id}});
 
@@ -70,9 +81,7 @@ const Admin = class extends Controller {
 	}
 
 	async create() {
-		this.parseParams();
-		const {ctx} = this;
-		const params = ctx.request.body;
+		const params = this.parseParams();
 
 		const data = await this.resource.create(params);
 
@@ -80,12 +89,10 @@ const Admin = class extends Controller {
 	}
 
 	async update() {
-		this.parseParams();
-		const {ctx} = this;
-		const params = ctx.request.body;
-		const id = _.toNumber(ctx.params.id);
+		const params = this.parseParams();
+		const id = _.toNumber(params.id);
 
-		if (!id) ctx.throw(400, "args error");
+		if (!id) this.throw(400, "args error");
 
 		const data = await this.resource.update(params, {where:{id}});
 
@@ -93,11 +100,10 @@ const Admin = class extends Controller {
 	}
 
 	async destroy() {
-		this.parseParams();
-		const {ctx} = this;
-		const id = _.toNumber(ctx.params.id);
+		const params = this.parseParams();
+		const id = _.toNumber(params.id);
 
-		if (!id) ctx.throw(400, "args error");
+		if (!id) this.throw(400, "args error");
 
 		const data = await this.resource.destroy({where:{id}});
 

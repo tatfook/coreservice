@@ -143,6 +143,7 @@ module.exports = app => {
 
 	const admin = controller.admin;
 	router.post(`${prefix}admins/login`, admin.login);
+	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const trade = controller.trade;
