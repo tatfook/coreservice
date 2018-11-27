@@ -30,6 +30,7 @@ module.exports = {
 	OAUTH_SERVICE_TYPE_WEIXIN:1,  // 微信
 	OAUTH_SERVICE_TYPE_GITHUB:2,  // GITHUB
 	OAUTH_SERVICE_TYPE_XINLANG:3, // 新浪
+	OAUTH_SERVICE_TYPE_PARACRAFT_WORLD:4, // paracraft world
 
 	// 角色
 	USER_ROLE_NORMAL:0,     // 普通

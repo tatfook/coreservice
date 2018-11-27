@@ -2,6 +2,7 @@ const joi = require("joi");
 const axios = require("axios");
 const _ = require("lodash");
 
+const consts = require("../core/consts.js");
 const Controller = require("../core/controller.js");
 
 const User = class extends Controller {
@@ -104,10 +105,41 @@ const User = class extends Controller {
 		return this.success(user);
 	}
 
-	checkCellphoneCaptcha(cellphone, captcha) {
-		if (cache.captcha == captcha) return true;
+	async paracraftWorldLogin() {
+		const config = this.config.self;
+		const params = this.validate({uid:"string", token:"string"});
 
-		return false;
+		params["is_need_user_info"] = true;
+
+		const data = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
+		//if (data.status != 0) return this.success(data); 
+
+		let user = undefined, payload = {externalId: params.uid, type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD};
+		let token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD}});
+
+		if (!oauthUser) {
+			oauthUser = await this.model.oauthUsers.create({
+				externalId: params.uid,
+				type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD,
+				token: token,
+			});
+			if (!oauthUser) return this.throw(500);
+		}
+
+		oauthUser = oauthUser.get({plain:true});
+
+		if (oauthUser.userId) {
+			user = await this.model.users.findOne({where:{id:oauthUser.userId}});
+			if (user) {
+				user = user.get({plain:true});
+				payload.userId = user.id;
+				payload.username = user.username;
+				token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+			}
+		}
+
+		return this.success({user, token, qq: data});
 	}
 
 	async register() {
