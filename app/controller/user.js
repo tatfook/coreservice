@@ -122,6 +122,7 @@ const User = class extends Controller {
 		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
 		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
 		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname).trim("\r\n ");
+		qq.data.user_info.figureurl = Base64.decode(qq.data.user_info.figureurl).trim("\r\n ");
 		const nickname = qq.data.user_info.nickname;
 
 		let user = undefined, payload = {external:true};
@@ -142,7 +143,7 @@ const User = class extends Controller {
 			user = user.get({plain:true});
 			username = "qh" + moment().format("YYYYMMDD") + user.id;
 			await this.model.users.update({username}, {where:{id: user.id}});
-			user.username = user.nickname = username;
+			user.username = username;
 
 			// 同步用户到wikicraft
 			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
