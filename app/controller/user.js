@@ -112,7 +112,7 @@ const User = class extends Controller {
 		const params = this.validate({uid:"string", token:"string", platform:"string"});
 		const username = "qh" + uuidv1().replace(/-/g, "");
 		const password = username + _.random(100, 999);
-		const oauthTypes = {paracraftWorld: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD};
+		const oauthTypes = {qqHall: consts.OAUTH_SERVICE_TYPE_QQ_HALL};
 		const oauthType = oauthTypes[params.platform];
 		params["is_need_user_info"] = true;
 
