@@ -107,7 +107,7 @@ const User = class extends Controller {
 		return this.success(user);
 	}
 
-	async paracraftWorldLogin() {
+	async platformLogin() {
 		const config = this.config.self;
 		const params = this.validate({uid:"string", token:"string", platform:"string"});
 		const username = "qh" + uuidv1().replace(/-/g, "");

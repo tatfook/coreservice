@@ -15,7 +15,7 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
 
 	const user = controller.user;
-	router.post(`${prefix}users/paracraft_world_login`, user.paracraftWorldLogin);
+	router.post(`${prefix}users/platform_login`, user.platformLogin);
 	router.post(`${prefix}users/search`, user.search);
 	router.post(`${prefix}users/:id/contributions`, user.addContributions);
 	router.get(`${prefix}users/:id/contributions`, user.contributions);
