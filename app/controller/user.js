@@ -111,7 +111,7 @@ const User = class extends Controller {
 	async platformLogin() {
 		const config = this.config.self;
 		const params = this.validate({uid:"string", token:"string", platform:"string"});
-		const username = "qh" + uuidv1().replace(/-/g, "");
+		let username = "qh" + uuidv1().replace(/-/g, "");
 		const password = username + _.random(100, 999);
 		const oauthTypes = {qqHall: consts.OAUTH_SERVICE_TYPE_QQ_HALL};
 		const oauthType = oauthTypes[params.platform];
@@ -120,8 +120,8 @@ const User = class extends Controller {
 		if (oauthType == undefined) return this.throw(400, 参数错误);
 
 		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
-		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
-		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname);
+		//if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
+		//qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname);
 
 		let user = undefined, payload = {external:true};
 		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
@@ -132,19 +132,23 @@ const User = class extends Controller {
 		}
 		
 		if (!user) {  // 用户不存在则注册用户
-			// 同步用户到wikicraft
-			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
-			if (!data || data.error.id != 0) {
-				console.log("创建wikicraft用户失败", data);
-				return this.fail(-1, 400, data);
-			} 
 			user = await this.model.users.create({
-				nickname: username,
 				username: username,
 				password: this.app.util.md5(password),
 			});
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
+			username = "qh" + moment().format("YYYYMMDD") + user.id;
+			await this.model.users.update({username, nickname:username}, {where:{id: user.id}});
+			user.username = user.nickname = username;
+
+			// 同步用户到wikicraft
+			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
+			if (!data || data.error.id != 0) {
+				await this.model.users.destroy({where:{id:user.id}});
+				console.log("创建wikicraft用户失败", data);
+				return this.fail(-1, 400, data);
+			} 
 			const ok = await this.app.api.createGitUser({
 				id: user.id,
 				username: username,
