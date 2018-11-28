@@ -121,7 +121,8 @@ const User = class extends Controller {
 
 		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
 		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
-		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname);
+		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname).trim("\r\n ");
+		const nickname = qq.data.user_info.nickname;
 
 		let user = undefined, payload = {external:true};
 		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
@@ -133,13 +134,14 @@ const User = class extends Controller {
 		
 		if (!user) {  // 用户不存在则注册用户
 			user = await this.model.users.create({
+				nickname,
 				username: username,
 				password: this.app.util.md5(password),
 			});
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
 			username = "qh" + moment().format("YYYYMMDD") + user.id;
-			await this.model.users.update({username, nickname:username}, {where:{id: user.id}});
+			await this.model.users.update({username}, {where:{id: user.id}});
 			user.username = user.nickname = username;
 
 			// 同步用户到wikicraft
@@ -175,6 +177,7 @@ const User = class extends Controller {
 		payload.userId = user.id;
 		payload.username = user.username;
 		delete user.password;
+		delete qq.data.token;
 		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
 
 		return this.success({kp:{user, token}, qq});
