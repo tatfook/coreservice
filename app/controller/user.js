@@ -1,5 +1,7 @@
 const joi = require("joi");
 const axios = require("axios");
+const uuidv1 = require('uuid/v1');
+const moment = require("moment");
 const _ = require("lodash");
 
 const consts = require("../core/consts.js");
@@ -107,39 +109,68 @@ const User = class extends Controller {
 
 	async paracraftWorldLogin() {
 		const config = this.config.self;
-		const params = this.validate({uid:"string", token:"string"});
-
+		const params = this.validate({uid:"string", token:"string", platform:"string"});
+		const username = "qh" + uuidv1().replace(/-/g, "");
+		const password = username + _.random(100, 999);
+		const oauthTypes = {paracraftWorld: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD};
+		const oauthType = oauthTypes[params.platform];
 		params["is_need_user_info"] = true;
 
-		const data = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
-		//if (data.status != 0) return this.success(data); 
+		if (oauthType == undefined) return this.throw(400, 参数错误);
 
-		let user = undefined, payload = {externalId: params.uid, type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD};
-		let token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
-		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD}});
+		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
+		//if (qq.data.status != 0) return this.success(qq); 
 
-		if (!oauthUser) {
-			oauthUser = await this.model.oauthUsers.create({
-				externalId: params.uid,
-				type: consts.OAUTH_SERVICE_TYPE_PARACRAFT_WORLD,
-				token: token,
-			});
-			if (!oauthUser) return this.throw(500);
-		}
+		let user = undefined, payload = {external:true};
+		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
 
-		oauthUser = oauthUser.get({plain:true});
-
-		if (oauthUser.userId) {
+		if (oauthUser && oauthUser.userId) {
 			user = await this.model.users.findOne({where:{id:oauthUser.userId}});
-			if (user) {
-				user = user.get({plain:true});
-				payload.userId = user.id;
-				payload.username = user.username;
-				token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+			user = user && user.get({plain:true});
+		}
+		
+		if (!user) {  // 用户不存在则注册用户
+			// 同步用户到wikicraft
+			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
+			if (!data || data.error.id != 0) {
+				console.log("创建wikicraft用户失败", data);
+				return this.fail(-1, 400, data);
+			} 
+			user = await this.model.users.create({
+				nickname: username,
+				username: username,
+				password: this.app.util.md5(password),
+			});
+			if (!user) return this.fail(0);
+			user = user.get({plain:true});
+			const ok = await this.app.api.createGitUser({
+				id: user.id,
+				username: username,
+				password: password,
+				extra:{external: true},
+			});
+			if (!ok) {
+				await this.model.users.destroy({where:{id:user.id}});
+				return this.fail(6);
 			}
+			await this.app.api.createGitProject({
+				username: user.username,
+				sitename: '__keepwork__',
+				visibility: 'public',
+			});
+
+			await this.model.oauthUsers.upsert({
+				userId: user.id,
+				externalId: params.uid,
+				type: oauthType,
+			});
 		}
 
-		return this.success({user, token, qq: data});
+		payload.userId = user.id;
+		payload.username = user.username;
+		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+
+		return this.success({kp:{user, token}, qq});
 	}
 
 	async register() {
