@@ -2,6 +2,7 @@ const joi = require("joi");
 const axios = require("axios");
 const uuidv1 = require('uuid/v1');
 const moment = require("moment");
+const Base64 = require('js-base64').Base64;
 const _ = require("lodash");
 
 const consts = require("../core/consts.js");
@@ -120,6 +121,7 @@ const User = class extends Controller {
 
 		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
 		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
+		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname);
 
 		let user = undefined, payload = {external:true};
 		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
@@ -168,6 +170,7 @@ const User = class extends Controller {
 
 		payload.userId = user.id;
 		payload.username = user.username;
+		delete user.password;
 		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
 
 		return this.success({kp:{user, token}, qq});
