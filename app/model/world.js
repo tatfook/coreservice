@@ -87,6 +87,16 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.__hook__ = async function(data, oper) {
+		//if (oper == "update") return;
+
+		const {userId} = data;
+
+		const count = await app.model.worlds.count({where:{userId}});
+		await app.model.userRanks.update({world:count}, {where:{userId}});
+		//await app.model.userRanks.increment({project:1})
+	}
+
 	model.getById = async function(id, userId) {
 		const where = {id};
 

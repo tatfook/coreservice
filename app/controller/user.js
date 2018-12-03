@@ -351,10 +351,32 @@ const User = class extends Controller {
 			return this.success("OK");
 		}
 
-		if (!params.isBind) cellphone = "";
+		if (!params.isBind) cellphone = null;
 
 		await this.model.users.update({cellphone}, {where:{id:userId}});
 		return this.success("OK");
+	}
+
+	async captchaVerify(key, captcha) {
+		const cache = await this.model.caches.get(key);
+		console.log(cache, captcha, key);
+		if (!captcha || !cache || cache.captcha != captcha) return false;
+
+		return true;
+	}
+
+	async resetPassword() {
+		const {key, password, captcha} = this.validate({key:"string", password:"string", captcha:"string"});
+		const ok = await this.captchaVerify(key, captcha);
+		if (!ok) return this.fail(5);
+		const result = await this.model.users.update({
+			password: this.app.util.md5(password),
+		}, {
+			where:{$or: [{email:key}, {cellphone:key}]}
+		});
+		if (result[0] == 1) return this.success("OK");
+
+		return this.fail(10);	
 	}
 
 	// 邮箱验证第一步

@@ -11,6 +11,7 @@ module.exports = app => {
 	const models = {
 		users:"users", 
 		sites:"sites", 
+		worlds: "worlds",
 		packages:"packages", 
 		projects:"projects",
 		favorites: "favorites",

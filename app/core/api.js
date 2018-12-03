@@ -134,6 +134,7 @@ class Api  {
 			display_name: inst.displayName,
 			cover: inst.extra.imageUrl,
 			description: inst.description,
+			created_time: inst.createdAt,
 		}, this.esConfig);
 	}
 
