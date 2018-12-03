@@ -1,5 +1,18 @@
 const _ = require("lodash");
 
+const {
+	ENTITY_TYPE_USER,
+	ENTITY_TYPE_SITE,
+	ENTITY_TYPE_PAGE,
+	ENTITY_TYPE_PROJECT,
+
+	PROJECT_PRIVILEGE_RECRUIT_ENABLE,
+	PROJECT_PRIVILEGE_RECRUIT_DISABLE,
+
+	PROJECT_TYPE_PARACRAFT,
+	PROJECT_TYPE_SITE
+} = require("../core/consts.js");
+
 module.exports = app => {
 	const {
 		BIGINT,
