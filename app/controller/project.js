@@ -30,8 +30,11 @@ const Project = class extends Controller {
 			await this.model.projects.destroy({where:{id:projectId}});
 			return false;
 		};
-		await this.model.worlds.upsert({worldName, projectId, userId});
-		//await this.model.projects.update({status:2}, {where:{id:projectId}});
+		try {
+			await this.model.worlds.create({worldName, projectId, userId});
+			//await this.model.projects.update({status:2}, {where:{id:projectId}});
+		} catch(e) {
+		}
 
 		return true;
 	}
