@@ -122,20 +122,20 @@ class Api  {
 	}
 
 	async sitesUpsert(inst) {
-		_.each(inst, (val, key) => {
-			if (val == null) delete inst[key];
-		});
+		//_.each(inst, (val, key) => {
+			//if (val == null) delete inst[key];
+		//});
 
-		return this.curl('post', `/sites/${inst.id}/upsert`, {
-		//return await this.curl('post', `/sites/${inst.id}/upsert`, {
-			id: inst.id,
-			username: inst.username,
-			sitename: inst.sitename,
-			display_name: inst.displayName,
-			cover: inst.extra.imageUrl,
-			description: inst.description,
-			created_time: inst.createdAt,
-		}, this.esConfig);
+		//return this.curl('post', `/sites/${inst.id}/upsert`, {
+		////return await this.curl('post', `/sites/${inst.id}/upsert`, {
+			//id: inst.id,
+			//username: inst.username,
+			//sitename: inst.sitename,
+			//display_name: inst.displayName,
+			//cover: inst.extra.imageUrl,
+			//description: inst.description,
+			//created_time: inst.createdAt,
+		//}, this.esConfig);
 	}
 
 	async projectsUpsert(inst) {
@@ -189,7 +189,7 @@ class Api  {
 	}
 
 	async sitesDestroy({id}) {
-		return await this.curl('delete', `/sites/${id}`, {}, this.esConfig);
+		//return await this.curl('delete', `/sites/${id}`, {}, this.esConfig);
 	}
 
 	async projectsDestroy({id, userId}) {
