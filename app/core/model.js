@@ -15,6 +15,8 @@ module.exports = app => {
 		packages:"packages", 
 		projects:"projects",
 		favorites: "favorites",
+		issues: "issues",
+		comments: "comments",
 	};
 
 	const map = {};
