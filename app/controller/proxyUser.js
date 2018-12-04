@@ -60,7 +60,9 @@ const ProxyUser = class extends Controller {
 		});
 		if (!data || data.error.id != 0) return this.success(data || {error:-1, message:"wikicraft用户创建失败"});
 		
-		user = await this.model.users.create({username, password:this.app.util.md5(password)});
+		user = await this.model.users.create({
+			username: username.toLowerCase(),
+		   	password:this.app.util.md5(password)});
 		if (!user) return this.success({error:{id:-1, message:"服务器内部错误"}});
 
 		const ok = await this.app.api.createGitUser(user);

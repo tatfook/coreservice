@@ -112,6 +112,7 @@ const User = class extends Controller {
 		const config = this.config.self;
 		const params = this.validate({uid:"string", token:"string", platform:"string"});
 		let username = "qh" + uuidv1().replace(/-/g, "");
+		let nickname = username;
 		const password = username + _.random(100, 999);
 		const oauthTypes = {qqHall: consts.OAUTH_SERVICE_TYPE_QQ_HALL};
 		const oauthType = oauthTypes[params.platform];
@@ -123,7 +124,7 @@ const User = class extends Controller {
 		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
 		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname).trim("\r\n ");
 		qq.data.user_info.figureurl = Base64.decode(qq.data.user_info.figureurl).trim("\r\n ");
-		const nickname = qq.data.user_info.nickname;
+		nickname = qq.data.user_info.nickname;
 
 		let user = undefined, payload = {external:true};
 		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
@@ -195,12 +196,13 @@ const User = class extends Controller {
 			"username":"string",
 			"password":"string",
 		});
-		const {username, password} = params;
+		let {username, password} = params;
+		username = username.toLowerCase();
 
-		const words = await this.app.ahocorasick.check(params.username);
+		const words = await this.app.ahocorasick.check(username);
 		if (words.length) return this.fail(8);
-		if (!usernameReg.test(params.username)) return this.fail(2);
-		let user = await model.users.getByName(params.username);
+		if (!usernameReg.test(username)) return this.fail(2);
+		let user = await model.users.getByName(username);
 		if (user) return this.fail(3);
 
 		// 同步用户到wikicraft
@@ -225,8 +227,8 @@ const User = class extends Controller {
 
 		user = await model.users.create({
 			cellphone: params.cellphone,
-			nickname: params.nickname || params.username,
-			username: params.username,
+			nickname: params.nickname || username,
+			username: username,
 			password: util.md5(params.password),
 			realname: cellphone,
 		});

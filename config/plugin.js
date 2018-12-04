@@ -12,5 +12,9 @@ exports.cors = {
 exports.validate = {
 	enable: true,
 	package: 'egg-validate',
-};
+}
 
+exports.graphql = {
+	enable: true,
+	package: 'egg-graphql',
+}
