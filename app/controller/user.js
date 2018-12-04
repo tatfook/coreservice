@@ -120,7 +120,13 @@ const User = class extends Controller {
 
 		if (oauthType == undefined) return this.throw(400, 参数错误);
 
-		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
+		let qq = {};
+		try {
+			qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
+		} catch(e) {
+			return this.throw(400, "平台登录失败"); 
+		}
+
 		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
 		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname).trim("\r\n ");
 		qq.data.user_info.figureurl = Base64.decode(qq.data.user_info.figureurl).trim("\r\n ");

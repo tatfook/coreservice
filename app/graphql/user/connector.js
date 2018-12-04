@@ -35,6 +35,10 @@ class UserConnector {
 	async fetchContributionsByUserId(userId, years) {
 		return {data:await this.model.contributions.getByUserId(userId, years)};
 	}
+
+	async fetchFansByUserId(userId, page, perPage) {
+		return this.model.favorites.getFollows(userId);
+	}
 }
 
 module.exports = UserConnector;
