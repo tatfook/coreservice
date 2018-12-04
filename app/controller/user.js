@@ -1,7 +1,11 @@
 const joi = require("joi");
 const axios = require("axios");
+const uuidv1 = require('uuid/v1');
+const moment = require("moment");
+const Base64 = require('js-base64').Base64;
 const _ = require("lodash");
 
+const consts = require("../core/consts.js");
 const Controller = require("../core/controller.js");
 
 const User = class extends Controller {
@@ -104,10 +108,81 @@ const User = class extends Controller {
 		return this.success(user);
 	}
 
-	checkCellphoneCaptcha(cellphone, captcha) {
-		if (cache.captcha == captcha) return true;
+	async platformLogin() {
+		const config = this.config.self;
+		const params = this.validate({uid:"string", token:"string", platform:"string"});
+		let username = "qh" + uuidv1().replace(/-/g, "");
+		let nickname = username;
+		const password = username + _.random(100, 999);
+		const oauthTypes = {qqHall: consts.OAUTH_SERVICE_TYPE_QQ_HALL};
+		const oauthType = oauthTypes[params.platform];
+		params["is_need_user_info"] = true;
 
-		return false;
+		if (oauthType == undefined) return this.throw(400, 参数错误);
+
+		const qq = await axios.post(config.paracraftWorldLoginUrl, params).then(res => res.data);
+		if (qq.data.status != 0) return this.throw(400, "平台登录失败"); 
+		qq.data.user_info.nickname = Base64.decode(qq.data.user_info.nickname).trim("\r\n ");
+		qq.data.user_info.figureurl = Base64.decode(qq.data.user_info.figureurl).trim("\r\n ");
+		nickname = qq.data.user_info.nickname;
+
+		let user = undefined, payload = {external:true};
+		let oauthUser = await this.model.oauthUsers.findOne({where:{externalId:params.uid, type: oauthType}});
+
+		if (oauthUser && oauthUser.userId) {
+			user = await this.model.users.findOne({where:{id:oauthUser.userId}});
+			user = user && user.get({plain:true});
+		}
+		
+		if (!user) {  // 用户不存在则注册用户
+			user = await this.model.users.create({
+				nickname,
+				username: username,
+				password: this.app.util.md5(password),
+			});
+			if (!user) return this.fail(0);
+			user = user.get({plain:true});
+			username = "qh" + moment().format("YYYYMMDD") + user.id;
+			await this.model.users.update({username}, {where:{id: user.id}});
+			user.username = username;
+
+			// 同步用户到wikicraft
+			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
+			if (!data || data.error.id != 0) {
+				await this.model.users.destroy({where:{id:user.id}});
+				console.log("创建wikicraft用户失败", data);
+				return this.fail(-1, 400, data);
+			} 
+			const ok = await this.app.api.createGitUser({
+				id: user.id,
+				username: username,
+				password: password,
+				extra:{external: true},
+			});
+			if (!ok) {
+				await this.model.users.destroy({where:{id:user.id}});
+				return this.fail(6);
+			}
+			await this.app.api.createGitProject({
+				username: user.username,
+				sitename: '__keepwork__',
+				visibility: 'public',
+			});
+
+			await this.model.oauthUsers.upsert({
+				userId: user.id,
+				externalId: params.uid,
+				type: oauthType,
+			});
+		}
+
+		payload.userId = user.id;
+		payload.username = user.username;
+		delete user.password;
+		delete qq.data.token;
+		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+
+		return this.success({kp:{user, token}, qq});
 	}
 
 	async register() {
@@ -121,12 +196,13 @@ const User = class extends Controller {
 			"username":"string",
 			"password":"string",
 		});
-		const {username, password} = params;
+		let {username, password} = params;
+		username = username.toLowerCase();
 
-		const words = await this.app.ahocorasick.check(params.username);
+		const words = await this.app.ahocorasick.check(username);
 		if (words.length) return this.fail(8);
-		if (!usernameReg.test(params.username)) return this.fail(2);
-		let user = await model.users.getByName(params.username);
+		if (!usernameReg.test(username)) return this.fail(2);
+		let user = await model.users.getByName(username);
 		if (user) return this.fail(3);
 
 		// 同步用户到wikicraft
@@ -151,8 +227,8 @@ const User = class extends Controller {
 
 		user = await model.users.create({
 			cellphone: params.cellphone,
-			nickname: params.nickname || params.username,
-			username: params.username,
+			nickname: params.nickname || username,
+			username: username,
 			password: util.md5(params.password),
 			realname: cellphone,
 		});
@@ -277,10 +353,32 @@ const User = class extends Controller {
 			return this.success("OK");
 		}
 
-		if (!params.isBind) cellphone = "";
+		if (!params.isBind) cellphone = null;
 
 		await this.model.users.update({cellphone}, {where:{id:userId}});
 		return this.success("OK");
+	}
+
+	async captchaVerify(key, captcha) {
+		const cache = await this.model.caches.get(key);
+		console.log(cache, captcha, key);
+		if (!captcha || !cache || cache.captcha != captcha) return false;
+
+		return true;
+	}
+
+	async resetPassword() {
+		const {key, password, captcha} = this.validate({key:"string", password:"string", captcha:"string"});
+		const ok = await this.captchaVerify(key, captcha);
+		if (!ok) return this.fail(5);
+		const result = await this.model.users.update({
+			password: this.app.util.md5(password),
+		}, {
+			where:{$or: [{email:key}, {cellphone:key}]}
+		});
+		if (result[0] == 1) return this.success("OK");
+
+		return this.fail(10);	
 	}
 
 	// 邮箱验证第一步
@@ -369,8 +467,14 @@ const User = class extends Controller {
 		const {id} = this.validate({id:'int'});
 		const user = await this.model.users.getById(id);
 		if (!user) this.throw(400);
-		
-		user.siteCount = await this.model.sites.getCountByUserId(id);
+
+		const rank = await this.model.userRanks.getByUserId(id);
+		const contributions = await this.model.contributions.getByUserId(id);
+
+		user.rank = rank;
+		user.contributions = contributions;
+
+		return this.success(user);
 	}
 
 	async sites() {
@@ -384,6 +488,24 @@ const User = class extends Controller {
 		const joinSites = await this.model.sites.getJoinSites(userId, 0);
 
 		return this.success(sites.concat(joinSites));
+	}
+	
+	// 增加用户活跃度
+	async addContributions() {
+		const {userId} = this.authenticated();
+		const {id, count=1} = this.validate({id:"int", count:"int_optional"});
+		
+		await this.model.contributions.addContributions(userId, count);
+
+		return this.success("OK");
+	}
+
+	// 获取用户的活跃度
+	async contributions() {
+		const {id} = this.validate({id:'int'});
+		const data = await this.model.contributions.getByUserId(id);
+
+		return this.success(data);
 	}
 }
 

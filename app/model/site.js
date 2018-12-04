@@ -77,6 +77,15 @@ module.exports = app => {
 	});
 
 	//model.sync({force:true});
+	model.__hook__ = async function(data, oper) {
+		//if (oper == "update") return;
+
+		const {userId} = data;
+
+		const count = await app.model.sites.count({where:{userId}});
+		await app.model.userRanks.update({site:count}, {where:{userId}});
+		//await app.model.userRanks.increment({project:1})
+	}
 
 	model.get = async function(userId) {
 		const list = await app.model.sites.findAll({where:{userId}});

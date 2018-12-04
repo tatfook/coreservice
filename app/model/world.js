@@ -87,6 +87,26 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.__hook__ = async function(data, oper) {
+		//if (oper == "update") return;
+
+		const {userId} = data;
+
+		const count = await app.model.worlds.count({where:{userId}});
+		await app.model.userRanks.update({world:count}, {where:{userId}});
+		//await app.model.userRanks.increment({project:1})
+	}
+
+	model.getById = async function(id, userId) {
+		const where = {id};
+
+		if (userId) where.userId = userId;
+
+		const data = await app.model.sites.findOne({where: where});
+
+		return data && data.get({plain:true});
+	}
+
 	model.getByProjectId = async function(projectId) {
 		const world = await app.model.worlds.findOne({where:{projectId}});
 		

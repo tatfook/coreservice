@@ -1,5 +1,18 @@
 const _ = require("lodash");
 
+const {
+	ENTITY_TYPE_USER,
+	ENTITY_TYPE_SITE,
+	ENTITY_TYPE_PAGE,
+	ENTITY_TYPE_PROJECT,
+
+	PROJECT_PRIVILEGE_RECRUIT_ENABLE,
+	PROJECT_PRIVILEGE_RECRUIT_DISABLE,
+
+	PROJECT_TYPE_PARACRAFT,
+	PROJECT_TYPE_SITE
+} = require("../core/consts.js");
+
 module.exports = app => {
 	const {
 		BIGINT,
@@ -87,6 +100,13 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.__hook__ = async function(data, oper) {
+		if (oper == "create" && data.objectType == ENTITY_TYPE_PROJECT) {
+			// ISSUE创建  活跃度加1
+			await app.model.contributions.addContributions(data.userId);
+		}
+	}
+
 	model.getById = async function(id, userId) {
 		const where = {id};
 

@@ -3,6 +3,7 @@ const {
 	ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
 	ENTITY_TYPE_PAGE,
+	ENTITY_TYPE_ISSUE,
 	ENTITY_TYPE_PROJECT,
 } = require("../core/consts.js");
 
@@ -57,6 +58,13 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	model.__hook__ = async function(data, oper) {
+		if (oper == "create" && (data.objectType == ENTITY_TYPE_PROJECT || data.objectType == ENTITY_TYPE_ISSUE)) {
+			// 项目评论 ISSUE回复  活跃度加1
+			await app.model.contributions.addContributions(data.userId);
+		}
+	}
+
 	model.createComment = async function(userId, objectId, objectType, content) {
 		const user = await app.model.users.getById(userId);
 		if (!user) return ;
