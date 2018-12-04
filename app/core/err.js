@@ -25,5 +25,6 @@ new Err(6, "创建git用户失败");
 new Err(7, "无权限操作");
 new Err(8, "内容不合法,包含铭感词");
 new Err(9, "创建world失败");
+new Err(10, "未绑定用户");
 
 module.exports = Err;

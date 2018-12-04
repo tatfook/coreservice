@@ -1,0 +1,37 @@
+
+
+type User {
+	id: ID!
+	username: String!
+	nickname: String!
+	email: String
+	cellphone: String
+	portrait: String
+	sex: String
+	description: String
+	extra: Json!
+	rank: UserRank!
+	contributions(years: String): Contribution 
+	fans(page: Int = 1, perPage: Int = 100): [Favorite]
+	favorites(page: Int = 1, perPage: Int = 100): [Favorite]
+}
+
+type UserRank {
+	id: ID!
+	userId: Int!
+	project: Int
+	site: Int
+	world: Int
+	follow: Int
+	fans: Int
+	active: Int
+	extra: Json
+}
+
+type Contribution {
+	data: Json
+}
+
+type FansUser {
+	id ID!
+}

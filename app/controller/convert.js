@@ -5,7 +5,7 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 
-//const sites = require("./sites.js");
+const sites = require("./sites.js");
 
 const {
 	ENTITY_TYPE_USER,
@@ -108,6 +108,21 @@ const Convert = class extends Controller {
 		return this.success(datas);
 	}
 
+	async convertSiteVisibility() {
+		const compare = (s1, s2) => s1.username == s2.username && (s1.sitename || s1.name) == (s2.sitename || s2.name);
+		const datas = _.uniqWith(sites, compare);
+		for (let i = 0; i < datas.length; i++) {
+			const data = datas[i];
+			const username = data.username;
+			const sitename = data.name || data.sitename;
+			const visibility = data.visibility == "private" ? 1 : 0;
+
+			await this.model.sites.update({visibility}, {where:{username, sitename}});
+		}
+		
+		return this.success("OK");
+	}
+
 	async convertSiteFile() {
 		const compare = (s1, s2) => s1.username == s2.username && (s1.sitename || s1.name) == (s2.sitename || s2.name);
 		const datas = _.uniqWith(sites, compare);
@@ -130,7 +145,7 @@ const Convert = class extends Controller {
 			userId: user.id,
 			username: user.username,
 			sitename: data.name || data.sitename,
-			visibility: data.visibility == "public" ? 0 : 1,
+			visibility: data.visibility == "private" ? 1 : 0,
 			description: data.desc,
 			extra: {
 				logoUrl: data.logoUrl,

@@ -15,7 +15,10 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
 
 	const user = controller.user;
+	router.post(`${prefix}users/platform_login`, user.platformLogin);
 	router.post(`${prefix}users/search`, user.search);
+	router.post(`${prefix}users/:id/contributions`, user.addContributions);
+	router.get(`${prefix}users/:id/contributions`, user.contributions);
 	router.get(`${prefix}users/:id/detail`, user.detail);
 	router.get(`${prefix}users/:id/sites`, user.sites);
 	router.get(`${prefix}users/tokeninfo`, user.tokeninfo);
@@ -29,6 +32,7 @@ module.exports = app => {
 	router.post(`${prefix}users/email_captcha`, user.emailVerifyTwo);
 	router.get(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyOne);
 	router.post(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyTwo);
+	router.post(`${prefix}users/reset_password`, user.resetPassword);
 	router.resources(`${prefix}users`, user);
 
 	const site = controller.site;
@@ -41,6 +45,7 @@ module.exports = app => {
 	router.resources(`${prefix}sites`, site);
 
 	const page = controller.page;
+	router.post(`${prefix}pages/save`, page.save);
 	router.get(`${prefix}pages/visit`, page.visit);
 	router.resources(`${prefix}pages`, page);
 
@@ -99,6 +104,7 @@ module.exports = app => {
 	router.resources(`${prefix}tags`, tag);
 
 	const project = controller.project;
+	router.get(`${prefix}projects/importProjectCover`, project.importProjectCover);
 	router.get(`${prefix}projects/import`, project.importProject);
 	router.get(`${prefix}projects/:id/status`, project.status);
 	router.get(`${prefix}projects/join`, project.join);
@@ -128,6 +134,7 @@ module.exports = app => {
 
 	const convert = controller.convert;
 	router.get(`${prefix}converts`, convert.convert);
+	router.get(`${prefix}converts/siteVisibility`, convert.convertSiteVisibility);
 	router.get(`${prefix}converts/siteFile`, convert.convertSiteFile);
 	router.get(`${prefix}converts/userEmail`, convert.userEmail);
 	router.get(`${prefix}converts/users`, convert.users);
@@ -137,6 +144,8 @@ module.exports = app => {
 	router.get(`${prefix}converts/site_groups`, convert.siteGroups);
 
 	const admin = controller.admin;
+	router.post(`${prefix}admins/login`, admin.login);
+	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const trade = controller.trade;
@@ -144,6 +153,7 @@ module.exports = app => {
 	router.resources(`${prefix}trades`, trade);
 
 	const world = controller.world;
+	router.post(`${prefix}worlds/save`, world.save);
 	router.get(`${prefix}worlds/test`, world.test);
 	router.get(`${prefix}worlds/testDelete`, world.testDelete);
 	router.resources(`${prefix}worlds`, world);

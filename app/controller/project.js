@@ -1,9 +1,8 @@
 const joi = require("joi");
 const _ = require("lodash");
-//const worlds = require("./worlds.js");
+const worlds = require("./worlds.js");
 
-const {
-	ENTITY_TYPE_USER,
+const { ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
 	ENTITY_TYPE_PAGE,
 	ENTITY_TYPE_PROJECT,
@@ -31,8 +30,11 @@ const Project = class extends Controller {
 			await this.model.projects.destroy({where:{id:projectId}});
 			return false;
 		};
-		await this.model.worlds.upsert({worldName, projectId, userId});
-		//await this.model.projects.update({status:2}, {where:{id:projectId}});
+		try {
+			await this.model.worlds.create({worldName, projectId, userId});
+			//await this.model.projects.update({status:2}, {where:{id:projectId}});
+		} catch(e) {
+		}
 
 		return true;
 	}
@@ -301,6 +303,39 @@ const Project = class extends Controller {
 		}
 		//console.log(worlds.length);
 		return this.success(worlds);
+	}
+
+	async importProjectCover() {
+		//const worlds = await this.model.worlds.findAll({limit:100000});
+
+		for (let i = 0; i < worlds.length; i++) {
+			//const world = worlds[i].get({plain:true});
+			const world = worlds[i];
+			const {userid, worldsName, _id, commitId="master"} = world;
+
+			if (!world.preview) continue;
+			let previewUrl = world.preview;
+			try {
+				previewUrl = JSON.parse(world.preview)[0].previewUrl;
+			} catch(e) {
+				previewUrl = world.preview;
+			}
+
+			let project = await this.model.projects.findOne({where:{userId:userid, name: worldsName}});
+			if (!project) continue;
+			project = project.get({plain:true});
+			const extra = project.extra;
+
+			previewUrl = previewUrl.replace(/http:/, "https:");
+		   	const archiveUrl = previewUrl.replace(/\/raw\/.*$/, "") + '/repository/archive.zip?ref=' + commitId; 
+			await this.model.worlds.update({extra:{coverUrl: previewUrl}, archiveUrl}, {where:{userId:userid, worldName: worldsName}});
+			extra.imageUrl = previewUrl;
+			await this.model.projects.update({extra}, {where: {id: project.id}});
+		}
+
+		console.log(worlds.length);
+
+		return this.success("OK");
 	}
 }
 

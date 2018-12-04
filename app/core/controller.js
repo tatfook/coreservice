@@ -87,6 +87,15 @@ class BaseController extends Controller {
 		return user;
 	}
 
+	adminAuthenticated() {
+		const config = this.config.self;
+		const token = this.ctx.state.token;
+		const user = this.app.util.jwt_decode(token || "", config.adminSecret, true);
+		if (!user) return this.throw(401);
+		
+		return user;
+	}
+
 	success(body = "OK", status=200) {
 		this.ctx.status = status;
 		this.ctx.body = body;

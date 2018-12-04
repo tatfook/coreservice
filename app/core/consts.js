@@ -30,6 +30,7 @@ module.exports = {
 	OAUTH_SERVICE_TYPE_WEIXIN:1,  // 微信
 	OAUTH_SERVICE_TYPE_GITHUB:2,  // GITHUB
 	OAUTH_SERVICE_TYPE_XINLANG:3, // 新浪
+	OAUTH_SERVICE_TYPE_QQ_HALL:4, // QQ HALL
 
 	// 角色
 	USER_ROLE_NORMAL:0,     // 普通
@@ -90,6 +91,9 @@ module.exports = {
 
 	PROJECT_TYPE_SITE: 0,      // 网站项目
 	PROJECT_TYPE_PARACRAFT: 1, // paracraft 项目
+
+	// 管理员角色
+	ADMIN_ROLE_SUPER: 10,      // 超级管理员
 }
 
 

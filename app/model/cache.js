@@ -44,13 +44,13 @@ module.exports = app => {
 	
 	model.get = async function(key) {
 		let data = await app.model.caches.findOne({where:{key}});
-		if (!data) return ;
+		if (!data) return console.log("cache not found");
 
 		data = data.get({plain:true});
 
 		const curtime = (new Date()).getTime();
 
-		if (data.expire && curtime > data.expire) return ;
+		if (data.expire && curtime > data.expire) return console.log("cache 过期");
 
 		return data.value;
 	}

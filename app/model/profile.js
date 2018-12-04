@@ -48,12 +48,6 @@ module.exports = app => {
 		app.model.profiles.belongsTo(app.model.users);
 	}
 
-	model.put = async function(userId, data) {
-		const olddata = await this.get(userId);
-		_.merge(olddata, data);
-		return await this.set(userId, olddata);
-	}
-
 	model.set = async function(userId, data = {}) {
 		return await app.model.datas.update({data}, {where:{userId}});
 	}
