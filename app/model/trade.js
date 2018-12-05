@@ -39,7 +39,7 @@ module.exports = app => {
 
 		goodsId: {
 			type: BIGINT,  // 物品ID
-			allowNull: false,
+			defaultValue: 0,
 		},
 
 		state: {
@@ -60,10 +60,6 @@ module.exports = app => {
 
 		body: {                      // 商品描述信息
 			type: STRING(256),
-		},
-
-		extra: {                     // 交易额外参数
-			type: JSON,
 		},
 
 		description: {

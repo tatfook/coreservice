@@ -11,3 +11,10 @@ module.exports = {
 		},
 	},
 };
+
+
+	//fans(page: Int = 1, perPage: Int = 100): [Favorite]
+	//favorites(page: Int = 1, perPage: Int = 100): [Favorite]
+//type FansUser {
+	//id ID!
+//}

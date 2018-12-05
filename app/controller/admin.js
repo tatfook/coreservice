@@ -49,6 +49,17 @@ const Admin = class extends Controller {
 		return this.success(user);
 	}
 
+	async query() {
+		this.adminAuthenticated();
+
+		const {sql} = this.validate({sql:"string"});
+		const list = await this.model.query(sql, {
+			type: this.model.QueryTypes.SELECT,
+		});
+
+		return this.success(list);
+	}
+
 	async search() {
 		const query = this.parseParams();
 

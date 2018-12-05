@@ -144,11 +144,13 @@ module.exports = app => {
 	router.get(`${prefix}converts/site_groups`, convert.siteGroups);
 
 	const admin = controller.admin;
+	router.all(`${prefix}admins/query`, admin.query);
 	router.post(`${prefix}admins/login`, admin.login);
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const trade = controller.trade;
+	router.get(`${prefix}trades/:id/payQR`, trade.payQR);
 	router.post(`${prefix}trades/pingpp`, trade.pingpp);
 	router.resources(`${prefix}trades`, trade);
 
