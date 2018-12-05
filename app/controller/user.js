@@ -152,6 +152,9 @@ const User = class extends Controller {
 			await this.model.users.update({username}, {where:{id: user.id}});
 			user.username = username;
 
+			// 创建用户账号记录
+			await this.model.accounts.upsert({userId: user.id});
+
 			// 同步用户到wikicraft
 			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
 			if (!data || data.error.id != 0) {
@@ -241,6 +244,9 @@ const User = class extends Controller {
 
 		if (!user) return this.fail(0);
 		user = user.get({plain:true});
+
+		// 创建用户账号记录
+		await this.model.accounts.upsert({userId: user.id});
 
 		const ok = await this.app.api.createGitUser({
 			id: user.id,

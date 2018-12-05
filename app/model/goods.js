@@ -52,6 +52,11 @@ module.exports = app => {
 			type: STRING(128),
 		},
 
+		callbackData: {              // 回调Data
+			type: JSON,
+			defaultValue: {},
+		},
+
 		extra: {                     // 附加信息
 			type: JSON,
 			defaultValue: {},
