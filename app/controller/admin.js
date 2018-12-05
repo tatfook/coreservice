@@ -53,6 +53,18 @@ const Admin = class extends Controller {
 		this.adminAuthenticated();
 
 		const {sql} = this.validate({sql:"string"});
+		const _sql = sql.toLowerCase();
+		if (_sql.indexOf("select ") != 0 || 
+				_sql.indexOf(";") >= 0 ||
+				_sql.indexOf("drop ") >= 0 ||
+				_sql.indexOf("update ") >= 0 || 
+				_sql.indexOf("delete ") >= 0 ||
+				_sql.indexOf("create ") >= 0 ||
+				_sql.indexOf("show ") >= 0 ||
+				_sql.indexOf("alter ") >= 0) {
+			return this.throw(404, "sql 不合法");
+		}
+
 		const list = await this.model.query(sql, {
 			type: this.model.QueryTypes.SELECT,
 		});
