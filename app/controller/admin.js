@@ -56,6 +56,7 @@ const Admin = class extends Controller {
 		const _sql = sql.toLowerCase();
 		if (_sql.indexOf("select ") != 0 || 
 				_sql.indexOf(";") >= 0 ||
+				_sql.indexOf("upsert ") >= 0 ||
 				_sql.indexOf("drop ") >= 0 ||
 				_sql.indexOf("update ") >= 0 || 
 				_sql.indexOf("delete ") >= 0 ||
