@@ -149,9 +149,11 @@ module.exports = app => {
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.resources(`${prefix}admins/:resources`, admin);
 
+	const order = controller.order;
+	router.post(`${prefix}orders/charge`, order.charge);
+	router.resources(`${prefix}orders`, order);
+
 	const trade = controller.trade;
-	router.get(`${prefix}trades/:id/payQR`, trade.payQR);
-	router.post(`${prefix}trades/pingpp`, trade.pingpp);
 	router.resources(`${prefix}trades`, trade);
 
 	const world = controller.world;
