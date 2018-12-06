@@ -62,6 +62,9 @@ module.exports = app => {
 
 		await app.model.contributions.upsert(data);
 
+		// 增加用户总的活跃度
+		await app.model.userRanks.increment({active: count}, {where:{userId}});
+
 		return;
 	}
 
