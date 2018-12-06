@@ -476,12 +476,15 @@ const User = class extends Controller {
 	};
 
 	async detail() {
-		const {id} = this.validate({id:'int'});
-		const user = await this.model.users.getById(id);
+		//const {id} = this.validate({id:'int'});
+		//const user = await this.model.users.getById(id);
+		const {id} = this.validate();
+		const user = await this.model.users.get(id);
 		if (!user) this.throw(400);
 
-		const rank = await this.model.userRanks.getByUserId(id);
-		const contributions = await this.model.contributions.getByUserId(id);
+		const userId = user.id;
+		const rank = await this.model.userRanks.getByUserId(userId);
+		const contributions = await this.model.contributions.getByUserId(userId);
 
 		user.rank = rank;
 		user.contributions = contributions;
