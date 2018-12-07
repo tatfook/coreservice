@@ -522,6 +522,23 @@ const User = class extends Controller {
 
 		return this.success(data);
 	}
+
+	// 用户排行
+	async rank() {
+		const query = this.validate();
+		this.formatQuery(query);
+
+		const list = await this.model.userRanks.findAll({...this.queryOptions, where: query}).then(l => l.map(o => o.toJSON()));
+		const userIds = [];
+		const users = [];
+		
+		_.each(list, o => userIds.push(o.userId));
+
+		const usermap = await this.model.users.getUsers(userIds);
+		_.each(userIds, id => users.push(usermap[id]));
+
+		return this.success(users);
+	}
 }
 
 module.exports = User;

@@ -15,6 +15,7 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
 
 	const user = controller.user;
+	router.get(`${prefix}users/rank`, user.rank);
 	router.post(`${prefix}users/platform_login`, user.platformLogin);
 	router.post(`${prefix}users/search`, user.search);
 	router.post(`${prefix}users/:id/contributions`, user.addContributions);
