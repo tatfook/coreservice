@@ -71,3 +71,4 @@ module.exports = app => {
   //app.model.orders.sync({force:true});
   //app.model.discounts.sync({force:true});
 };
+
