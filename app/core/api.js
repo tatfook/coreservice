@@ -168,6 +168,7 @@ class Api  {
 			recent_like: inst.lastStar,
 			recent_view: inst.lastVisit,
 			updated_time: inst.updatedAt,
+			video: (inst.extra || {}).videoUrl,
 		}, this.esConfig);
 	}
 

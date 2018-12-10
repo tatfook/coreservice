@@ -21,6 +21,7 @@ module.exports = app => {
   app.unittest = app.config.env == 'unittest';
 
   console.log(app.config.self);
+  //console.log(app.lessonModel);
 
   sms(app);
   email(app);
@@ -64,4 +65,9 @@ module.exports = app => {
   //app.model.users.sync({force:true});
   //app.model.visitors.sync({force:true});
   //app.model.worlds.sync({force:true});
+
+  //app.model.accounts.sync({force:true});
+  //app.model.trades.sync({force:true});
+  //app.model.orders.sync({force:true});
+  //app.model.discounts.sync({force:true});
 };

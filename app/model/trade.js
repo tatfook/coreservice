@@ -19,55 +19,70 @@ module.exports = app => {
 			type: BIGINT,
 			allowNull:  false,
 		},
-		
-		type: {
-			type: INTEGER, // 0 - charge充值  1 - expense 消费 
-		},
-		
-		amount: {
+
+		type:{                       // 交易类型
 			type: INTEGER,
+			defaultValue: 0,
 		},
 
-		tradeNo: {
-			type: STRING(64), // 交易号
-			unique: true,
+		subject: {                   // 物品标题
+			type: STRING,
+			defaultValue: "",
 		},
 
-		pingppId: {
-			type: STRING(64), // pingppId
+		body: {                      // 物品描述
+			type: STRING,
+			defaultValue: "",
 		},
 
-		goodsId: {
-			type: BIGINT,  // 物品ID
-			allowNull: false,
+		count: {                     // 交易的数量
+			type: INTEGER,
+			defaultValue: 1,
 		},
 
-		state: {
-			type: BIGINT, // 交易状态
+		goodsId: {                   // 物品id
+			type: BIGINT,
+			defaultValue: 0,
 		},
 
-		callback: {                  // 交易成功回调通知 通过缓存解决
-			type: STRING(128),
+		discountId: {                // 优惠券id
+			type: BIGINT,
+			defaultValue: 0,
 		},
 
-		channel: {                   // 支付渠道
-			type: STRING(16),
+		rmb: {                       // 交易消耗或获取人民币
+			type: INTEGER,
+			defaultValue:0,
 		},
 
-		subject: {                   // 商品标题
-			type: STRING(64),
+		coin: {                      // 交易消耗或获取知识币
+			type: INTEGER,
+			defaultValue: 0,
 		},
 
-		body: {                      // 商品描述信息
-			type: STRING(256),
+		bean: {                      // 交易消耗或获取知识豆
+			type: INTEGER,
+			defaultValue: 0,
 		},
 
-		extra: {                     // 交易额外参数
-			type: JSON,
+		rewardRmb: {                 // 奖励rmb
+			type: INTEGER,
+			defaultValue:0,
 		},
 
-		description: {
-			type: STRING(256), // 交易附加信息
+		rewardCoin: {                // 奖励coin
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		rewardBean: {                // 奖励bean
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		description: {		          // 交易内容
+			type: STRING,       
+			defaultValue:"",
 		},
 
 		extra: {
@@ -84,7 +99,6 @@ module.exports = app => {
 	//model.sync({force:true});
 	
 	app.model.trades = model;
-
 	return model;
 };
 

@@ -12,8 +12,7 @@ type User {
 	extra: Json!
 	rank: UserRank!
 	contributions(years: String): Contribution 
-	fans(page: Int = 1, perPage: Int = 100): [Favorite]
-	favorites(page: Int = 1, perPage: Int = 100): [Favorite]
+	lesson: Lesson
 }
 
 type UserRank {
@@ -32,6 +31,4 @@ type Contribution {
 	data: Json
 }
 
-type FansUser {
-	id ID!
-}
+

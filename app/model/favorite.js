@@ -87,7 +87,7 @@ module.exports = app => {
 	
 	// 获取粉丝
 	model.getFollows = async function(objectId, objectType = ENTITY_TYPE_USER) {
-		const sql = `select users.id, users.username, users.nickname, users.portrait 
+		const sql = `select users.id, users.username, users.nickname, users.portrait, users.description 
 			from favorites, users
 			where favorites.userId = users.id and objectType = :objectType and favorites.objectId = :objectId`;
 
@@ -104,7 +104,7 @@ module.exports = app => {
 
 	// 关注
 	model.getFollowing = async function(userId) {
-		const sql = `select users.id, users.username, users.nickname, users.portrait 
+		const sql = `select users.id, users.username, users.nickname, users.portrait, users.description 
 			from favorites, users
 			where favorites.objectId = users.id and objectType = :objectType and favorites.userId = :userId`;
 

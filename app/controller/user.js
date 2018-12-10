@@ -152,6 +152,9 @@ const User = class extends Controller {
 			await this.model.users.update({username}, {where:{id: user.id}});
 			user.username = username;
 
+			// 创建用户账号记录
+			await this.model.accounts.upsert({userId: user.id});
+
 			// 同步用户到wikicraft
 			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
 			if (!data || data.error.id != 0) {
@@ -241,6 +244,9 @@ const User = class extends Controller {
 
 		if (!user) return this.fail(0);
 		user = user.get({plain:true});
+
+		// 创建用户账号记录
+		await this.model.accounts.upsert({userId: user.id});
 
 		const ok = await this.app.api.createGitUser({
 			id: user.id,
@@ -470,12 +476,15 @@ const User = class extends Controller {
 	};
 
 	async detail() {
-		const {id} = this.validate({id:'int'});
-		const user = await this.model.users.getById(id);
+		//const {id} = this.validate({id:'int'});
+		//const user = await this.model.users.getById(id);
+		const {id, username} = this.validate();
+		const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
 		if (!user) this.throw(400);
 
-		const rank = await this.model.userRanks.getByUserId(id);
-		const contributions = await this.model.contributions.getByUserId(id);
+		const userId = user.id;
+		const rank = await this.model.userRanks.getByUserId(userId);
+		const contributions = await this.model.contributions.getByUserId(userId);
 
 		user.rank = rank;
 		user.contributions = contributions;
@@ -512,6 +521,23 @@ const User = class extends Controller {
 		const data = await this.model.contributions.getByUserId(id);
 
 		return this.success(data);
+	}
+
+	// 用户排行
+	async rank() {
+		const query = this.validate();
+		this.formatQuery(query);
+
+		const list = await this.model.userRanks.findAll({...this.queryOptions, where: query}).then(l => l.map(o => o.toJSON()));
+		const userIds = [];
+		const users = [];
+		
+		_.each(list, o => userIds.push(o.userId));
+
+		const usermap = await this.model.users.getUsers(userIds);
+		_.each(userIds, id => users.push(usermap[id]));
+
+		return this.success(users);
 	}
 }
 

@@ -62,22 +62,34 @@ module.exports = {
 	// 申请类型
 	APPLY_TYPE_MEMBER:0,     // 成员申请
 
-	                       // 交易状态
-	TRADE_STATE_START:0,   // 交易开始
-	TRADE_STATE_PAYING:1,  // 交易进行中
-	TRADE_STATE_SUCCESS:2, // 交易成功
-	TRADE_STATE_FAILED:4,  // 交易失败
-	TRADE_STATE_FINISH:8,  // 交易完成
-	TRADE_STATE_REFUNDING:16, // 交易退款中
-	TRADE_STATE_REFUND_SUCCESS:32, // 交易退款完成
-	TRADE_STATE_REFUND_FAILED:64, // 退款失败
-	TRADE_STATE_CHARGING:128, // 交易充值中
-	TRADE_STATE_CHARGE_SUCCESS:256, // 交易充值完成
-	TRADE_STATE_CHARGE_FAILED:512, // 交易充值失败
+	                       // 订单状态
+	ORDER_STATE_START:0,   // 订单开始
+	ORDER_STATE_PAYING:1,  // 订单进行中
+	ORDER_STATE_SUCCESS:2, // 订单成功
+	ORDER_STATE_FAILED:4,  // 订单失败
+	ORDER_STATE_FINISH:8,  // 订单完成
+	ORDER_STATE_REFUNDING:16, // 订单退款中
+	ORDER_STATE_REFUND_SUCCESS:32, // 订单退款完成
+	ORDER_STATE_REFUND_FAILED:64, // 退款失败
+	ORDER_STATE_CHARGING:128, // 订单充值中
+	ORDER_STATE_CHARGE_SUCCESS:256, // 订单充值完成
+	ORDER_STATE_CHARGE_FAILED:512, // 订单充值失败
 
 	// 交易类型
-	TRADE_TYPE_CHARGE:0,  // 充值
-	TRADE_TYPE_EXPENSE:1, // 消费
+	TRADE_TYPE_CHARGE:0,      // 充值
+	TRADE_TYPE_EXCHANGE:1,    // 兑换
+	TRADE_TYPE_PACKAGE_BUY:2,   // 购买课程包
+	TRADE_TYPE_LESSON_STUDY: 3, // 课程学习
+
+	// 物品所属平台
+	GOODS_PLATFORM_KEEPWORK:0,   // keepwork 
+	GOODS_PLATFORM_LESSON:1,     // lesson
+	GOODS_PLATFORM_HAQI:2,       // haqi
+
+	// 优惠券类型
+	DISCOUNT_TYPE_DEFAULT:0,     // 通用性
+	DISCOUNT_TYPE_PACKAGE:1,     // 课程包
+
 
 	PROJECT_PRIVILEGE_RECRUIT_ENABLE: 1,  // 招募 开启
 	PROJECT_PRIVILEGE_RECRUIT_DISABLE: 2, // 招募 关闭
