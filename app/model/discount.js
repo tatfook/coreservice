@@ -22,6 +22,11 @@ module.exports = app => {
 			allowNull:  false,
 		},
 
+		type: {                       // 优惠券类型  0 - 通用性  1 - 课程包
+			type: INTEGER,
+			defaultValue: 0, 
+		},
+
 		state: {                      // 状态
 			type: INTEGER, 
 			defaultValue: 0,
@@ -57,17 +62,22 @@ module.exports = app => {
 			defaultValue:0,
 		},
 
-		description: {		          // 优惠券内容
+		title: {                      // 优惠券标题
 			type: STRING,       
 			defaultValue:"",
 		},
 
-		startDate: {                  // 开始日期
-			type: DATE,
+		description: {		          // 优惠券描述  备注
+			type: STRING,       
+			defaultValue:"",
 		},
 
-		endDate: {                    // 结束日期
-			type: DATE,
+		startTime: {                  // 开始日期
+			type: BIGINT,
+		},
+
+		endTime: {                    // 结束日期
+			type: BIGINT,
 		},
 
 		extra: {

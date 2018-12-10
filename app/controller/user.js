@@ -478,8 +478,8 @@ const User = class extends Controller {
 	async detail() {
 		//const {id} = this.validate({id:'int'});
 		//const user = await this.model.users.getById(id);
-		const {id} = this.validate();
-		const user = await this.model.users.get(id);
+		const {id, username} = this.validate();
+		const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
 		if (!user) this.throw(400);
 
 		const userId = user.id;

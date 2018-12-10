@@ -5,6 +5,9 @@ module.exports = {
 		rank(root, {userId}, ctx) {
 			return ctx.connector.user.fetchRankByUserId(root.id);
 		},
+		acount(root, _, ctx) {
+			return ctx.connector.user.fetchAccountByUserId(root.id);
+		},
 		contributions(root, {years}, ctx) {
 			years = (years || "").split(",");
 			return ctx.connector.user.fetchContributionsByUserId(root.id, years);

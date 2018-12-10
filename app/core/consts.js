@@ -81,6 +81,16 @@ module.exports = {
 	TRADE_TYPE_PACKAGE_BUY:2,   // 购买课程包
 	TRADE_TYPE_LESSON_STUDY: 3, // 课程学习
 
+	// 物品所属平台
+	GOODS_PLATFORM_KEEPWORK:0,   // keepwork 
+	GOODS_PLATFORM_LESSON:1,     // lesson
+	GOODS_PLATFORM_HAQI:2,       // haqi
+
+	// 优惠券类型
+	DISCOUNT_TYPE_DEFAULT:0,     // 通用性
+	DISCOUNT_TYPE_PACKAGE:1,     // 课程包
+
+
 	PROJECT_PRIVILEGE_RECRUIT_ENABLE: 1,  // 招募 开启
 	PROJECT_PRIVILEGE_RECRUIT_DISABLE: 2, // 招募 关闭
 	PROJECT_PRIVILEGE_COMMENT_ALL: 4,     // 评论 所有人

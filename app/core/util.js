@@ -1,5 +1,6 @@
 //const jwt = require("jwt-simple");
 const jwt = require("./jwt.js");
+const crypto = require("crypto");
 const _ = require("lodash");
 const Hashes = require("jshashes");
 const md5 = require("blueimp-md5");
@@ -133,6 +134,14 @@ util.getDate = function() {
 	
 	const datetime = year + month + day + hour + minute + second;
 	return {year, month, day, hour, minute, second, datetime};
+}
+
+util.rsaEncrypt = function(prvKey, message) {
+	return crypto.privateEncrypt(prvKey, Buffer.from(message, "utf8")).toString("hex");
+}
+
+util.rsaDecrypt = function(pubKey, sig) {
+	return crypto.publicDecrypt(pubKey, Buffer.from(sig, "hex")).toString("utf8");
 }
 
 module.exports = util;

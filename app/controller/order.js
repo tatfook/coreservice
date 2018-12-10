@@ -24,6 +24,9 @@ const {
 	TRADE_TYPE_EXCHANGE,
 	TRADE_TYPE_PACKAGE_BUY,
 	TRADE_TYPE_LESSON_STUDY,
+
+	DISCOUNT_TYPE_DEFAULT,
+	DISCOUNT_TYPE_PACKAGE,
 } = require("../core/consts.js");
 
 const generateQR = async text => {
@@ -166,13 +169,26 @@ const Order = class extends Controller {
 		order.state = state;
 		order.description = description;
 
-		// 
-		if (params.type == "charge.succeeded") {
-			//await this.chargeCallback(order);
-		//} else if (params.type == "refund.succeeded") {
-			//await this.refundCallback(order);
-		} else {
-		}
+		// 奖励优惠券
+		const startTime = new Date().getTime();
+		const endTime = startTime + 1000 * 3600 * 24 * 30;
+		const discounts = [
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime},
+		{coin:10, rewardRmb: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{bean:10, rewardRmb: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		];
+		const discount = discounts[_.random(0,3)];
+		discount.userId = userId;
+		await this.model.discounts.create(discount);
+
+		////  
+		//if (params.type == "charge.succeeded") {
+			////await this.chargeCallback(order);
+		////} else if (params.type == "refund.succeeded") {
+			////await this.refundCallback(order);
+		//} else {
+		//}
 		
 		return this.success("OK");
 	}

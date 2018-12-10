@@ -14,7 +14,12 @@ module.exports = app => {
 			autoIncrement: true,
 			primaryKey: true,
 		},
-		
+
+		platform: {                  // 物品所属平台
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		subject: {                   // 商品标题
 			type: STRING(64),
 		},
