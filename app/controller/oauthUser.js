@@ -24,6 +24,15 @@ const OauthUsers = class extends Controller {
 		return this.getConfig().apiUrlPrefix + "oauth_users/" + serverName;
 	}
 
+	async destroy() {
+		const {userId} = this.authenticated();
+		const {id, password} = this.validate({password:"string", id:"int"});
+
+		await this.model.oauthUsers.destroy({where:{userId, id}});
+
+		return this.success("OK");
+	}
+
 	async qq() {
 		const {ctx, model, app, axios} = this;
 		const config = this.getConfig();
