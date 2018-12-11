@@ -28,6 +28,10 @@ const OauthUsers = class extends Controller {
 		const {userId} = this.authenticated();
 		const {id, password} = this.validate({password:"string", id:"int"});
 
+		const user = await this.model.users.findOne({where: {userId, password: this.app.util.md5(password)}});
+
+		if (!user) return this.fail(11);
+
 		await this.model.oauthUsers.destroy({where:{userId, id}});
 
 		return this.success("OK");
