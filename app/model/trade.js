@@ -111,7 +111,7 @@ module.exports = app => {
 		collate: 'utf8mb4_bin',
 	});
 
-	model.sync({force:true});
+	//model.sync({force:true});
 	
 	app.model.trades = model;
 	return model;
