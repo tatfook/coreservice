@@ -246,8 +246,6 @@ const OauthUsers = class extends Controller {
 		if (!user) return this.success({token: oauthUser.token});
 		user = user.get({plain:true});
 
-		if (model.roles.isExceptionRole(user.roleId)) this.throw(403, "异常用户");
-
 		const token = this.util.jwt_encode({
 			userId: user.id,
 			roleId: user.roleId,

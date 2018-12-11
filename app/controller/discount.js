@@ -17,19 +17,13 @@ const Discount = class extends Controller {
 	}
 
 	async create() {
-
+		return this.success("OK");
 	}
-
-	async update() {
-
-	}
-
 	async destroy() {
-
+		return this.success("OK");
 	}
-
-	detail() {
-
+	async update() {
+		return this.success("OK");
 	}
 }
 

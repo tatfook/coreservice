@@ -103,13 +103,12 @@ const Project = class extends Controller {
 
 	async index() {
 		const userId = this.authenticated().userId;
-		const model = this.model[this.modelName];
 		const params = this.validate();
 		params.userId = userId;
 
 		this.formatQuery(params);
 
-		const list = await model.findAll({...this.queryOptions, where:params});
+		const list = await this.model.projects.findAll({...this.queryOptions, where:params});
 
 		await this.setProjectUser(list);
 

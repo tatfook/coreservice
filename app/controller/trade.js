@@ -76,14 +76,15 @@ const Trade = class extends Controller {
 		try {
 			// 签名内容
 			const sigcontent = uuidv1().replace(/-/g, "");
-			axios.post(goods.callback, callbackData, {
+			await axios.post(goods.callback, callbackData, {
 				headers: {
-					"Authorization": "Bearer " + this.ctx.state.token,  // 内部可直接使用token解析  外需只用rsa验证
 					"x-keepwork-signature": this.util.rsaEncrypt(this.config.self.rsa.privateKey, sigcontent),
 					"x-keepwork-sigcontent": sigcontent,
 				}
 			});
 		} catch(e) {
+			console.log(callbackData);
+			console.log(e);
 			return this.throw(500, "交易失败");
 		}
 
@@ -95,7 +96,7 @@ const Trade = class extends Controller {
 
 		// 创建交易记录
 		await this.model.trades.create({
-			type, goodsId, count, discount,
+			userId, type, goodsId, count, discount,
 			rmb: rmb, coin: coin, bean: bean,
 			subject: goods.subject,  body: goods.body,
 		});
