@@ -92,6 +92,7 @@ const Trade = class extends Controller {
 		
 		// 设置已使用优惠券
 		if (discount) await this.model.discounts.update({state:DISCOUNT_STATE_USED}, {where:{id: discount.id}});
+
 		// 创建交易记录
 		await this.model.trades.create({
 			type, goodsId, count, discount,
