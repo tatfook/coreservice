@@ -65,6 +65,21 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		realRmb: {                   // 交易实际消耗rmb
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		realCoin: {                  // 交易实际消耗coin
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		realBean: {                  // 交易实际消耗bean
+			type: INTEGER,
+			defaultValue:0,
+		},
+
 		rewardRmb: {                 // 奖励rmb
 			type: INTEGER,
 			defaultValue:0,
@@ -96,7 +111,7 @@ module.exports = app => {
 		collate: 'utf8mb4_bin',
 	});
 
-	//model.sync({force:true});
+	model.sync({force:true});
 	
 	app.model.trades = model;
 	return model;

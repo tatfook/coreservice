@@ -50,12 +50,13 @@ const Trade = class extends Controller {
 		const discount = await this.model.discounts.findOne({where:{id: discountId, userId, state:DISCOUNT_STATE_UNUSE}}).then(o => o && o.toJSON());
 		if (discountId && !discount) return this.throw(400, "优惠券不存在");
 
-		let rmb = (params.rmb || goods.rmb) * count;
-		let coin = (params.coin || goods.coin) * count;
-		let bean = (params.bean || goods.bean) * count;
+		const rmb = (params.rmb || goods.rmb) * count;
+		const coin = (params.coin || goods.coin) * count;
+		const bean = (params.bean || goods.bean) * count;
+		let realRmb = rmb;
+		let realCoin = coin;
+		let realBean = bean;
 		
-		callbackData.amount = {rmb, coin, bean};
-		callbackData.userId = params.userId || userId;  // 可帮别人买
 
 		if (discount) {
 			const types = {TRADE_TYPE_PACKAGE_BUY: DISCOUNT_TYPE_PACKAGE};
@@ -66,14 +67,17 @@ const Trade = class extends Controller {
 			const endtime = discount.endTime;
 			if (curtime < starttime || curtime >= endtime) return this.throw(400, "优惠券已过期");
 
-			rmb -= discount.rewardRmb;
-			coin -= discount.rewardCoin;
-			bean -= discount.rewardBean;
+			realRmb -= discount.rewardRmb;
+			realCoin -= discount.rewardCoin;
+			realBean -= discount.rewardBean;
 		}
 
-		if (account.rmb < rmb || account.coin < coin || account.bean < bean) return this.throw(400, "余额不足");
+		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) return this.throw(400, "余额不足");
 		
 		try {
+			callbackData.amount = {rmb, coin, bean};
+			callbackData.userId = params.userId || userId;  // 可帮别人买
+
 			// 签名内容
 			const sigcontent = uuidv1().replace(/-/g, "");
 			await axios.post(goods.callback, callbackData, {
@@ -89,7 +93,7 @@ const Trade = class extends Controller {
 		}
 
 		// 更新用户余额
-		await this.model.accounts.decrement({rmb, coin, bean}, {where: {userId}});
+		await this.model.accounts.decrement({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
 		
 		// 设置已使用优惠券
 		if (discount) await this.model.discounts.update({state:DISCOUNT_STATE_USED}, {where:{id: discount.id}});
@@ -97,7 +101,7 @@ const Trade = class extends Controller {
 		// 创建交易记录
 		await this.model.trades.create({
 			userId, type, goodsId, count, discount,
-			rmb: rmb, coin: coin, bean: bean,
+			rmb, coin, bean, realRmb, realCoin, realBean,
 			subject: goods.subject,  body: goods.body,
 		});
 
