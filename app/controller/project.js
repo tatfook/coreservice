@@ -93,10 +93,10 @@ const Project = class extends Controller {
 
 	async join() {
 		const user = this.getUser();
-		let {userId} = this.validate({userId: "int_optional"});
+		let {userId, exclude} = this.validate({userId: "int_optional", exclude:"boolean_optional"});
 		if (!user.userId && !userId) return this.throw(400, "参数错误");
 
-		const list = await this.model.projects.getJoinProjects(userId || user.userId, userId == user.userId ? undefined : 0);
+		const list = await this.model.projects.getJoinProjects(userId || user.userId, userId == user.userId ? undefined : 0, exclude);
 
 		await this.setProjectUser(list);
 
