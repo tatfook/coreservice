@@ -170,16 +170,19 @@ module.exports = app => {
 		return data && data.get({plain:true});
 	}
 
-	model.getJoinProjects = async function(userId) {
-		const sql = `select projects.* from projects, members where 
+	model.getJoinProjects = async function(userId, visibility) {
+
+		let sql = `select projects.* from projects, members where 
 			members.memberId = :memberId and projects.id = members.objectId 
 			and objectType = :objectType`;
+		if (visibility != undefined) sql += " and projects.visibility = :visibility";
 
 		const list = app.model.query(sql, {
 			type: app.model.QueryTypes.SELECT,
 			replacements: {
 				memberId: userId,
 			   	objectType: ENTITY_TYPE_PROJECT,
+				visibility,
 			}
 		});
 

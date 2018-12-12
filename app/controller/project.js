@@ -92,9 +92,11 @@ const Project = class extends Controller {
 	}
 
 	async join() {
-		const {userId} = this.authenticated();
+		const user = this.getUser();
+		let {userId} = this.validate({userId: "int_optional"});
+		if (!user.userId && !userId) return this.throw(400, "参数错误");
 
-		const list = await this.model.projects.getJoinProjects(userId);
+		const list = await this.model.projects.getJoinProjects(userId || user.userId, userId == user.userId ? undefined : 0);
 
 		await this.setProjectUser(list);
 
@@ -102,9 +104,12 @@ const Project = class extends Controller {
 	}
 
 	async index() {
-		const userId = this.authenticated().userId;
+		const user = this.getUser();
 		const params = this.validate();
-		params.userId = userId;
+
+		if (!params.userId && !user.userId) return this.throw(400, "参数错误");
+		params.userId = params.userId || user.userId;
+		if (params.userId != user.userId) params.visibility = 0;
 
 		this.formatQuery(params);
 
