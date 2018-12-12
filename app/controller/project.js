@@ -7,6 +7,9 @@ const { ENTITY_TYPE_USER,
 	ENTITY_TYPE_PAGE,
 	ENTITY_TYPE_PROJECT,
 
+	ENTITY_VISIBILITY_PUBLIC,
+	ENTITY_VISIBILITY_PRIVATE,
+
 	PROJECT_TYPE_SITE,
 	PROJECT_TYPE_PARACRAFT,
 } = require("../core/consts.js");
@@ -92,11 +95,17 @@ const Project = class extends Controller {
 	}
 
 	async join() {
-		const user = this.getUser();
+		const authUserId = this.getUser().userId;
 		let {userId, exclude} = this.validate({userId: "int_optional", exclude:"boolean_optional"});
-		if (!user.userId && !userId) return this.throw(400, "参数错误");
-
-		const list = await this.model.projects.getJoinProjects(userId || user.userId, userId == user.userId ? undefined : 0, exclude);
+		if (!authUserId && !userId) return this.throw(400, "参数错误");
+		userId = userId || authUserId;
+		let list = await this.model.projects.getJoinProjects(userId, undefined, exclude);
+		const projects = authUserId ? await this.model.members.findAll({where:{userId: authUserId, objectType: ENTITY_TYPE_PROJECT}}) : [];
+		list = _.filter(list, o => {
+			if (o.visibility == ENTITY_VISIBILITY_PUBLIC) return true;
+			const index = _.findIndex(projects, t => t.objectId == o.id);
+			return index < 0 ? false : true;
+		});
 
 		await this.setProjectUser(list);
 
@@ -104,19 +113,20 @@ const Project = class extends Controller {
 	}
 
 	async index() {
-		const user = this.getUser();
+		const authUserId = this.getUser().userId;
 		const params = this.validate();
-
-		if (!params.userId && !user.userId) return this.throw(400, "参数错误");
-		params.userId = params.userId || user.userId;
-		if (params.userId != user.userId) params.visibility = 0;
-
+		if (!params.userId && !authUserId) return this.throw(400, "参数错误");
+		params.userId = params.userId || authUserId;
 		this.formatQuery(params);
-
-		const list = await this.model.projects.findAll({...this.queryOptions, where:params});
+		let list = await this.model.projects.findAll({...this.queryOptions, where:params});
+		const projects = authUserId ? await this.model.members.findAll({where:{userId: authUserId, objectType: ENTITY_TYPE_PROJECT}}) : [];
+		list = _.filter(list, o => {
+			if (o.visibility == ENTITY_VISIBILITY_PUBLIC) return true;
+			const index = _.findIndex(projects, t => t.objectId == o.id);
+			return index < 0 ? false : true;
+		});
 
 		await this.setProjectUser(list);
-
 		return this.success(list);
 	}
 
