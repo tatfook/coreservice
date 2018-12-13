@@ -102,7 +102,7 @@ const Project = class extends Controller {
 		let list = await this.model.projects.getJoinProjects(userId, undefined, exclude);
 		const projects = authUserId ? await this.model.members.findAll({where:{userId: authUserId, objectType: ENTITY_TYPE_PROJECT}}) : [];
 		list = _.filter(list, o => {
-			if (o.visibility == ENTITY_VISIBILITY_PUBLIC) return true;
+			if (o.visibility == ENTITY_VISIBILITY_PUBLIC || userId == authUserId) return true;
 			const index = _.findIndex(projects, t => t.objectId == o.id);
 			return index < 0 ? false : true;
 		});
@@ -121,7 +121,7 @@ const Project = class extends Controller {
 		let list = await this.model.projects.findAll({...this.queryOptions, where:params});
 		const projects = authUserId ? await this.model.members.findAll({where:{userId: authUserId, objectType: ENTITY_TYPE_PROJECT}}) : [];
 		list = _.filter(list, o => {
-			if (o.visibility == ENTITY_VISIBILITY_PUBLIC) return true;
+			if (o.visibility == ENTITY_VISIBILITY_PUBLIC || authUserId == params.userId) return true;
 			const index = _.findIndex(projects, t => t.objectId == o.id);
 			return index < 0 ? false : true;
 		});
