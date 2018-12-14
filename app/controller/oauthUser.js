@@ -28,6 +28,10 @@ const OauthUsers = class extends Controller {
 		const {userId} = this.authenticated();
 		const {id, password} = this.validate({password:"string", id:"int"});
 
+		const user = await this.model.users.findOne({where: {id:userId, password: this.app.util.md5(password)}});
+
+		if (!user) return this.fail(11);
+
 		await this.model.oauthUsers.destroy({where:{userId, id}});
 
 		return this.success("OK");
@@ -241,8 +245,6 @@ const OauthUsers = class extends Controller {
 		let user = await this.model.users.findOne({where:{id:oauthUser.userId}});
 		if (!user) return this.success({token: oauthUser.token});
 		user = user.get({plain:true});
-
-		if (model.roles.isExceptionRole(user.roleId)) this.throw(403, "异常用户");
 
 		const token = this.util.jwt_encode({
 			userId: user.id,

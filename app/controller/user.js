@@ -214,15 +214,6 @@ const User = class extends Controller {
 		let user = await model.users.getByName(username);
 		if (user) return this.fail(3);
 
-		// 同步用户到wikicraft
-		const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
-			console.log("创建wikicraft用户失败", e);
-		});
-		if (!data || data.error.id != 0) {
-			console.log("创建wikicraft用户失败", data);
-			return this.fail(-1, 400, data);
-		} 
-
 		const cellphone = params.cellphone;
 		if (cellphone) {
 			const cache = await this.app.model.caches.get(cellphone) || {};
@@ -233,6 +224,15 @@ const User = class extends Controller {
 			const isBindCellphone = await model.users.findOne({where:{cellphone}});
 			if (isBindCellphone) delete params.cellphone;
 		}
+
+		// 同步用户到wikicraft
+		const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
+			console.log("创建wikicraft用户失败", e);
+		});
+		if (!data || data.error.id != 0) {
+			console.log("创建wikicraft用户失败", data);
+			return this.fail(-1, 400, data);
+		} 
 
 		user = await model.users.create({
 			cellphone: params.cellphone,
@@ -349,6 +349,8 @@ const User = class extends Controller {
 		// 解绑有密码 优先密码验证
 		if (!params.isBind && params.password) {
 			const ok = await this.model.users.update({cellphone: null}, {where:{id:userId, password: this.util.md5(params.password)}});
+			if (ok[0] == 0) return this.fail(11);
+
 			return this.success(ok);
 		}
 		
@@ -427,6 +429,9 @@ const User = class extends Controller {
 		// 解绑有密码 优先密码验证
 		if (!params.isBind && params.password) {
 			const ok = await this.model.users.update({email: null}, {where:{id:userId, password: this.util.md5(params.password)}});
+
+			if (ok[0] == 0) return this.fail(11);
+
 			return this.success(ok);
 		}
 		const captcha = params.captcha;

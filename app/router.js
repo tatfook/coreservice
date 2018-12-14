@@ -157,6 +157,12 @@ module.exports = app => {
 	const trade = controller.trade;
 	router.resources(`${prefix}trades`, trade);
 
+	const discount = controller.discount;
+	router.resources(`${prefix}discounts`, discount);
+
+	const goods = controller.goods;
+	router.resources(`${prefix}goodss`, goods);
+
 	const world = controller.world;
 	router.post(`${prefix}worlds/save`, world.save);
 	router.get(`${prefix}worlds/test`, world.test);

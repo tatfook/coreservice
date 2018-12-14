@@ -26,7 +26,6 @@ class Pay extends Service {
 	async chrage(data) {
 		return await new Promise((resolve, reject) => {
 			this.pingpp.charges.create(data, function(err, charge) {
-				console.log(err, charge);
 				if (err) return reject(err);
 				return resolve(charge);
 			});

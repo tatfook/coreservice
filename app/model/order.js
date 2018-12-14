@@ -30,22 +30,17 @@ module.exports = app => {
 			type: INTEGER,
 		},
 
-		count: {                     // 购买数量
-			type: INTEGER,
-			defaultValue: 1,
-		},
-
-		goodsId: {
-			type: BIGINT,            // 物品ID
-			defaultValue: 0,
-		},
-
 		state: {
 			type: BIGINT,            // 交易状态
 		},
 
 		channel: {                   // 支付渠道
 			type: STRING(16),
+		},
+
+		tradeId: {                   // 交易ID
+			type: BIGINT,            
+			defaultValue: 0,
 		},
 
 		chargeId: {

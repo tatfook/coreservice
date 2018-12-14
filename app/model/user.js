@@ -77,10 +77,6 @@ module.exports = app => {
 
 	//model.sync({force:true});
 
-	model.associate = function() {
-		app.model.users.hasOne(app.model.profiles);
-	}
-
 	model.get = async function(id) {
 		if (_.toNumber(id)) {
 			return await this.getById(_.toNumber(id));

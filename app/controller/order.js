@@ -57,23 +57,17 @@ const Order = class extends Controller {
 	async create() {
 		const {userId} = this.authenticated();
 		const params = this.validate({
-			subject: "string",
-			body: "string",
 			amount: "int",
 			channel: "string",  // wx_pub_qr   alipay_qr
-			goodsId: "int_optional",
-			count: "int_optional", // 购买量
 		});
 
-		const count = params.count || 1;
- 
-		let order = await this.model.orders.create({userId, count}).then(o => o && o.toJSON());
+		let order = await this.model.orders.create({userId}).then(o => o && o.toJSON());
 		if (!order) return this.throw(500, "创建订单记录失败");
 
 		const channel = params.channel;
 		const config = this.app.config.self;
 		const datetime = moment().format("YYYYMMDDHHmmss");
-		const order_no = datetime + "trade" + order.id;
+		const order_no = datetime + "order" + order.id;
 		const chargeData = {
 			order_no,
 			app: {id: config.pingpp.appId},
@@ -81,8 +75,8 @@ const Order = class extends Controller {
 			amount: params.amount,			
 			client_ip: this.ctx.request.headers["x-real-ip"] || this.ctx.request.ip,
 			currency: "cny",
-			subject: params.subject,
-			body: params.body,
+			subject: params.subject || "用户充值",
+			body: params.body || "用户充值",
 		}
 
 		if (channel == "wx_pub_qr") {
@@ -103,17 +97,11 @@ const Order = class extends Controller {
 		order = {
 			...order,
 			userId,
-			count,
 			orderNo: order_no,
 			amount: params.amount,
-			goodsId: params.goodsId || 0,
 			pingppId: charge.id,
 			state: ORDER_STATE_PAYING,
 			channel: params.channel,
-			extra: {
-				subject: params.subject,
-				body: params.body,
-			}
 		}
 		
 		await this.model.orders.update(order, {where:{id: order.id}});
@@ -154,6 +142,9 @@ const Order = class extends Controller {
 			return this.throw(400, "参数错误");
 		}
 
+		// 获取用户账户信息
+		await this.model.accounts.getByUserId(order.userId);
+
 		// 更新订单状态
 		await this.model.orders.update({state, description}, {where:{id:order.id}});
 		// 增加用户余额
@@ -175,11 +166,11 @@ const Order = class extends Controller {
 		const discounts = [
 		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
 		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime},
-		{coin:10, rewardRmb: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
-		{bean:10, rewardRmb: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{coin:10, rewardCoin: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{bean:10, rewardBean: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
 		];
 		const discount = discounts[_.random(0,3)];
-		discount.userId = userId;
+		discount.userId = order.userId;
 		await this.model.discounts.create(discount);
 
 		////  
