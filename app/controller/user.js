@@ -349,6 +349,8 @@ const User = class extends Controller {
 		// 解绑有密码 优先密码验证
 		if (!params.isBind && params.password) {
 			const ok = await this.model.users.update({cellphone: null}, {where:{id:userId, password: this.util.md5(params.password)}});
+			if (ok[0] == 0) return this.fail(11);
+
 			return this.success(ok);
 		}
 		
@@ -427,6 +429,9 @@ const User = class extends Controller {
 		// 解绑有密码 优先密码验证
 		if (!params.isBind && params.password) {
 			const ok = await this.model.users.update({email: null}, {where:{id:userId, password: this.util.md5(params.password)}});
+
+			if (ok[0] == 0) return this.fail(11);
+
 			return this.success(ok);
 		}
 		const captcha = params.captcha;
