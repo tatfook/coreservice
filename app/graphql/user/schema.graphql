@@ -3,16 +3,19 @@
 type User {
 	id: ID!
 	username: String!
-	nickname: String!
+	nickname: String
 	email: String
 	cellphone: String
 	portrait: String
 	sex: String
 	description: String
-	extra: Json!
-	rank: UserRank!
+	extra: Json
+	rank: UserRank
 	contributions(years: String): Contribution 
+	account: Account
 	lesson: Lesson
+	projects: [Project]
+	joinProjects: [Project]
 }
 
 type UserRank {
@@ -31,4 +34,10 @@ type Contribution {
 	data: Json
 }
 
-
+type Account {
+	userId: Int
+	rmb: Int
+	coin: Int
+	bean: Int
+	lockCoin: Int
+}

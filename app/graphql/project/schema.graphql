@@ -1,0 +1,23 @@
+
+type Project {
+	id: ID!
+	userId: Int
+	name: String!
+	siteId: Int
+	visibility: Int
+	privilege: Int
+	type: Int
+	tags: String
+	visit: Int
+	star: Int
+	favorite: Int
+	comment: Int
+	lastVisit: Int
+	lastStar: Int
+	lastComment: Int
+	stars: Json
+	hotNo: Int
+	choicenessNo: Int
+	description: String
+	extra: Json
+}

@@ -36,7 +36,7 @@ class UserConnector {
 
 	// 获取用户账户信息
 	async fetchAccountByUserId(userId) {
-		return await this.model.acounts.getFollows(userId);
+		return await this.model.accounts.getByUserId(userId);
 	}
 
 	// 获取用户活跃度信息
