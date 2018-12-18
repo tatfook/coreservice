@@ -1,0 +1,15 @@
+
+type UserRank {
+	id: ID
+	userId: Int
+	project: Int
+	site: Int
+	world: Int
+	follow: Int
+	fans: Int
+	active: Int
+	extra: Json
+
+	user: User
+}
+

@@ -3,4 +3,5 @@ type Query {
 	user(id: ID!): User
 	projects(userId: Int): [Project]
 	joinProjects(userId: Int): [Project]
+	ranks(type: String = "user"): [UserRank]
 }
