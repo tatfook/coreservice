@@ -6,27 +6,21 @@ class UserConnector {
 	constructor(ctx) {
 		this.ctx = ctx;
 		this.model = ctx.app.model;
-		this.loader = new DataLoader(this.fetch.bind(this));
+		this.loader = new DataLoader(ids => this.fetch(ids));
 	}
 
-	fetch(ids) {
-		const users = this.ctx.app.model.User.findAll({
-		where: {
-			id: {
-				$in: ids,
-			},
-		},
-		}).then(us => us.map(u => u.toJSON()));
+	async fetch(ids) {
+		const users = await this.ctx.app.model.User.findAll({where: {id: {$in: ids}}}).then(us => us.map(u => u.toJSON()));
 		return users;
 	}
 
-	fetchByIds(ids) {
-		return this.loader.loadMany(ids);
+	async fetchByIds(ids) {
+		return await this.loader.loadMany(ids);
 	}
 
 	// 获取指定用户
-	fetchById(id) {
-		return this.loader.load(id);
+	async fetchById(id) {
+		return await this.loader.load(id);
 	}
 
 	// 获取用户排名信息
@@ -36,7 +30,7 @@ class UserConnector {
 
 	// 获取用户账户信息
 	async fetchAccountByUserId(userId) {
-		return await this.model.acounts.getFollows(userId);
+		return await this.model.accounts.getByUserId(userId);
 	}
 
 	// 获取用户活跃度信息

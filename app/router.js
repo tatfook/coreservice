@@ -26,6 +26,7 @@ module.exports = app => {
 	router.post(`${prefix}users/register`, user.register);
 	router.post(`${prefix}users/login`, user.login);
 	router.post(`${prefix}users/logout`, user.logout);
+	router.get(`${prefix}users/account`, user.account);
 	router.get(`${prefix}users/profile`, user.profile);
 	router.post(`${prefix}users/profile`, user.setProfile);
 	router.put(`${prefix}users/pwd`, user.changepwd);

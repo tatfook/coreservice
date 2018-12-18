@@ -5,13 +5,21 @@ module.exports = {
 		rank(root, {userId}, ctx) {
 			return ctx.connector.user.fetchRankByUserId(root.id);
 		},
-		acount(root, _, ctx) {
+		account(root, _, ctx) {
 			return ctx.connector.user.fetchAccountByUserId(root.id);
 		},
 		contributions(root, {years}, ctx) {
 			years = (years || "").split(",");
 			return ctx.connector.user.fetchContributionsByUserId(root.id, years);
 		},
+
+		projects(root, _, ctx) {
+			return ctx.connector.project.fetchByUserId(root.id);
+		},
+
+		joinProjects(root, _, ctx) {
+			return ctx.connector.project.fetchJoinByUserId(root.id);
+		}
 	},
 };
 

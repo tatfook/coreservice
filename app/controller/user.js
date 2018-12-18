@@ -544,6 +544,15 @@ const User = class extends Controller {
 
 		return this.success(users);
 	}
+
+	// 用户余额
+	async account() {
+		const {userId} = this.authenticated();
+
+		const account = await this.model.accounts.getByUserId(userId);
+
+		return this.success(account);
+	}
 }
 
 module.exports = User;
