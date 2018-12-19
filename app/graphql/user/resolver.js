@@ -35,6 +35,10 @@ module.exports = {
 		teacher(root, _, ctx) {
 			return ctx.connector.user.fetchTeacherByUserId(root.id);
 		},
+
+		roles(root, _, ctx) {
+			return ctx.connector.user.fetchRolesByUserId(root.id);
+		}
 	},
 };
 

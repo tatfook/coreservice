@@ -14,7 +14,14 @@ class Index extends Controller {
 	}
 
 	async test() {
-
+		const user = await this.model.users.findOne({where:{id:300}});
+		const account = await user.getAccount();
+		const accountUser = await account.getUser();
+		//console.log(account, user);
+		const roles = await user.getRoles();
+		const role = roles[0];
+		const roleUser = await role.getUser();
+		return this.success(account);
 	}
 }
 

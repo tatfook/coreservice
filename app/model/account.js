@@ -45,6 +45,7 @@ module.exports = app => {
 		},
 
 	}, {
+		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
 	});

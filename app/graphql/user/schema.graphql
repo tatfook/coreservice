@@ -19,6 +19,7 @@ type User {
 	joinProjects: [Project]
 	tutor: Tutor
 	teacher: Teacher
+	roles: [Role]
 }
 
 type Contribution {
@@ -49,4 +50,11 @@ type Tutor {
 	startTime: Int
 	endTime: Int
 	extra: Json
+}
+
+type Role {
+	userId: Int
+	roleId: Int
+	startTime: Int
+	endTime: Int
 }

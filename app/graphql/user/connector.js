@@ -58,6 +58,11 @@ class UserConnector {
 	async fetchTeacherByUserId(userId) {
 		return await this.lessonModel.teachers.getByUserId(userId);
 	}
+
+	// 获取用户角色
+	async fetchRolesByUserId(userId) {
+		return await this.model.roles.getByUserId(userId);
+	}
 }
 
 module.exports = UserConnector;
