@@ -10,12 +10,15 @@ type User {
 	sex: String
 	description: String
 	extra: Json
+	identify: Int
 	rank: UserRank
 	contributions(years: String): Contribution 
 	account: Account
 	lesson: Lesson
 	projects: [Project]
 	joinProjects: [Project]
+	tutor: Tutor
+	teacher: Teacher
 }
 
 type Contribution {
@@ -30,3 +33,20 @@ type Account {
 	lockCoin: Int
 }
 
+type Teacher {
+	userId: Int
+	key: String
+	privilege: Int
+	school: String
+	startTime: Int
+	endTime: Int
+	extra: Json
+}
+
+type Tutor {
+	userId: Int
+	tutorId: Int
+	startTime: Int
+	endTime: Int
+	extra: Json
+}

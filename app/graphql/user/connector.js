@@ -6,6 +6,7 @@ class UserConnector {
 	constructor(ctx) {
 		this.ctx = ctx;
 		this.model = ctx.app.model;
+		this.lessonModel = ctx.app.lessonModel;
 		this.loader = new DataLoader(ids => this.fetch(ids));
 	}
 
@@ -41,6 +42,21 @@ class UserConnector {
 	// 获取用户粉丝信息
 	async fetchFansByUserId(userId, page, perPage) {
 		return this.model.favorites.getFollows(userId);
+	}
+
+	// 取lesson 用户信息
+	async fetchLessonUserByUserId(userId) {
+		return await this.lessonModel.users.findOne({where:{id:userId}}) 
+	}
+
+	// 取导师信息
+	async fetchTutorByUserId(userId) {
+		return await this.lessonModel.tutors.getByUserId(userId);
+	}
+
+	// 取教师信息
+	async fetchTeacherByUserId(userId) {
+		return await this.lessonModel.teachers.getByUserId(userId);
 	}
 }
 

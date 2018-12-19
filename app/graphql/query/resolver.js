@@ -16,7 +16,7 @@ module.exports = {
 		},
 
 		ranks(root, {type}, ctx) {
-			console.log(type);
+			console.log(type, ctx.request.body);
 			return ctx.connector.userRank.fetchAll();
 		}
 	}

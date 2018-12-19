@@ -56,7 +56,6 @@ module.exports = app => {
   //app.model.oauthUsers.sync({force:true});
   //app.model.pages.sync({force:true});
   //app.model.projects.sync({force:true});
-  //app.model.roles.sync({force:true});
   //app.model.sensitiveWords.sync({force:true});
   //app.model.sites.sync({force:true});
   //app.model.siteGroups.sync({force:true});
@@ -70,5 +69,6 @@ module.exports = app => {
   //app.model.trades.sync({force:true});
   //app.model.orders.sync({force:true});
   //app.model.discounts.sync({force:true});
+  //app.model.roles.sync({force:true});
 };
 

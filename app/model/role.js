@@ -1,10 +1,12 @@
 const _ = require("lodash");
 const {
-	USER_ROLE_EXCEPTION,
-	USER_ROLE_NORMAL,
-	USER_ROLE_VIP,
-	USER_ROLE_MANAGER,
-	USER_ROLE_ADMIN,
+	//USER_ROLE_EXCEPTION,
+	//USER_ROLE_NORMAL,
+	//USER_ROLE_VIP,
+	//USER_ROLE_MANAGER,
+	//USER_ROLE_ADMIN,
+	USER_ROLE_ALLIANCE_MEMBER,
+	USER_ROLE_TUTOR,
 } = require("../core/consts.js");
 
 module.exports = app => {
@@ -33,18 +35,22 @@ module.exports = app => {
 		roleId: {
 			type: INTEGER,
 			allowNull: false,
+			defaultValue: 0,
 		},
 
-		description: {
-			type: STRING(128),
+		startTime: {                   // 开始时间
+			type: BIGINT,
+			defaultValue: 0,
 		},
 
-		startTime: {
-			type: DATE,
+		endTime: {                     // 结束时间
+			type: BIGINT,
+			defaultValue: 0,
 		},
 
-		endTime: {
-			type: DATE,
+		extra: {
+			type:JSON,
+			defaultValue:{},
 		},
 
 	}, {
@@ -60,29 +66,41 @@ module.exports = app => {
 	});
 
 	//model.sync({force:true});
+	
 	model.getByUserId = async function(userId) {
-		const roles = await this.model.findAll({where: {userId}});
-
-		return roles;
+		return await app.keepworkModel.roles.findAll({where:{userId}}).then(list => _.map(list, o => o && o.toJSON()));
 	}
 
 	model.getRoleIdByUserId = async function(userId) {
-		const roles = await this.model.findAll({where: {userId}});
-		let roleId = USER_ROLE_NORMAL;
+		const roles = await this.getByUserId(userId);
+		let roleId = 0;
 		_.each(roles, role => roleId = roleId | role.roleId);
 
 		return roleId;
 	}
 
-	model.isExceptionRole = function(roleId = USER_ROLE_NORMAL) {
-		return roleId & USER_ROLE_EXCEPTION;
+	model.getAllianceMemberByUserId = async function(userId) {
+		return await app.keepworkModel.roles.findOne({where:{
+			userId,
+			roleId: USER_ROLE_ALLIANCE_MEMBER,
+		}}).then(o => o && o.toJSON());
 	}
 
-	model.isExceptionUser = async function(userId) {
-		const roleId = await this.getRoleIdByUserId(userId);
-		
-		return this.isExceptionRole(roleId);
+	model.getTutorByUserId = async function(userId) {
+		return await app.keepworkModel.roles.findOne({where:{
+			userId,
+			roleId: USER_ROLE_TUTOR,
+		}}).then(o => o && o.toJSON());
 	}
+	//model.isExceptionRole = function(roleId = USER_ROLE_NORMAL) {
+		//return roleId & USER_ROLE_EXCEPTION;
+	//}
+
+	//model.isExceptionUser = async function(userId) {
+		//const roleId = await this.getRoleIdByUserId(userId);
+		
+		//return this.isExceptionRole(roleId);
+	//}
 	
 	app.model.roles = model;
 	return model;

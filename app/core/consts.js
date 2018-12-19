@@ -32,12 +32,17 @@ module.exports = {
 	OAUTH_SERVICE_TYPE_XINLANG:3, // 新浪
 	OAUTH_SERVICE_TYPE_QQ_HALL:4, // QQ HALL
 
+	USER_ROLE_DEFAULT: 0,            // 普通用户
+	USER_ROLE_STUDENT: 1,            // 学生
+	USER_ROLE_TEACHER: 2,            // 讲师
+	USER_ROLE_ALLIANCE_MEMBER: 8,    // 联盟会员
+	USER_ROLE_TUTOR: 16,             // 导师
 	// 角色
-	USER_ROLE_NORMAL:0,     // 普通
-	USER_ROLE_EXCEPTION:1,  // 异常
-	USER_ROLE_VIP:4,        // vip
-	USER_ROLE_MANAGER:64,   // 管理者
-	USER_ROLE_ADMIN:128,    // 超管
+	//USER_ROLE_NORMAL:0,     // 普通
+	//USER_ROLE_EXCEPTION:1,  // 异常
+	//USER_ROLE_VIP:4,        // vip
+	//USER_ROLE_MANAGER:64,   // 管理者
+	//USER_ROLE_ADMIN:128,    // 超管
 
 	// 通知状态
 	NOTIFICATION_STATE_UNREAD:0, // 未读
