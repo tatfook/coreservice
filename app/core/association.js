@@ -8,7 +8,6 @@ module.exports = app => {
 	users.hasOne(accounts, {
 		//as: "Account",
 		foreignKey: "userId",
-		//uniqueKey: "userId",
 	});
 
 	accounts.belongsTo(users, {

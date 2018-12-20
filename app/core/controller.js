@@ -115,6 +115,7 @@ class BaseController extends Controller {
 	}
 
 	formatQuery(query) {
+		const self = this;
 		const Op = this.app.Sequelize.Op;
 		for (let key in query) {
 			const arr = key.split("-");
@@ -146,6 +147,10 @@ class BaseController extends Controller {
 						data[Op[op]] = val;
 						delete data[key];
 					}
+					if (key == "$model$" && typeof(val) == "string" && self.model[val]) {
+						data["model"] = self.model[val];
+						delete data["$model$"];
+					}
 				}
 				replaceOp(val);
 			});
@@ -172,6 +177,17 @@ class BaseController extends Controller {
 		this.formatQuery(query);
 
 		const result = await model.findAndCount({...this.queryOptions, where:query});
+
+		this.success(result);
+	}
+
+	async query() {
+		const model = this.model[this.modelName];
+		const query = this.validate();
+
+		this.formatQuery(query);
+
+		const result = await model.findAndCount(query);
 
 		this.success(result);
 	}

@@ -73,6 +73,16 @@ const Admin = class extends Controller {
 		return this.success(list);
 	}
 
+	async resourcesQuery() {
+		const query = this.parseParams();
+
+		this.formatQuery(query);
+
+		const list = await this.resource.findAndCount(query);
+
+		this.success(list);
+	}
+
 	async search() {
 		const query = this.parseParams();
 

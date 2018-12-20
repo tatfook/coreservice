@@ -50,6 +50,9 @@ const Trade = class extends Controller {
 		const discount = await this.model.discounts.findOne({where:{id: discountId, userId, state:DISCOUNT_STATE_UNUSE}}).then(o => o && o.toJSON());
 		if (discountId && !discount) return this.throw(400, "优惠券不存在");
 
+		const user = await this.model.users.getById(userId);
+		if (!user) return this.fail(12);
+
 		const rmb = (params.rmb || goods.rmb) * count;
 		const coin = (params.coin || goods.coin) * count;
 		const bean = (params.bean || goods.bean) * count;
@@ -57,6 +60,11 @@ const Trade = class extends Controller {
 		let realCoin = coin;
 		let realBean = bean;
 		
+		if (rmb > 0) {  // 验证手机验证码
+			if (!user.cellphone) return this.fail(5);
+			const cache = await this.model.caches.get(user.cellphone);
+			if (!params.captcha || !cache || cache.captcha != params.captcha) return this.fail(5);
+		}
 
 		if (discount) {
 			const types = {TRADE_TYPE_PACKAGE_BUY: DISCOUNT_TYPE_PACKAGE};
@@ -72,8 +80,17 @@ const Trade = class extends Controller {
 			realBean -= discount.rewardBean;
 		}
 
-		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) return this.throw(400, "余额不足");
+		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) return this.fail(13);
 		
+		// 更新用户余额
+		const ret = await this.model.accounts.decrement({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {
+			userId, 
+			rmb: {[this.model.Op.gte]: realRmb},
+			coin: {[this.model.Op.gte]: realCoin},
+			bean: {[this.model.Op.gte]: realBean},
+		}});
+		if (res[0] != 1) return this.fail(13);
+
 		try {
 			callbackData.amount = {rmb, coin, bean};
 			callbackData.userId = params.userId || userId;  // 可帮别人买
@@ -89,11 +106,9 @@ const Trade = class extends Controller {
 		} catch(e) {
 			console.log(callbackData);
 			console.log(e);
+			await this.model.accounts.increment({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
 			return this.throw(500, "交易失败");
 		}
-
-		// 更新用户余额
-		await this.model.accounts.decrement({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
 		
 		// 设置已使用优惠券
 		if (discount) await this.model.discounts.update({state:DISCOUNT_STATE_USED}, {where:{id: discount.id}});
