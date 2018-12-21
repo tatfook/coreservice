@@ -80,16 +80,20 @@ const Trade = class extends Controller {
 			realBean -= discount.rewardBean;
 		}
 
-		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) return this.fail(13);
+		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) {
+			return this.fail(13);
+		}
 		
 		// 更新用户余额
-		const ret = await this.model.accounts.decrement({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {
+		const ret = await this.model.accounts.update({rmb:account.rmb - realRmb, coin: account.coin - realCoin, bean: account.bean - realBean}, {where: {
 			userId, 
 			rmb: {[this.model.Op.gte]: realRmb},
 			coin: {[this.model.Op.gte]: realCoin},
 			bean: {[this.model.Op.gte]: realBean},
 		}});
-		if (ret[0] != 1) return this.fail(13);
+		if (ret[0] != 1) {
+			return this.fail(13);
+		}
 
 		try {
 			callbackData.amount = {rmb, coin, bean};
