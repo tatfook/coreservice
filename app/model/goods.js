@@ -15,9 +15,19 @@ module.exports = app => {
 			primaryKey: true,
 		},
 
+		goodsId: {                  // 平台的物品id
+			type: BIGINT,
+			defaultValue: 0,
+		},
+
 		platform: {                  // 物品所属平台
 			type: INTEGER,
 			defaultValue: 0,
+		},
+
+		thumbnail: {                 // 缩略图
+			type: STRING,
+			defaultValue:"",
 		},
 
 		subject: {                   // 商品标题
@@ -34,6 +44,11 @@ module.exports = app => {
 		},
 
 		max: {                       // 单次最大购买量
+			type: INTEGER,
+			defaultValue: 1,
+		},
+
+		defaultCount: {              // 默认购买量
 			type: INTEGER,
 			defaultValue: 1,
 		},

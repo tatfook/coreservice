@@ -163,7 +163,8 @@ module.exports = app => {
 	router.resources(`${prefix}discounts`, discount);
 
 	const goods = controller.goods;
-	router.resources(`${prefix}goodss`, goods);
+	//router.all(`${prefix}goods/importOldData`, goods.importOldData);
+	router.resources(`${prefix}goods`, goods);
 
 	const world = controller.world;
 	router.post(`${prefix}worlds/save`, world.save);
