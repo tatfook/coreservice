@@ -90,6 +90,7 @@ module.exports = {
 	GOODS_PLATFORM_KEEPWORK:0,   // keepwork 
 	GOODS_PLATFORM_LESSON:1,     // lesson
 	GOODS_PLATFORM_HAQI:2,       // haqi
+	GOODS_PLATFORM_HAQI2:3,      // haqi2
 
 	// 优惠券类型
 	DISCOUNT_TYPE_DEFAULT:0,     // 通用性

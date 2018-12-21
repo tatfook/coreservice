@@ -19,7 +19,7 @@ module.exports = app => {
 		
 		word: {
 			type:STRING,
-			unique: true,
+			//unique: true,
 		},
 
 		extra: {
@@ -38,7 +38,6 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-
 	app.model.sensitiveWords = model;
 	return model;
 };

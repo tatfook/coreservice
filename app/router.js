@@ -173,6 +173,7 @@ module.exports = app => {
 	router.resources(`${prefix}worlds`, world);
 
 	const sensitiveWord = controller.sensitiveWord;
+	//router.get(`${prefix}sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
 	router.get(`${prefix}sensitiveWords/trim`, sensitiveWord.trim);
 	router.all(`${prefix}sensitiveWords/check`, sensitiveWord.check);
 	router.get(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);

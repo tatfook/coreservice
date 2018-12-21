@@ -5,6 +5,8 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 
+const sensitiveWords = require("./sensitiveWords.js");
+
 const SensitiveWord = class extends Controller {
 	get modelName() {
 		return "sensitiveWords";
@@ -16,6 +18,20 @@ const SensitiveWord = class extends Controller {
 		const list = await this.model.sensitiveWords.findAll({...this.queryOptions, where: query});
 
 		return this.success(list);
+	}
+
+	async importOldWords() {
+		const words = [];
+		_.each(sensitiveWords, o => {
+			const word = o.name;
+
+			for (let i = 0; i < words.length; i++) {
+				if (words[i] == word) return;
+			}
+			words.push(word);
+		});
+		await this.model.sensitiveWords.bulkCreate(_.map(words, o => {return {word: o}}));
+		return this.success("OK");
 	}
 
 	async importWords() {
