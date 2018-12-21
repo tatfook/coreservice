@@ -89,7 +89,7 @@ const Trade = class extends Controller {
 			coin: {[this.model.Op.gte]: realCoin},
 			bean: {[this.model.Op.gte]: realBean},
 		}});
-		if (res[0] != 1) return this.fail(13);
+		if (ret[0] != 1) return this.fail(13);
 
 		try {
 			callbackData.amount = {rmb, coin, bean};
