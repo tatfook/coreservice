@@ -60,7 +60,7 @@ const Trade = class extends Controller {
 		let realCoin = coin;
 		let realBean = bean;
 		
-		if (rmb > 0) {  // 验证手机验证码
+		if (rmb > 200) {  // 验证手机验证码
 			if (!user.cellphone) return this.fail(5);
 			const cache = await this.model.caches.get(user.cellphone);
 			if (!params.captcha || !cache || cache.captcha != params.captcha) return this.fail(5);
