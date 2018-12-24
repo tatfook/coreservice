@@ -1,4 +1,5 @@
 
+const _ = require("lodash");
 const {
 	DISCOUNT_TYPE_DEFAULT,
 	DISCOUNT_TYPE_PACKAGE,
