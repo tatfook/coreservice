@@ -176,7 +176,7 @@ module.exports = app => {
 	//router.get(`${prefix}sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
 	router.get(`${prefix}sensitiveWords/trim`, sensitiveWord.trim);
 	router.all(`${prefix}sensitiveWords/check`, sensitiveWord.check);
-	router.get(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);
+	router.post(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);
 	router.resources(`${prefix}sensitiveWords`, sensitiveWord);
 
 	// wikicraft proxy
