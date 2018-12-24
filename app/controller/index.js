@@ -14,6 +14,7 @@ class Index extends Controller {
 	}
 
 	async test() {
+		this.model.logs.debug("this is a test");
 		//const user = await this.model.users.findOne({where:{id:300}});
 		//const account = await user.getAccount();
 		//const accountUser = await account.getUser();

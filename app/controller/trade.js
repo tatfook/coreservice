@@ -108,8 +108,8 @@ const Trade = class extends Controller {
 				}
 			});
 		} catch(e) {
-			console.log(callbackData);
-			console.log(e);
+			const logmsg = e.stack || e.message || e.toString();
+			this.model.logs.debug(logmsg);
 			await this.model.accounts.increment({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
 			return this.throw(500, "交易失败");
 		}

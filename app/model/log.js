@@ -39,6 +39,25 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
+	model.output = async function(text, level = "DEBUG") {
+		await app.model.logs.create({text, level});
+	}
+	model.debug = async function(text) {
+		await this.output(text, "DEBUG");
+	}
+
+	model.info = async function(text) {
+		await this.output(text, "INFO");
+	}
+	
+	model.warn = async function(text) {
+		await this.output(text, "WARN");
+	}
+
+	model.error = async function(text) {
+		await this.output(text, "ERROR");
+	}
+
 	app.model.logs = model;
 	return model;
 }
