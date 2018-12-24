@@ -181,6 +181,19 @@ class BaseController extends Controller {
 		this.success(result);
 	}
 
+	async _search() {
+		const userId = this.authenticated().userId;
+		const model = this.model[this.modelName];
+		const query = this.validate();
+		query.userId = userId;
+
+		this.formatQuery(query);
+
+		const result = await model.findAndCount({...this.queryOptions, where:query});
+
+		this.success(result);
+	}
+
 	async query() {
 		const model = this.model[this.modelName];
 		const query = this.validate();
