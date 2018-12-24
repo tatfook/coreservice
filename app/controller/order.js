@@ -161,15 +161,7 @@ const Order = class extends Controller {
 		order.description = description;
 
 		// 奖励优惠券
-		const startTime = new Date().getTime();
-		const endTime = startTime + 1000 * 3600 * 24 * 30;
-		const discounts = [
-		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
-		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime},
-		{coin:10, rewardCoin: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
-		{bean:10, rewardBean: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
-		];
-		const discount = discounts[_.random(0,3)];
+		const discount = this.model.discounts.generateDiscount();
 		discount.userId = order.userId;
 		await this.model.discounts.create(discount);
 

@@ -1,4 +1,9 @@
 
+const {
+	DISCOUNT_TYPE_DEFAULT,
+	DISCOUNT_TYPE_PACKAGE,
+} = require("../core/consts.js");
+
 module.exports = app => {
 	const {
 		BIGINT,
@@ -93,7 +98,22 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
+	model.generateDiscount = function() {
+		const startTime = new Date().getTime();
+		const endTime = startTime + 1000 * 3600 * 24 * 30;
+		const discounts = [
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime},
+		{coin:10, rewardCoin: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		{bean:10, rewardBean: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime},
+		];
+		const discount = discounts[_.random(0,3)];
+
+		return discount;
+	}
+
 	app.model.discounts = model;
+
 	return model;
 };
 

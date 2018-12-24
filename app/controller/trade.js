@@ -47,7 +47,7 @@ const Trade = class extends Controller {
 		const account = await this.model.accounts.findOne({where:{userId}}).then(o => o && o.toJSON());
 		if (!account) return this.throw(500);
 		
-		const discount = await this.model.discounts.findOne({where:{id: discountId, userId, state:DISCOUNT_STATE_UNUSE}}).then(o => o && o.toJSON());
+		let discount = await this.model.discounts.findOne({where:{id: discountId, userId, state:DISCOUNT_STATE_UNUSE}}).then(o => o && o.toJSON());
 		if (discountId && !discount) return this.throw(400, "优惠券不存在");
 
 		const user = await this.model.users.getById(userId);
@@ -118,13 +118,17 @@ const Trade = class extends Controller {
 		if (discount) await this.model.discounts.update({state:DISCOUNT_STATE_USED}, {where:{id: discount.id}});
 
 		// 创建交易记录
-		await this.model.trades.create({
+		const trade = await this.model.trades.create({
 			userId, type, goodsId, count, discount,
 			rmb, coin, bean, realRmb, realCoin, realBean,
 			subject: goods.subject,  body: goods.body,
 		});
 
-		return this.success("OK");
+		discount = this.model.discounts.generateDiscount();
+		discount.userId = userId;
+		discount = await this.model.discounts.create(discount);
+
+		return this.success({trade, discount});
 	}
 }
 
