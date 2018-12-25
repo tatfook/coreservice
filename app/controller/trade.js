@@ -52,9 +52,9 @@ const Trade = class extends Controller {
 		const user = await this.model.users.getById(userId);
 		if (!user) return this.fail(12);
 
-		const rmb = (params.rmb || goods.rmb) * count;
-		const coin = (params.coin || goods.coin) * count;
-		const bean = (params.bean || goods.bean) * count;
+		const rmb = (params.rmb == undefined ? goods.rmb : params.rmb) * count;
+		const coin = (params.coin == undefined ? goods.coin : params.coin) * count;
+		const bean = (params.bean == undefined ? goods.bean : params.bean) * count;
 		let realRmb = rmb;
 		let realCoin = coin;
 		let realBean = bean;
