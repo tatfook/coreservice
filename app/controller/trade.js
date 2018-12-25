@@ -95,23 +95,28 @@ const Trade = class extends Controller {
 			return this.fail(13);
 		}
 
-		try {
-			callbackData.amount = {rmb, coin, bean};
-			callbackData.userId = params.userId || userId;  // 可帮别人买
+		let success = true;
+		let errinfo = "";
+		callbackData.amount = {rmb, coin, bean};
+		callbackData.userId = params.userId || userId;  // 可帮别人买
 
-			// 签名内容
-			const sigcontent = uuidv1().replace(/-/g, "");
-			await axios.post(goods.callback, callbackData, {
-				headers: {
-					"x-keepwork-signature": this.util.rsaEncrypt(this.config.self.rsa.privateKey, sigcontent),
-					"x-keepwork-sigcontent": sigcontent,
-				}
-			});
-		} catch(e) {
-			const logmsg = e.stack || e.message || e.toString();
-			this.model.logs.debug(logmsg);
+		// 签名内容
+		const sigcontent = uuidv1().replace(/-/g, "");
+		await axios.post(goods.callback, callbackData, {
+			headers: {
+				"x-keepwork-signature": this.util.rsaEncrypt(this.config.self.rsa.privateKey, sigcontent),
+				"x-keepwork-sigcontent": sigcontent,
+			}
+		}).catch(e => {
+			//console.log(e);
+			success = false;
+			errinfo = "statusCode:" + e.response.status + " data:" + e.response.data;
+			//this.model.logs.debug(errinfo);
+		});
+
+		if (!success) {
 			await this.model.accounts.increment({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
-			return this.throw(500, "交易失败");
+			return this.throw(500, errinfo);
 		}
 		
 		// 设置已使用优惠券
