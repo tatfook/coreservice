@@ -20,10 +20,8 @@ const {
 	ORDER_STATE_CHARGE_SUCCESS,
 	ORDER_STATE_CHARGE_FAILED,
 
-	TRADE_TYPE_CHARGE,
-	TRADE_TYPE_EXCHANGE,
-	TRADE_TYPE_PACKAGE_BUY,
-	TRADE_TYPE_LESSON_STUDY,
+	TRADE_TYPE_DEFAULT,
+	TRADE_TYPE_HAQI_EXCHANGE,
 
 	DISCOUNT_TYPE_DEFAULT,
 	DISCOUNT_TYPE_PACKAGE,
@@ -152,7 +150,7 @@ const Order = class extends Controller {
 		// 增加充值交易明细
 		await this.model.trades.create({
 			userId:order.userId, 
-			type: TRADE_TYPE_CHARGE,
+			type: TRADE_TYPE_DEFAULT,
 			subject: order.channel == "wx_pub_qr" ? "微信充值" : "支付宝充值",
 			rmb: order.amount, 
 		});
@@ -189,51 +187,6 @@ const Order = class extends Controller {
 		//await this.model.trades.update(trade, {where:{id:trade.id}});
 		//return;
 	//}
-
-	async chargeCallback(order) {
-		// 没有回调 用户单纯充值	
-		if (!order.goodsId) return;
-
-		const goods = await this.model.goods.findOne({where:{id: order.goodsId}}).then(o => o && o.toJSON());
-
-		if (!goods.callback) return;
-		const data = {extra: goods.callbackData || {}, amount: order.amount, goods};
-
-		const account = await this.model.accounts.getByUserId(order.userId);
-		const rmb = goods.rmb * order.count;
-		const coin = goods.coin * order.count;
-		const bean = goods.bean * order.count;
-		if (!account || account.rmb < rmb || account.coin < coin || account.bean < bean) {
-			await this.model.logs.create({text:"余额不足"});
-			return;
-		}
-
-		// 加密数据
-		try {
-			await axios.post(goods.callback, data);
-		} catch(e) {
-			await this.model.logs.create({text:"物品兑换失败"});
-			return ;
-		}
-
-		// 交易成功 减去用户余额
-		await this.model.accounts.decrement({rmb, coin, bean}, {where:{userId: order.userId}});
-
-		// 写交易记录
-		await this.model.trades.create({
-			userId:order.userId, 
-			type: TRADE_TYPE_EXCHANGE,
-			subject: goods.subject,
-			body: goods.body,
-			rmb: rmb, 
-			coin: coin,
-			bean: bean,
-		});
-		
-	}
-
-	async refundCallback() {
-	}
 
 }
 

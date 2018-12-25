@@ -6,10 +6,9 @@ const axios = require("axios");
 
 const Controller = require("../core/controller.js");
 const {
-	TRADE_TYPE_CHARGE,
-	TRADE_TYPE_EXCHANGE,
+	TRADE_TYPE_DEFAULT,
+	TRADE_TYPE_HAQI_EXCHANGE,
 	TRADE_TYPE_PACKAGE_BUY,
-	TRADE_TYPE_LESSON_STUDY,
 
 	DISCOUNT_STATE_UNUSE,
 	DISCOUNT_STATE_USED,
@@ -25,9 +24,9 @@ const Trade = class extends Controller {
 	}
 
 	async create() {
-		const {userId} = this.authenticated();
+		const {userId, username} = this.authenticated();
 		const params = this.validate({
-			type: "int",                      // 交易类型  课程包购买  哈奇物品兑换
+			type: joi.number().valid([TRADE_TYPE_DEFAULT, TRADE_TYPE_HAQI_EXCHANGE, TRADE_TYPE_PACKAGE_BUY]),                      // 交易类型  课程包购买  哈奇物品兑换
 			goodsId: "int",                   // 物品id
 			count: "int",                     // 购买量
 			discountId: "int_optional",       // 优惠券id
@@ -97,22 +96,29 @@ const Trade = class extends Controller {
 
 		let success = true;
 		let errinfo = "";
-		callbackData.amount = {rmb, coin, bean};
-		callbackData.userId = params.userId || userId;  // 可帮别人买
-
 		// 签名内容
 		const sigcontent = uuidv1().replace(/-/g, "");
-		await axios.post(goods.callback, callbackData, {
-			headers: {
-				"x-keepwork-signature": this.util.rsaEncrypt(this.config.self.rsa.privateKey, sigcontent),
-				"x-keepwork-sigcontent": sigcontent,
-			}
-		}).catch(e => {
+		const headers = {
+			"x-keepwork-signature": this.util.rsaEncrypt(this.config.self.rsa.privateKey, sigcontent),
+			"x-keepwork-sigcontent": sigcontent,
+		};
+		const fail = (e) => {
 			//console.log(e);
 			success = false;
 			errinfo = "statusCode:" + e.response.status + " data:" + e.response.data;
 			//this.model.logs.debug(errinfo);
-		});
+		};
+		callbackData.amount = {rmb, coin, bean};
+		callbackData.userId = params.userId || userId;  // 可帮别人买
+		callbackData.count = count;
+		callbackData.goods = goods;
+		
+		if (type == TRADE_TYPE_HAQI_EXCHANGE) {              // 哈奇兑换
+			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: bean, method:"1", orderno: goods.id, from:"0", price:goods.bean, user_nid:callbackData.user_nid};
+			await axios.get(goods.callback, {params, headers}).catch(fail);
+		} else {
+			await axios.post(goods.callback, callbackData, {headers}).catch(fail);
+		}
 
 		if (!success) {
 			await this.model.accounts.increment({rmb:realRmb, coin:realCoin, bean:realBean}, {where: {userId}});
@@ -138,3 +144,4 @@ const Trade = class extends Controller {
 }
 
 module.exports = Trade;
+
