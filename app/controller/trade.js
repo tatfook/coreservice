@@ -103,7 +103,7 @@ const Trade = class extends Controller {
 			"x-keepwork-sigcontent": sigcontent,
 		};
 		const fail = (e) => {
-			//console.log(e);
+			console.log(e);
 			success = false;
 			errinfo = "statusCode:" + e.response.status + " data:" + e.response.data;
 			//this.model.logs.debug(errinfo);
@@ -115,9 +115,17 @@ const Trade = class extends Controller {
 		
 		if (type == TRADE_TYPE_HAQI_EXCHANGE) {              // 哈奇兑换
 			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: bean, method:"1", orderno: goods.id, from:"0", price:goods.bean, user_nid:callbackData.user_nid};
-			await axios.get(goods.callback, {params, headers}).catch(fail);
+			await axios.get(goods.callback, {params, headers}).then(res => {
+				//console.log(res);
+				//if (res.status != 200 || !res.data) {
+					//success = false;
+					//errinfo = "响应内容为空";
+				//}
+			}).catch(fail);
 		} else {
-			await axios.post(goods.callback, callbackData, {headers}).catch(fail);
+			await axios.post(goods.callback, callbackData, {headers}).then(e => {
+				//console.log(e);
+			}).catch(fail);
 		}
 
 		if (!success) {

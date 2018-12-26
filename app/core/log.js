@@ -19,7 +19,7 @@ class DBTransport extends Transport {
 		this.msgs = this.msgs || [];
 		this.size = this.size || 0;
 
-		this.msgs.push({text:message, date, level});
+		this.msgs.push({text:message, level});
 		this.size += message.length;
 
 		const _output = () => {

@@ -26,11 +26,6 @@ module.exports = app => {
 			defaultValue: "",
 		},
 
-		date: {
-			type: STRING(24),
-			defaultValue: "",
-		},
-
 	}, {
 		underscored: false,
 		charset: "utf8mb4",
