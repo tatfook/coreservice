@@ -1,5 +1,11 @@
 
 module.exports = {
+	EVENT_ID_ES_USER_ATTR_UPDATE: 100, // ES用户属性更新
+	EVENT_ID_ES_USER_DELETE: 101,      // ES用户删除
+
+	EVENT_ID_ES_PROJECT_ATTR_UPDATE:200, // ES项目属性更新
+	EVENT_ID_ES_PROJECT_DELETE: 201,     // ES项目删除
+
 	                            // LOG_TYPE
 	LOG_TYPE_REQUEST_ELAPSED:1, // 请求耗时统计日志
 	LOG_TYPE_SYSTEM:2,          // 系统错误日志

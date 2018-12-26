@@ -140,7 +140,7 @@ const Trade = class extends Controller {
 		const trade = await this.model.trades.create({
 			userId, type, goodsId, count, discount,
 			rmb, coin, bean, realRmb, realCoin, realBean,
-			subject: goods.subject,  body: goods.body,
+			subject: params.subject || goods.subject,  body: params.body || goods.body,
 		});
 
 		discount = this.model.discounts.generateDiscount();
