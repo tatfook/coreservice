@@ -5,7 +5,7 @@ const trie = new ahocorasick.TrieNode();
 
 module.exports = async app => {
 	const list = await app.model.sensitiveWords.findAll({limit:100000});
-	_.each(list, o => o && trie.add(o.word, {word:o.word.trim()}));
+	_.each(list, o => o.word && trie.add(o.word, {word:o.word.trim()}));
 	ahocorasick.add_suffix_links(trie);
 
 	ahocorasick.check = async (word) => {

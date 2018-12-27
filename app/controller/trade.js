@@ -113,14 +113,12 @@ const Trade = class extends Controller {
 		callbackData.count = count;
 		callbackData.goods = goods;
 		
-		if (type == TRADE_TYPE_HAQI_EXCHANGE) {              // 哈奇兑换
-			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: bean, method:"1", orderno: goods.id, from:"0", price:goods.bean, user_nid:callbackData.user_nid};
+		if (goods.platform == 2 || goods.platform == 3) {              // 哈奇兑换
+			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: bean, method:"1", orderno: userId + "" + (new Date().getTime()), from:"0", price:goods.bean, user_nid:callbackData.user_nid};
 			await axios.get(goods.callback, {params, headers}).then(res => {
-				//console.log(res);
-				//if (res.status != 200 || !res.data) {
-					//success = false;
-					//errinfo = "响应内容为空";
-				//}
+				if (/,result=0,/.test(res.data)) return;
+				success = false;
+				errinfo = "兑换失败";
 			}).catch(fail);
 		} else {
 			await axios.post(goods.callback, callbackData, {headers}).then(e => {
