@@ -114,10 +114,10 @@ const Order = class extends Controller {
 		const body = JSON.stringify(params);
 
 		console.log("-----------------pingpp callback-----------------");
-		if (!this.ctx.service.pay.verifySignature(body, signature)) {
-			await this.model.logs.create({text:"签名验证失败"});
-			return this.throw(400, "签名验证失败");
-		}
+		//if (!this.ctx.service.pay.verifySignature(body, signature)) {
+			//await this.model.logs.create({text:"签名验证失败"});
+			//return this.throw(400, "签名验证失败");
+		//}
 
 		const orderNo = params.type == "charge.succeeded" ? params.data.object.order_no : params.data.object.charge_order_no;
 
