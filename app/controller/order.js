@@ -70,7 +70,7 @@ const Order = class extends Controller {
 			order_no,
 			app: {id: config.pingpp.appId},
 			channel: params.channel,
-			amount: params.amount,			
+			amount: params.amount * 100,			
 			client_ip: this.ctx.request.headers["x-real-ip"] || this.ctx.request.ip,
 			currency: "cny",
 			subject: params.subject || "用户充值",
@@ -104,7 +104,7 @@ const Order = class extends Controller {
 		
 		await this.model.orders.update(order, {where:{id: order.id}});
 
-		return this.success({...order, payQRUrl, QRUrl, QR});
+		return this.success({...order, payQRUrl, QRUrl, QR, orderNo:undefined});
 	}
 
 	// pingpp充值回调接口  只处理充值逻辑
