@@ -9,6 +9,7 @@ module.exports = app => {
 		TEXT,
 		BOOLEAN,
 		JSON,
+		DECIMAL,
 	} = app.Sequelize;
 
 	const model = app.model.define("accounts", {
@@ -25,7 +26,7 @@ module.exports = app => {
 		},
 
 		rmb: {                       // 人民币
-			type: INTEGER,
+			type: DECIMAL(10,2),
 			defaultValue: 0,
 		},
 

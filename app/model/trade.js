@@ -6,6 +6,7 @@ module.exports = app => {
 		TEXT,
 		BOOLEAN,
 		JSON,
+		DECIMAL,
 	} = app.Sequelize;
 
 	const model = app.model.define("trades", {
@@ -51,7 +52,7 @@ module.exports = app => {
 		},
 
 		rmb: {                       // 交易消耗或获取人民币
-			type: INTEGER,
+			type: DECIMAL(10,2),
 			defaultValue:0,
 		},
 
@@ -66,7 +67,7 @@ module.exports = app => {
 		},
 
 		realRmb: {                   // 交易实际消耗rmb
-			type: INTEGER,
+			type: DECIMAL(10,2),
 			defaultValue:0,
 		},
 
@@ -81,7 +82,7 @@ module.exports = app => {
 		},
 
 		rewardRmb: {                 // 奖励rmb
-			type: INTEGER,
+			type: DECIMAL(10,2),
 			defaultValue:0,
 		},
 

@@ -7,6 +7,7 @@ module.exports = app => {
 		TEXT,
 		BOOLEAN,
 		JSON,
+		DECIMAL,
 	} = app.Sequelize;
 
 	const model = app.model.define("orders", {
@@ -27,7 +28,8 @@ module.exports = app => {
 		},
 
 		amount: {                    // 金额
-			type: INTEGER,
+			type: DECIMAL(10,2),
+			defaultValue:0,
 		},
 
 		state: {
