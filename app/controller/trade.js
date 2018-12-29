@@ -59,12 +59,6 @@ const Trade = class extends Controller {
 		let realCoin = coin;
 		let realBean = bean;
 		
-		if (rmb > 200) {  // 验证手机验证码
-			if (!user.cellphone) return this.fail(5);
-			const cache = await this.model.caches.get(user.cellphone);
-			if (!params.captcha || !cache || cache.captcha != params.captcha) return this.fail(5);
-		}
-
 		if (discount) {
 			const types = {TRADE_TYPE_PACKAGE_BUY: DISCOUNT_TYPE_PACKAGE};
 			if (discount.type != DISCOUNT_TYPE_DEFAULT && types[type] !== discount.type) return this.throw(400, "优惠券不可用");
@@ -77,6 +71,12 @@ const Trade = class extends Controller {
 			realRmb -= discount.rewardRmb;
 			realCoin -= discount.rewardCoin;
 			realBean -= discount.rewardBean;
+		}
+
+		if (realRmb > 200) {  // 验证手机验证码
+			if (!user.cellphone) return this.fail(5);
+			const cache = await this.model.caches.get(user.cellphone);
+			if (!params.captcha || !cache || cache.captcha != params.captcha) return this.fail(5);
 		}
 
 		if (account.rmb < realRmb || account.coin < realCoin || account.bean < realBean) {

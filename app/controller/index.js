@@ -14,26 +14,11 @@ class Index extends Controller {
 	}
 
 	async test() {
-		this.model.logs.debug("this is a test");
-		//const user = await this.model.users.findOne({where:{id:300}});
-		//const account = await user.getAccount();
-		//const accountUser = await account.getUser();
-		////console.log(account, user);
-		//const roles = await user.getRoles();
-		//const role = roles[0];
-		//const roleUser = await role.getUser();
+		const uuid_short = this.model.fn("uuid_short");
+		console.log(uuid_short, typeof(uuid_short));
 
-		const illegals = await this.model.illegals.findAll({
-			include: [
-			{
-				model: this.model.users,
-				where: {
-					username: "xiaoyao",
-				}
-			}
-			]
-		});
-		return this.success(illegals);
+		//console.log("uuid_short:", uuid_short());
+		return this.success();
 	}
 }
 

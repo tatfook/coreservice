@@ -5,6 +5,7 @@ module.exports = app => {
 	const {
 		BIGINT,
 		INTEGER,
+		FLOAT,
 		STRING,
 		TEXT,
 		BOOLEAN,
@@ -26,13 +27,13 @@ module.exports = app => {
 			allowNull: false,
 		},
 		
-		//longitude: {                        // 经度
+		longitude: {                        // 经度
+			type: FLOAT(10, 6),
+		},
 
-		//},
-
-		//latitude: {                         // 维度
-
-		//},
+		latitude: {                         // 维度
+			type: FLOAT(10, 6),
+		},
 
 	}, {
 		underscored: false,
@@ -43,7 +44,7 @@ module.exports = app => {
 	//model.sync({force:true}).then(() => {
 		//console.log("create table successfully");
 	//});
-
+	
 	app.model.locations = model;
 	return model;
 };
