@@ -41,8 +41,6 @@ class Pay extends Service {
 			});
 		});
 	}
-	
-
 }
 
 module.exports = Pay;

@@ -65,7 +65,7 @@ const Order = class extends Controller {
 		const channel = params.channel;
 		const config = this.app.config.self;
 		const datetime = moment().format("YYYYMMDDHHmmss");
-		const order_no = datetime + "order" + order.id;
+		const order_no = datetime + "order" + order.id + _.random(10, 99);
 		const chargeData = {
 			order_no,
 			app: {id: config.pingpp.appId},
@@ -125,6 +125,10 @@ const Order = class extends Controller {
 		if (!order) {
 			await this.model.logs.create({text:"交易记录不存在"});
 			return this.throw(400,"交易记录不存在");
+		}
+
+		if (order.state == ORDER_STATE_CHARGE_FAILED || order.state == ORDER_STATE_CHARGE_SUCCESS) {
+			return this.throw(400, "订单已过期");
 		}
 		
 		let state = ORDER_STATE_CHARGE_FAILED, description = "充值失败";
