@@ -1,3 +1,6 @@
+
+const _ = require("lodash");
+
 module.exports = app => {
 	const {
 		BIGINT,
@@ -54,6 +57,9 @@ module.exports = app => {
 		rmb: {                       // 交易消耗或获取人民币
 			type: DECIMAL(10,2),
 			defaultValue:0,
+			get() {
+				return _.toNumber(this.getDataValue('rmb'));
+			},
 		},
 
 		coin: {                      // 交易消耗或获取知识币
@@ -69,6 +75,9 @@ module.exports = app => {
 		realRmb: {                   // 交易实际消耗rmb
 			type: DECIMAL(10,2),
 			defaultValue:0,
+			get() {
+				return _.toNumber(this.getDataValue('realRmb'));
+			},
 		},
 
 		realCoin: {                  // 交易实际消耗coin
@@ -84,6 +93,9 @@ module.exports = app => {
 		rewardRmb: {                 // 奖励rmb
 			type: DECIMAL(10,2),
 			defaultValue:0,
+			get() {
+				return _.toNumber(this.getDataValue('rewardRmb'));
+			},
 		},
 
 		rewardCoin: {                // 奖励coin
