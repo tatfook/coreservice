@@ -6,6 +6,7 @@ module.exports = app => {
 		TEXT,
 		BOOLEAN,
 		JSON,
+		DECIMAL,
 	} = app.Sequelize;
 
 	const model = app.model.define("goods", {
@@ -54,8 +55,11 @@ module.exports = app => {
 		},
 
 		rmb: {                       // 人民币价格
-			type: INTEGER,
+			type: DECIMAL(10,2),
 			defaultValue: 0,
+			get() {
+				return _.toNumber(this.getDataValue('rmb'));
+			},
 		},
 
 		coin: {                      // 知识币价格
