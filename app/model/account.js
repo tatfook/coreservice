@@ -28,6 +28,9 @@ module.exports = app => {
 		rmb: {                       // 人民币
 			type: DECIMAL(10,2),
 			defaultValue: 0,
+			get() {
+				return _.toNumber(this.getDataValue('rmb'));
+			},
 		},
 
 		coin: {                      // 知识币
