@@ -22,7 +22,8 @@ module.exports = app => {
 	router.get(`${prefix}users/:id/contributions`, user.contributions);
 	router.get(`${prefix}users/:id/detail`, user.detail);
 	router.get(`${prefix}users/:id/sites`, user.sites);
-	router.get(`${prefix}users/tokeninfo`, user.tokeninfo);
+	router.get(`${prefix}users/token`, user.token);
+	router.get(`${prefix}users/token/info`, user.tokeninfo);
 	router.post(`${prefix}users/register`, user.register);
 	router.post(`${prefix}users/login`, user.login);
 	router.post(`${prefix}users/logout`, user.logout);

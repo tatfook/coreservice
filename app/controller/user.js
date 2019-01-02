@@ -14,7 +14,28 @@ const User = class extends Controller {
 	}
 
 	tokeninfo() {
-		return this.success(this.authenticated());
+		try {
+			console.log(this.ctx.state.token);
+			const user = this.app.util.jwt_decode(this.ctx.state.token, this.app.config.self.secret, true);
+			return this.success(user);
+		} catch(e) {
+			return this.throw(401);
+		}
+	}
+
+	token() {
+		const {appId} = this.validate({appId:"int_optional"});
+		const user = this.getUser();
+		const config = this.app.config.self;
+		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
+		const token = this.app.util.jwt_encode({
+			userId: user.id, 
+			appId: appId,
+		}, config.secret, tokenExpire);
+
+		console.log(token);
+
+		return this.success(token);
 	}
 
 	async search() {
