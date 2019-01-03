@@ -1,4 +1,5 @@
 
+show procedure status;
 
 -- 封停用户
 -- 将用户数据备份至非法数据表并删除用户数据
@@ -60,25 +61,60 @@ create procedure p_disable_project(In x_projectId bigint) comment '封停项目'
 begin
     -- 备份项目信息
     replace into illegalProjects select * from projects where id = x_projectId;
-    delete from projects where id = x_projectd;
+    delete from projects where id = x_projectId;
 	
     -- 备份项目收藏信息
     replace into illegalFavorites select * from favorites where id > 0 and (objectType = 5 and objectId = x_projectId);
     delete from favorites where id > 0 and (objectType = 5 and objectId = x_projectId);
 end //
 delimiter ;
+drop procedure p_disable_project;
+select * from projects where userId = 137;
+call p_disable_project(318);
+select * from illegalProjects;
 
 -- 解封项目
 delimiter //
-create procedure p_disable_project(In x_projectId bigint) comment '解封项目' modifies sql data
+create procedure p_enable_project(In x_projectId bigint) comment '解封项目' modifies sql data
 begin
     -- 备份项目信息
     replace into projects select * from illegalProjects where id = x_projectId;
-    delete from illegalProjects where id = x_projectd;
+    delete from illegalProjects where id = x_projectId;
 	
     -- 备份项目收藏信息
     replace into favorites select * from illegalFavorites where id > 0 and (objectType = 5 and objectId = x_projectId);
     delete from illegalFavorites where id > 0 and (objectType = 5 and objectId = x_projectId);
 end //
 delimiter ;
+drop procedure p_enable_project;
+call p_enable_project(318);
+select * from illegalProjects;
+
+
+-- 封停网站
+delimiter //
+create procedure p_disable_site(In x_siteId bigint) comment '封停网站' modifies sql data
+begin
+    -- 备份项目信息
+    replace into illegalSites select * from sites where id = x_siteId;
+    delete from sites where id = x_siteId;
+end //
+delimiter ;
+drop procedure p_disable_site;
+select * from sites where userId = 137;
+call p_disable_site(714);
+select * from illegalSites;
+
+-- 解封网站
+delimiter //
+create procedure p_enable_site(In x_siteId bigint) comment '解封网站' modifies sql data
+begin
+    -- 备份项目信息
+    replace into sites select * from illegalSites where id = x_siteId;
+    delete from illegalSites where id = x_siteId;
+end //
+delimiter ;
+drop procedure p_enable_site;
+call p_enable_site(714);
+select * from illegalSites;
 

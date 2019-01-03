@@ -1,5 +1,11 @@
 
 const _ = require("lodash");
+const {
+	ENTITY_TYPE_USER,
+	ENTITY_TYPE_SITE,
+	ENTITY_TYPE_PAGE,
+	ENTITY_TYPE_PROJECT,
+} = require("../core/consts.js");
 
 module.exports = app => {
 	const {
@@ -57,6 +63,43 @@ module.exports = app => {
 	});
 
 	//model.sync({force:true});
+	
+	model.__hook__ = async function(data, oper) {
+		const objectId = data.objectId;
+		if (oper == "destroy") {  // 解封 
+			if (data.objectType == ENTITY_TYPE_USER) {
+				await app.model.query(`call p_enable_user(${objectId})`);
+				const user = await app.model.users.findOne({where:{id: objectId}}).then(o => o && o.toJSON());
+				const projects = await app.model.projects.findAll({where:{userId: objectId}}).then(list => _.map(list, o => o.toJSON()));
+				await app.api.usersUpsert(user);
+				for (let i = 0; i < projects.length; i++) {
+					await app.api.projectsUpsert(projects[i]);
+				}
+			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
+				await app.model.query(`call p_enable_project(${objectId})`);
+				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());
+				await app.api.projectsUpsert(project);
+			} else if (data.objectType == ENTITY_TYPE_SITE) {
+				await app.model.query(`call p_enable_site(${objectId})`);
+			}
+		} else {                  // 封停
+			if (data.objectType == ENTITY_TYPE_USER) {
+				const user = await app.model.users.findOne({where:{id: objectId}}).then(o => o && o.toJSON());
+				const projects = await app.model.projects.findAll({where:{userId: objectId}}).then(list => _.map(list, o => o.toJSON()));
+				await app.api.usersDestroy(user);
+				for (let i = 0; i < projects.length; i++) {
+					await app.api.projectsDestroy(projects[i]);
+				}
+				await app.model.query(`call p_disable_user(${objectId})`);
+			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
+				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());
+				await app.api.projectsDestroy(project);
+				await app.model.query(`call p_disable_project(${objectId})`);
+			} else if (data.objectType == ENTITY_TYPE_SITE) {
+				await app.model.query(`call p_disable_site(${objectId})`);
+			}
+		}
+	}
 
 	app.model.illegals = model;
 
