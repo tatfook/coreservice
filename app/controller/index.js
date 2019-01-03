@@ -14,10 +14,12 @@ class Index extends Controller {
 	}
 
 	async test() {
-		const uuid_short = this.model.fn("uuid_short");
-		console.log(uuid_short, typeof(uuid_short));
+		this.model.query(`call p_disable_user(:userId)`, {
+			replacements: {
+				userId:137,
+			}
+		});
 
-		//console.log("uuid_short:", uuid_short());
 		return this.success();
 	}
 }

@@ -11,7 +11,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("users", {
+	const attrs = {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -68,12 +68,16 @@ module.exports = app => {
 			type: JSON,
 			defaultValue: {},
 		},
-
-	}, {
+	};
+	const opts = {
 		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
-	});
+	}
+
+	app.model.illegalUsers = app.model.define("illegalUsers", attrs, opts);
+
+	const model = app.model.define("users", attrs, opts);
 
 	//model.sync({force:true});
 

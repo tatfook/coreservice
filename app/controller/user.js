@@ -234,6 +234,8 @@ const User = class extends Controller {
 		if (!usernameReg.test(username)) return this.fail(2);
 		let user = await model.users.getByName(username);
 		if (user) return this.fail(3);
+		user = await this.model.illegalUsers.findOne({where:{username}});
+		if (user) return this.fail(3);
 
 		const cellphone = params.cellphone;
 		if (cellphone) {
