@@ -147,15 +147,20 @@ const Order = class extends Controller {
 		// 获取用户账户信息
 		await this.model.accounts.getByUserId(order.userId);
 
-		// 更新订单状态
-		await this.model.orders.update({state, description}, {where:{id:order.id}});
-		// 增加用户余额
-		await this.model.accounts.increment({rmb: order.amount}, {where:{userId: order.userId}});
-		
 		// 奖励优惠券
 		const discount = this.model.discounts.generateDiscount();
 		discount.userId = order.userId;
 		await this.model.discounts.create(discount);
+		
+
+		const extra = order.extra || {};
+		extra.discount = discount;
+
+		// 更新订单状态
+		await this.model.orders.update({state, description, extra}, {where:{id:order.id}});
+
+		// 增加用户余额
+		await this.model.accounts.increment({rmb: order.amount}, {where:{userId: order.userId}});
 		
 		// 增加充值交易明细
 		await this.model.trades.create({
@@ -163,9 +168,6 @@ const Order = class extends Controller {
 			type: TRADE_TYPE_DEFAULT,
 			subject: order.channel == "wx_pub_qr" ? "微信充值" : "支付宝充值",
 			rmb: order.amount, 
-			extra: {
-				discount,
-			},
 		});
 
 		order.state = state;
