@@ -34,4 +34,32 @@ module.exports = app => {
 		foreignKey: "objectId",
 		targetKey: "id",
 	});
+
+	
+	app.model.illegalUsers.hasOne(illegals, {
+		foreignKey: "objectId"
+	});
+
+	illegals.belongsTo(app.model.illegalUsers, {
+		foreignKey: "objectId",
+		targetKey: "id",
+	});
+
+	app.model.illegalProjects.hasOne(illegals, {
+		foreignKey: "objectId"
+	});
+
+	illegals.belongsTo(app.model.illegalProjects, {
+		foreignKey: "objectId",
+		targetKey: "id",
+	});
+
+	app.model.illegalSites.hasOne(illegals, {
+		foreignKey: "objectId"
+	});
+
+	illegals.belongsTo(app.model.illegalSites, {
+		foreignKey: "objectId",
+		targetKey: "id",
+	});
 }

@@ -22,7 +22,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("projects", {
+	const attrs = {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -133,8 +133,9 @@ module.exports = app => {
 			type: JSON,
 			defaultValue: {},
 		},
+	};
 
-	}, {
+	const opts = {
 		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
@@ -144,7 +145,10 @@ module.exports = app => {
 			fields: ["userId", "name"],
 		},
 		],
-	});
+	}
+	app.model.illegalProjects = app.model.define("illegalProjects", attrs, opts);
+
+	const model = app.model.define("projects", attrs, opts);
 
 	//model.sync({force:true}).then(() => {
 		//console.log("create table successfully");

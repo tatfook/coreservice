@@ -86,15 +86,15 @@ module.exports = app => {
 			if (data.objectType == ENTITY_TYPE_USER) {
 				const user = await app.model.users.findOne({where:{id: objectId}}).then(o => o && o.toJSON());
 				const projects = await app.model.projects.findAll({where:{userId: objectId}}).then(list => _.map(list, o => o.toJSON()));
+				await app.model.query(`call p_disable_user(${objectId})`);
 				await app.api.usersDestroy(user);
 				for (let i = 0; i < projects.length; i++) {
 					await app.api.projectsDestroy(projects[i]);
 				}
-				await app.model.query(`call p_disable_user(${objectId})`);
 			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
 				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());
-				await app.api.projectsDestroy(project);
 				await app.model.query(`call p_disable_project(${objectId})`);
+				await app.api.projectsDestroy(project);
 			} else if (data.objectType == ENTITY_TYPE_SITE) {
 				await app.model.query(`call p_disable_site(${objectId})`);
 			}

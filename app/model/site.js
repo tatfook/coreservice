@@ -25,7 +25,7 @@ module.exports = app => {
 		USER_ACCESS_LEVEL_WRITE,
 	} = consts;
 
-	const model = app.model.define("sites", {
+	const attrs = {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -63,8 +63,9 @@ module.exports = app => {
 			type: JSON,
 			defaultValue: {},
 		},
+	};
 
-	}, {
+	const opts = {
 		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
@@ -74,7 +75,10 @@ module.exports = app => {
 			fields: ["userId", "sitename"],
 		},
 		],
-	});
+	}
+	app.model.illegalSites = app.model.define("illegalSites", attrs, opts);
+
+	const model = app.model.define("sites", attrs, opts);
 
 	//model.sync({force:true});
 	model.__hook__ = async function(data, oper) {
