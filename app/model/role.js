@@ -27,7 +27,7 @@ module.exports = app => {
 			primaryKey: true,
 		},
 		
-		userId: {  // 文件所属者
+		userId: {                      // 用户ID
 			type: BIGINT,
 			allowNull: false,
 		},
