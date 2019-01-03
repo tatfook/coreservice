@@ -151,21 +151,26 @@ const Order = class extends Controller {
 		await this.model.orders.update({state, description}, {where:{id:order.id}});
 		// 增加用户余额
 		await this.model.accounts.increment({rmb: order.amount}, {where:{userId: order.userId}});
+		
+		// 奖励优惠券
+		const discount = this.model.discounts.generateDiscount();
+		discount.userId = order.userId;
+		await this.model.discounts.create(discount);
+		
 		// 增加充值交易明细
 		await this.model.trades.create({
 			userId:order.userId, 
 			type: TRADE_TYPE_DEFAULT,
 			subject: order.channel == "wx_pub_qr" ? "微信充值" : "支付宝充值",
 			rmb: order.amount, 
+			extra: {
+				discount,
+			},
 		});
 
 		order.state = state;
 		order.description = description;
 
-		// 奖励优惠券
-		const discount = this.model.discounts.generateDiscount();
-		discount.userId = order.userId;
-		await this.model.discounts.create(discount);
 
 		////  
 		//if (params.type == "charge.succeeded") {

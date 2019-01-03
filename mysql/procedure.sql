@@ -191,23 +191,49 @@ delete from projects where id = 347;
 delimiter //
 create procedure p_disable_user(IN x_userId bigint) comment '禁用用户' modifies sql data 
 begin
+	-- 备份用户信息
 	replace into illegalUsers select * from users where id = x_userId;
     delete from users where id = x_userId;
+    -- 备份用户项目信息
+    replace into illegalProjects select * from projects where userId = x_userId;
+    delete from projects where id > 0 and userId = x_userId;
+    -- 备份用户网站信息
+    replace into illegalSites select * from sites where userId = x_userId;
+    delete from sites where id > 0 and userId = x_userId;
+    -- 备份用户评论信息
+    replace into illegalComments select * from comments where userId = x_userId;
+    delete from comments where id > 0 and userId = x_userId;
+    -- 备份用户收藏及粉丝, 及项目收藏者
+    replace into illegalFavorites select * from favorites where userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId));
+    delete from favorites where id > 0 and (userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId)));
 end //
 delimiter ;
 drop procedure p_disable_user;
-
 select * from illegalUsers;
-select * from users where id = 137;
+select * from illegalProjects;
+select * from illegalComments;
+select * from illegalFavorites;
 call p_disable_user(137);
-
 
 -- 解封用户
 delimiter //
 create procedure p_enable_user(IN x_userId bigint) comment '解封用户' modifies sql data 
 begin
+	-- 恢复用户信息
 	replace into users select * from illegalUsers where id = x_userId;
     delete from illegalUsers where id = x_userId;
+    -- 恢复用户项目信息
+    replace into projects select * from illegalProjects where userId = x_userId;
+    delete from illegalProjects where id > 0 and userId = x_userId;
+    -- 恢复用户网站信息
+    replace into sites select * from illegalSites where userId = x_userId;
+    delete from illegalSites where id > 0 and userId = x_userId;
+    -- 恢复用户评论信息
+    replace into comments select * from illegalComments where userId = x_userId;
+    delete from illegalComments where id > 0 and userId = x_userId;
+    -- 恢复用户收藏及粉丝, 及项目收藏者
+    replace into favorites select * from illegalFavorites where userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId));
+    delete from illegalFavorites where id > 0 and (userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId)));
 end //
 delimiter ;
 drop procedure p_enable_user;
