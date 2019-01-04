@@ -68,13 +68,14 @@ module.exports = app => {
 		const objectId = data.objectId;
 		if (oper == "destroy") {  // 解封 
 			if (data.objectType == ENTITY_TYPE_USER) {
-				await app.model.query(`call p_enable_user(${objectId})`);
+				const result = await app.model.query(`call p_enable_user(${objectId})`);
 				const user = await app.model.users.findOne({where:{id: objectId}}).then(o => o && o.toJSON());
 				const projects = await app.model.projects.findAll({where:{userId: objectId}}).then(list => _.map(list, o => o.toJSON()));
-				await app.api.usersUpsert(user);
+				//await app.api.usersUpsert(user);
 				for (let i = 0; i < projects.length; i++) {
-					await app.api.projectsUpsert(projects[i]);
+					//await app.api.projectsUpsert(projects[i]);
 				}
+				app.model.logs.debug("0000000");
 			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
 				await app.model.query(`call p_enable_project(${objectId})`);
 				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());
@@ -87,10 +88,11 @@ module.exports = app => {
 				const user = await app.model.users.findOne({where:{id: objectId}}).then(o => o && o.toJSON());
 				const projects = await app.model.projects.findAll({where:{userId: objectId}}).then(list => _.map(list, o => o.toJSON()));
 				await app.model.query(`call p_disable_user(${objectId})`);
-				await app.api.usersDestroy(user);
+				//await app.api.usersDestroy(user);
 				for (let i = 0; i < projects.length; i++) {
-					await app.api.projectsDestroy(projects[i]);
+					//await app.api.projectsDestroy(projects[i]);
 				}
+				app.model.logs.debug("0000000");
 			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
 				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());
 				await app.model.query(`call p_disable_project(${objectId})`);
