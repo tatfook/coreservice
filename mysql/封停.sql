@@ -1,6 +1,8 @@
-
+select count(*) from logs;
+select * from logs;
 show procedure status;
 select * from users where id = 137;
+select * from illegals;
 -- 封停用户
 -- 将用户数据备份至非法数据表并删除用户数据
 delimiter //

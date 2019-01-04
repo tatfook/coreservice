@@ -29,6 +29,6 @@ new Err(10, "未绑定用户");
 new Err(11, "密码错误");
 new Err(12, "用户不存在");
 new Err(13, "余额不足");
-
+new Err(14, "该账号不可用");
 
 module.exports = Err;

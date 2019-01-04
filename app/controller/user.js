@@ -96,6 +96,9 @@ const User = class extends Controller {
 		});
 		username = username.toLowerCase();
 
+		const exist = await this.model.illegalUsers.findOne({where: {[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}],	password: this.app.util.md5(password)}});
+		if (exist) return this.fail(14);
+
 		let user = await this.model.users.findOne({
 			where: {
 				[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}],
