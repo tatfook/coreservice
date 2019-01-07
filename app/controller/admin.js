@@ -74,6 +74,8 @@ const Admin = class extends Controller {
 	}
 
 	async resourcesQuery() {
+		this.adminAuthenticated();
+
 		const query = this.parseParams();
 
 		this.formatQuery(query);
@@ -84,6 +86,8 @@ const Admin = class extends Controller {
 	}
 
 	async search() {
+		this.adminAuthenticated();
+
 		const query = this.parseParams();
 
 		this.formatQuery(query);
@@ -94,6 +98,8 @@ const Admin = class extends Controller {
 	}
 
 	async index() {
+		this.adminAuthenticated();
+
 		const query = this.parseParams();
 
 		this.formatQuery(query);
@@ -104,6 +110,8 @@ const Admin = class extends Controller {
 	}
 
 	async show() {
+		this.adminAuthenticated();
+
 		const params = this.parseParams();
 		const id = _.toNumber(params.id);
 
@@ -115,6 +123,8 @@ const Admin = class extends Controller {
 	}
 
 	async create() {
+		this.adminAuthenticated();
+
 		const params = this.parseParams();
 
 		const data = await this.resource.create(params);
@@ -123,6 +133,8 @@ const Admin = class extends Controller {
 	}
 
 	async update() {
+		this.adminAuthenticated();
+
 		const params = this.parseParams();
 		const id = _.toNumber(params.id);
 
@@ -134,6 +146,8 @@ const Admin = class extends Controller {
 	}
 
 	async destroy() {
+		this.adminAuthenticated();
+
 		const params = this.parseParams();
 		const id = _.toNumber(params.id);
 

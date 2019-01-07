@@ -35,7 +35,6 @@ module.exports = app => {
 		targetKey: "id",
 	});
 
-	
 	app.model.illegalUsers.hasOne(illegals, {
 		foreignKey: "objectId"
 	});

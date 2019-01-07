@@ -14,12 +14,6 @@ class Index extends Controller {
 	}
 
 	async test() {
-		this.model.query(`call p_disable_user(:userId)`, {
-			replacements: {
-				userId:137,
-			}
-		});
-
 		return this.success();
 	}
 }
