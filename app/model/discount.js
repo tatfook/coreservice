@@ -103,10 +103,10 @@ module.exports = app => {
 		const startTime = new Date().getTime();
 		const endTime = startTime + 1000 * 3600 * 24 * 30;
 		const discounts = [
-		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满100元可用", description:"通用券, Keepwork全平台通用", extra:{en:{title:"when you spend ￥100", description:"General Coupons, Applying to all products on Keepwork"}}},
-		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime, title:"满100元可用", description:"课程券, 仅限购买课程包使用", extra:{en:{title:"when you spend ￥100", description:"Lesson Coupons, Only applying to lesson packages"}}},
-		{coin:10, rewardCoin: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满10知识币可用", description:"通用券, Keepwork全平台通用", extra:{en:{title:"when you spend 10 coins", description:"General Coupons, Applying to all products on Keepwork"}}},
-		{bean:10, rewardBean: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满10知识豆可用", description:"通用券, Keepwork全平台通用", extra:{en:{title:"when you spend 10 beans", description:"General Coupons, Applying to all products on Keepwork"}}},
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满100元可用", description:"通用券, Keepwork全平台通用", extra:{enTitle:"when you spend ￥100", enDescription:"General Coupons, Applying to all products on Keepwork"}},
+		{rmb:100, rewardRmb: 5, type:DISCOUNT_TYPE_PACKAGE, startTime, endTime, title:"满100元可用", description:"课程券, 仅限购买课程包使用", extra:{enTitle:"when you spend ￥100", enDescription:"Lesson Coupons, Only applying to lesson packages"}},
+		{coin:10, rewardCoin: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满10知识币可用", description:"通用券, Keepwork全平台通用", extra:{enTitle:"when you spend 10 coins", enDescription:"General Coupons, Applying to all products on Keepwork"}},
+		{bean:10, rewardBean: 10, type:DISCOUNT_TYPE_DEFAULT, startTime, endTime, title:"满10知识豆可用", description:"通用券, Keepwork全平台通用", extra:{enTitle:"when you spend 10 beans", enDescription:"General Coupons, Applying to all products on Keepwork"}},
 		];
 		const discount = discounts[_.random(0,3)];
 
