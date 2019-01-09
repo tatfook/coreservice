@@ -6,49 +6,47 @@ module.exports = app => {
 	const illegals = app.model.illegals;
 
 	users.hasOne(accounts, {
-		//as: "Account",
+		as: "accounts",
 		foreignKey: "userId",
 		constraints: false,
 	});
 
 	accounts.belongsTo(users, {
-		//as: "User",
+		as: "users",
 		foreignKey: "userId",
 		targetKey: "id",
 		constraints: false,
 	});
 
 	users.hasMany(roles, {
+		as:"roles",
 		foreignKey: "userId",
 		sourceKey: "id",
 		constraints: false,
 	});
 
 	roles.belongsTo(users, {
+		as: "users",
 		foreignKey: "userId",
 		targetKey: "id",
 		constraints: false,
 	});
 
-	users.hasOne(illegals, {
+	app.model.users.hasOne(illegals, {
+		as: "illegals",
 		foreignKey: "objectId",
 		constraints: false,
 	});
 
 	illegals.belongsTo(users, {
+		as: "illegals",
 		foreignKey: "objectId",
 		targetKey: "id",
 		constraints: false,
 	});
 
-	app.model.illegalUsers.hasOne(illegals, {
-		as: "illegalUsers",
-		foreignKey: "objectId",
-		constraints: false,
-	});
-
 	app.model.projects.hasOne(illegals, {
-		as: "projects",
+		as: "illegals",
 		foreignKey: "objectId",
 		constraints: false,
 	});
@@ -61,7 +59,7 @@ module.exports = app => {
 	});
 
 	app.model.sites.hasOne(illegals, {
-		as: "sites",
+		as: "illegals",
 		foreignKey: "objectId",
 		constraints: false,
 	});
@@ -81,7 +79,7 @@ module.exports = app => {
 	});
 
 	app.model.illegalProjects.hasOne(illegals, {
-		as: "illegalProjects",
+		as: "illegals",
 		foreignKey: "objectId",
 		constraints: false,
 	});
@@ -94,7 +92,7 @@ module.exports = app => {
 	});
 
 	app.model.illegalSites.hasOne(illegals, {
-		as: "illegalSites",
+		as: "illegals",
 		foreignKey: "objectId",
 		constraints: false,
 	});

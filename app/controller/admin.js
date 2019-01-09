@@ -52,7 +52,7 @@ const Admin = class extends Controller {
 	async query() {
 		this.adminAuthenticated();
 
-		const {sql} = this.validate({sql:"string"});
+		const {sql, data} = this.validate({sql:"string"});
 		const _sql = sql.toLowerCase();
 		if (_sql.indexOf("select ") != 0 || 
 				_sql.indexOf(";") >= 0 ||
@@ -68,6 +68,7 @@ const Admin = class extends Controller {
 
 		const list = await this.model.query(sql, {
 			type: this.model.QueryTypes.SELECT,
+			replacements: data,
 		});
 
 		return this.success(list);
