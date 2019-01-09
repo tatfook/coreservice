@@ -39,7 +39,7 @@ module.exports = app => {
 	});
 
 	illegals.belongsTo(users, {
-		as: "illegals",
+		as: "users",
 		foreignKey: "objectId",
 		targetKey: "id",
 		constraints: false,
