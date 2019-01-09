@@ -75,7 +75,6 @@ module.exports = app => {
 				for (let i = 0; i < projects.length; i++) {
 					await app.api.projectsUpsert(projects[i]);
 				}
-				app.model.logs.debug("0000000");
 			} else if (data.objectType == ENTITY_TYPE_PROJECT) {
 				await app.model.query(`call p_enable_project(${objectId})`);
 				const project = await app.model.projects.findOne({where:{id:objectId}}).then(o => o && o.toJSON());

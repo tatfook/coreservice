@@ -8,57 +8,75 @@ module.exports = app => {
 	users.hasOne(accounts, {
 		//as: "Account",
 		foreignKey: "userId",
+		constraints: false,
 	});
 
 	accounts.belongsTo(users, {
 		//as: "User",
 		foreignKey: "userId",
 		targetKey: "id",
+		constraints: false,
 	});
 
 	users.hasMany(roles, {
 		foreignKey: "userId",
 		sourceKey: "id",
+		constraints: false,
 	});
 
 	roles.belongsTo(users, {
 		foreignKey: "userId",
 		targetKey: "id",
+		constraints: false,
 	});
 
 	users.hasOne(illegals, {
-		foreignKey: "objectId"
+		foreignKey: "objectId",
+		constraints: false,
 	});
 
 	illegals.belongsTo(users, {
 		foreignKey: "objectId",
 		targetKey: "id",
+		constraints: false,
 	});
 
 	app.model.illegalUsers.hasOne(illegals, {
-		foreignKey: "objectId"
+		as: "illegalUsers",
+		foreignKey: "objectId",
+		constraints: false,
 	});
 
 	illegals.belongsTo(app.model.illegalUsers, {
+		as: "illegalUsers",
 		foreignKey: "objectId",
 		targetKey: "id",
+		constraints: false,
 	});
 
 	app.model.illegalProjects.hasOne(illegals, {
-		foreignKey: "objectId"
+		as: "illegalProjects",
+		foreignKey: "objectId",
+		constraints: false,
 	});
 
 	illegals.belongsTo(app.model.illegalProjects, {
+		as: "illegalProjects",
 		foreignKey: "objectId",
 		targetKey: "id",
+		constraints: false,
 	});
 
 	app.model.illegalSites.hasOne(illegals, {
-		foreignKey: "objectId"
+		as: "illegalSites",
+		foreignKey: "objectId",
+		constraints: false,
 	});
 
 	illegals.belongsTo(app.model.illegalSites, {
+		as: "illegalSites",
 		foreignKey: "objectId",
 		targetKey: "id",
+		constraints: false,
 	});
 }
