@@ -32,6 +32,20 @@ module.exports = app => {
 		constraints: false,
 	});
 
+	app.model.users.hasMany(app.model.issues, {
+		as:"issues",
+		foreignKey: "userId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.issues.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey: "userId",
+		targetKey: "id",
+		constraints: false,
+	});
+
 	app.model.users.hasOne(illegals, {
 		as: "illegals",
 		foreignKey: "objectId",
