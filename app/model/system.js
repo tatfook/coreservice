@@ -29,7 +29,7 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 
-	app.model.accounts = model;
+	app.model.systems = model;
 	return model;
 };
 
