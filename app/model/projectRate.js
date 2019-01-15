@@ -91,7 +91,7 @@ module.exports = app => {
 		extra.rate[rateLevel] = (extra.rate[rateLevel] || 0) + 1;
 		extra.rate.count = (extra.rate.count || 0) + 1;
 
-		await app.model.projects.update({rate, extra}, {where:{id: projectId}});
+		await app.model.projects.update({rate:projectRate, extra}, {where:{id: projectId}});
 	}
 
 	app.model.projectRates = model;
