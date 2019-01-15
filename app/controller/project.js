@@ -141,6 +141,9 @@ const Project = class extends Controller {
 		delete params.visit;
 		delete params.hotNo;
 		delete params.choicenessNo;
+		delete params.rate;
+		delete params.rateCount;
+		delete params.classifyTags;
 
 		const data = await this.model.projects.create(params);
 		if (!data) return this.throw(500, "记录创建失败");
@@ -190,6 +193,9 @@ const Project = class extends Controller {
 		delete params.visit;
 		delete params.hotNo;
 		delete params.choicenessNo;
+		delete params.rate;
+		delete params.rateCount;
+		delete params.classifyTags;
 
 		const data = await this.model.projects.update(params, {where:{id, userId}});
 

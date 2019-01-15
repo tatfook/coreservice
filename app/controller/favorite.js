@@ -41,6 +41,24 @@ const Favorite = class extends Controller {
 			list = await model.favorites.getFavoriteSites(userId);
 		} else if (objectType == ENTITY_TYPE_PAGE) {
 			list = await model.favorites.getFavoritePages(userId);
+		} else {
+			const models = {
+				[ENTITY_TYPE_PROJECT]: {
+					as: "projects",
+					model: this.model.projects,
+					include: [
+					{
+						attributes:[["id", "userId"], "username", "nickname", "portrait", "description"],
+						as: "users",
+						model: this.model.users,
+					},
+					]
+				},
+			};
+			list = await this.model.favorites.findAll({
+				include: [models[objectType]],
+				where: { userId, objectType}
+			}).then(l => _.map(l, o => o.toJSON()));
 		}
 
 		return this.success(list);

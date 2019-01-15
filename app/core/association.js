@@ -117,4 +117,31 @@ module.exports = app => {
 		targetKey: "id",
 		constraints: false,
 	});
+
+	// 项目收藏
+	app.model.projects.hasMany(app.model.favorites, {
+		as: "favorites",
+		foreignKey: "objectId",
+		sourceKey: "id",
+		constraints: false,
+	});
+	app.model.favorites.belongsTo(app.model.projects, {
+		as: "projects",
+		foreignKey: "objectId",
+		targetKey: "id",
+		constraints: false,
+	});
+	// 用户项目
+	app.model.users.hasMany(app.model.projects, {
+		as: "projects",
+		foreignKey: "userId",
+		sourceKey: "id",
+		constraints: false,
+	});
+	app.model.projects.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey:"userId",
+		sourceKey: "id",
+		constraints: false,
+	});
 }

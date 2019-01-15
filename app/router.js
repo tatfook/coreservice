@@ -119,6 +119,10 @@ module.exports = app => {
 	router.post(`${prefix}projects/:id/unstar`, project.unstar);
 	router.resources(`${prefix}projects`, project);
 
+	// 项目评分
+	const projectRate = controller.projectRate;
+	router.resources(`${prefix}projectRates`, projectRate);
+
 	const issue = controller.issue;
 	router.post(`${prefix}issues/count`, issue.count);
 	router.post(`${prefix}issues/search`, issue.search);

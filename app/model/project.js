@@ -17,6 +17,7 @@ module.exports = app => {
 		BIGINT,
 		INTEGER,
 		STRING,
+		FLOAT,
 		TEXT,
 		BOOLEAN,
 		JSON,
@@ -89,17 +90,17 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		lastVisit: {                     // 最近访问量
+		lastVisit: {                 // 最近访问量
 			type: INTEGER,
 			defaultValue:0,
 		},
 
-		lastStar: {                      // 最近点赞数量
+		lastStar: {                  // 最近点赞数量
 			type: INTEGER,
 			defaultValue: 0,
 		},
 
-		lastComment: {                   // 最近评论数量
+		lastComment: {               // 最近评论数量
 			type: INTEGER,
 			defaultValue: 0,
 		},
@@ -124,7 +125,22 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
-		extend: {                      // 后端使用
+		rate: {                      // 项目评分
+			type: FLOAT,
+			defaultValue:0,
+		},
+
+		rateCount: {                 // 项目评分人数
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		classifyTags: {              // 系统分类tags
+			type:STRING(255),
+			defaultValue:"|",
+		},
+
+		extend: {                    // 后端使用
 			type: JSON,
 			defaultValue:{},
 		},

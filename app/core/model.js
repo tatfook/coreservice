@@ -18,6 +18,7 @@ module.exports = app => {
 		issues: "issues",
 		comments: "comments",
 		illegals:"illegals",
+		projectRates: "projectRates",
 	};
 
 	const map = {};
