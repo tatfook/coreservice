@@ -3,6 +3,16 @@ select * from logs;
 show procedure status;
 select * from users where id = 137;
 select * from illegals;
+use `keepwork-dev`;
+use `keepwork-rls`;
+use `keepwork`;
+create table illegalUsers like users;
+create table illegalProjects like projects;
+create table illegalSites like sites;
+create table illegalFavorites like favorites;
+create table illegalComments like comments;
+create table illegalIssues like issues;
+
 -- 封停用户
 -- 将用户数据备份至非法数据表并删除用户数据
 delimiter //
@@ -20,6 +30,9 @@ begin
     -- 备份用户评论信息
     replace into illegalComments select * from comments where userId = x_userId;
     delete from comments where id > 0 and userId = x_userId;
+    -- 备份用户ISSUES信息
+    replace into illegalIssues select * from issues where userId = x_userId;
+    delete from issues where id > 0 and userId = x_userId;
     -- 备份用户收藏及粉丝, 及项目收藏者
     replace into illegalFavorites select * from favorites where userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId));
     delete from favorites where id > 0 and (userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId)));
@@ -48,6 +61,9 @@ begin
     -- 恢复用户评论信息
     replace into comments select * from illegalComments where userId = x_userId;
     delete from illegalComments where id > 0 and userId = x_userId;
+    -- 恢复用户ISSUES信息
+    replace into issues select * from illegalIssues where userId = x_userId;
+    delete from illegalIssues where id > 0 and userId = x_userId;
     -- 恢复用户收藏及粉丝, 及项目收藏者
     replace into favorites select * from illegalFavorites where userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId));
     delete from illegalFavorites where id > 0 and (userId = x_userId or (objectId = x_userId  and objectType = 0) or (objectType = 5 and objectId in (select id from projects where userId = x_userId)));

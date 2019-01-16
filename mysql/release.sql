@@ -1,7 +1,10 @@
 
 use `keepwork-dev`;
+use `keepwork-rls`;
 
-
+alter table illegalProjects add column rate float default 0;    -- 评分值
+alter table illegalProjects add column rateCount int default 0; -- 评分数量
+alter table illegalProjects add column classifyTags varchar(255) default "|";
 alter table projects add column rate float default 0;    -- 评分值
 alter table projects add column rateCount int default 0; -- 评分数量
 alter table projects add column classifyTags varchar(255) default "|";
