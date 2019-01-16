@@ -73,10 +73,11 @@ module.exports = app => {
 		const project = await app.model.projects.getById(projectId);
 		if (!project) return;
 		const type = app.model.QueryTypes.SELECT;
-		let arr = await app.model.query(`select avg(rate) as avgrate from projectRates`, {type});
-		if (arr.length != 1) return;
-		const projectsAvgRate = _.toNumber(arr[0]["avgrate"]);
-		arr = await app.model.query(`select avg(rate) as avgrate, count(*) as count from projectRates where projectId = :projectId`, {
+		//let arr = await app.model.query(`select avg(rate) as avgrate from projectRates`, {type});
+		//if (arr.length != 1) return;
+		//const projectsAvgRate = _.toNumber(arr[0]["avgrate"]);
+		const projectsAvgRate = 70;
+		const arr = await app.model.query(`select avg(rate) as avgrate, count(*) as count from projectRates where projectId = :projectId`, {
 			type,replacements: {projectId},
 		});
 		if (arr.length != 1) return;
@@ -89,9 +90,14 @@ module.exports = app => {
 		extra.rate = extra.rate || {};
 		const rateLevel = _.floor(rate / 20);
 		extra.rate[rateLevel] = (extra.rate[rateLevel] || 0) + 1;
-		extra.rate.count = (extra.rate.count || 0) + 1;
+		extra.rate.count = projectRateCount;
 
-		await app.model.projects.update({rate:projectRate, extra}, {where:{id: projectId}});
+		await app.model.projects.update({rate:projectRate, rateCount:projectRateCount, extra}, {where:{id: projectId}});
+
+		project.rate = projectRate;
+		project.extra = extra;
+
+		app.api.projectsUpsert(project);
 	}
 
 	app.model.projectRates = model;

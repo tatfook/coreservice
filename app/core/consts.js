@@ -123,6 +123,9 @@ module.exports = {
 
 	// 管理员角色
 	ADMIN_ROLE_SUPER: 10,      // 超级管理员
+
+	TAG_CLASSIFY_USER: 0,      // 用户类别TAG
+	TAG_CLASSIFY_PROJECT: 1,   // 项目类别TAG
 }
 
 

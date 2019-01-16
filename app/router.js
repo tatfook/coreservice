@@ -139,6 +139,10 @@ module.exports = app => {
 	router.post(`${prefix}applies/search`, apply.search);
 	router.resources(`${prefix}applies`, apply);
 
+	// 系统tag
+	const systemTag = controller.systemTag;
+	router.resources(`${prefix}systemTags`, systemTag);
+
 	const convert = controller.convert;
 	router.get(`${prefix}converts`, convert.convert);
 	router.get(`${prefix}converts/siteVisibility`, convert.convertSiteVisibility);
