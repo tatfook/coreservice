@@ -169,6 +169,8 @@ class Api  {
 			recent_view: inst.lastVisit,
 			updated_at: inst.updatedAt,
 			video: (inst.extra || {}).videoUrl,
+			recommended: inst.choicenessNo > 0 ? true :false,
+			sys_tags: (inst.classifyTags || "").split("|").filter(o => o),
 		}, this.esConfig);
 	}
 
