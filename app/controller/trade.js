@@ -114,7 +114,7 @@ const Trade = class extends Controller {
 		callbackData.goods = goods;
 		
 		if (goods.platform == 2 || goods.platform == 3) {              // 哈奇兑换
-			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: bean, method:"1", orderno: userId + "" + (new Date().getTime()), from:"0", price:goods.bean, user_nid:callbackData.user_nid};
+			const params = {url:'Pay', username, gsid:goods.goodsId, count, money: rmb * 100, method:"1", orderno: userId + "" + (new Date().getTime()), from:"0", price:goods.bean, user_nid:callbackData.user_nid};
 			await axios.get(goods.callback, {params, headers}).then(res => {
 				if (/,result=0,/.test(res.data)) return;
 				success = false;
