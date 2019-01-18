@@ -84,7 +84,7 @@ module.exports = app => {
 		const projectAvgRate = _.toNumber(arr[0]["avgrate"]);
 		const projectRateCount = _.toNumber(arr[0]["count"]);
 		const rateThreshold = 20;
-		const projectRate = projectRateCount / (projectRateCount + rateThreshold) * projectAvgRate + rateThreshold / (projectRateCount + rateThreshold) *projectsAvgRate;
+		const projectRate = projectRateCount < 8 ? 0 : (projectRateCount / (projectRateCount + rateThreshold) * projectAvgRate + rateThreshold / (projectRateCount + rateThreshold) *projectsAvgRate);
 	
 		const extra = project.extra || {};
 		extra.rate = extra.rate || {};
