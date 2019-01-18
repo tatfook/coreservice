@@ -21,6 +21,17 @@ CREATE TABLE `projectRates` (
   UNIQUE KEY `project_rates_user_id_project_id` (`userId`,`projectId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
+CREATE TABLE `systemTags` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `classify` int(11) DEFAULT NULL,
+  `tagname` varchar(24) COLLATE utf8mb4_bin NOT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `system_tags_classify_tagname` (`classify`,`tagname`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 
 insert into projectRates(userId, projectId, rate, createdAt, updatedAt) values
 (300, 1, 60, current_time(), current_time()),

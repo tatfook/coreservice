@@ -171,7 +171,7 @@ class Api  {
 			video: (inst.extra || {}).videoUrl,
 			recommended: inst.choicenessNo > 0 ? true :false,
 			sys_tags: (inst.classifyTags || "").split("|").filter(o => o),
-			point: inst.rate,
+			point: inst.rateCount < 8 ? : undefined : inst.rate,
 		}, this.esConfig);
 	}
 

@@ -159,6 +159,7 @@ module.exports = app => {
 	router.post(`${prefix}admins/login`, admin.login);
 	router.post(`${prefix}admins/:resources/query`, admin.resourcesQuery);
 	router.post(`${prefix}admins/:resources/search`, admin.search);
+	router.post(`${prefix}admins/:resources/bulk`, admin.bulkCreate);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const order = controller.order;

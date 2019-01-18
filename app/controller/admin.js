@@ -123,6 +123,16 @@ const Admin = class extends Controller {
 		return this.success(data);
 	}
 
+	async bulkCreate() {
+		this.adminAuthenticated();
+
+		const {datas} = this.parseParams();
+
+		const data = await this.resource.bulkCreate(datas); 
+
+		return this.success(data);
+	}
+
 	async create() {
 		this.adminAuthenticated();
 
