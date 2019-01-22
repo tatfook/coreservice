@@ -28,7 +28,7 @@ module.exports = app => {
 		},
 
 		active: {                      // 是否激活
-			type: BOOLEAN,
+			type: INTEGER,
 			defaultValue: false,
 		},
 
@@ -47,7 +47,7 @@ module.exports = app => {
 		},
 
 		purchase: {                    // 是否购买
-			type: BOOLEAN,
+			type: INTEGER,
 			defaultValue: false,
 		},
 
