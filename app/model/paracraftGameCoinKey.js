@@ -32,6 +32,10 @@ module.exports = app => {
 			defaultValue: false,
 		},
 
+		activeTime: {                  // 激活时间
+			type: DATE,
+		},
+
 		gameCoin: {                    // 游戏币数量
 			type: INTEGER,
 			defaultValue: 0,
@@ -40,10 +44,6 @@ module.exports = app => {
 		deviceId: {                    // 激活设备ID
 			type: STRING,
 			defaultValue:"",
-		},
-
-		activeTime: {                  // 激活时间
-			type: DATE,
 		},
 
 		purchase: {                    // 是否购买

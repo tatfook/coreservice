@@ -5,7 +5,7 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 
-const sensitiveWords = require("./sensitiveWords.js");
+const sensitiveWords = [];
 
 const SensitiveWord = class extends Controller {
 	get modelName() {

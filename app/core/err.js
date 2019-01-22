@@ -30,5 +30,7 @@ new Err(11, "密码错误");
 new Err(12, "用户不存在");
 new Err(13, "余额不足");
 new Err(14, "该账号不可用");
+new Err(15, "无效激活码");
+new Err(16, "激活码被使用");
 
 module.exports = Err;

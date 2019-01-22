@@ -191,6 +191,12 @@ module.exports = app => {
 	router.post(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);
 	router.resources(`${prefix}sensitiveWords`, sensitiveWord);
 
+	// 探索APP
+	const paracraftGameCoinKey = controller.paracraftGameCoinKey;
+	const paracraftDevice = controller.paracraftDevice;
+	router.get(`${prefix}paracraftDevices/pwdVerify`, paracraftDevice.pwdVerify);
+	router.post(`${prefix}paracraftGameCoinKeys/active`, paracraftGameCoinKey.active);
+
 	// wikicraft proxy
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
 	router.all("/api/wiki/models/user/register", controller.proxyUser.register);
