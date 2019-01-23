@@ -136,9 +136,13 @@ const Admin = class extends Controller {
 	async bulkUpdate() {
 		this.adminAuthenticated();
 
-		const {data, query} = this.parseParams();
+		const {data, query, datas=[]} = this.parseParams();
 		
 		const data = await this.resource.update(data, {where:query});	
+		for (let i = 0; i < datas.length; i++) {
+			if (!datas[i].id) continue;
+			await this.resource.update(datas[i], {where:{id:datas[i].id}});
+		}
 
 		return this.success(data);
 	}
@@ -146,9 +150,13 @@ const Admin = class extends Controller {
 	async bulkDestroy() {
 		this.adminAuthenticated();
 
-		const {query} = this.parseParams();
+		const {query, datas=[]} = this.parseParams();
 		
 		const data = await this.resource.destroy({where:query});	
+		for (let i = 0; i < datas.length; i++) {
+			if (!datas[i].id) continue;
+			await this.resource.destroy({where:{id:datas[i].id}});
+		}
 
 		return this.success(data);
 	}
