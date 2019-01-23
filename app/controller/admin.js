@@ -143,6 +143,16 @@ const Admin = class extends Controller {
 		return this.success(data);
 	}
 
+	async bulkDestroy() {
+		this.adminAuthenticated();
+
+		const {query} = this.parseParams();
+		
+		const data = await this.resource.destroy({where:query});	
+
+		return this.success(data);
+	}
+
 	async create() {
 		this.adminAuthenticated();
 
