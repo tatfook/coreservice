@@ -46,6 +46,11 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
+		identity: {                    // 购买者身份
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		purchase: {                    // 是否购买
 			type: INTEGER,
 			defaultValue: false,
