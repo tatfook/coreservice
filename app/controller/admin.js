@@ -133,6 +133,16 @@ const Admin = class extends Controller {
 		return this.success(data);
 	}
 
+	async bulkUpdate() {
+		this.adminAuthenticated();
+
+		const {data, query} = this.parseParams();
+		
+		const data = await this.resource.update(data, {where:query});	
+
+		return this.success(data);
+	}
+
 	async create() {
 		this.adminAuthenticated();
 

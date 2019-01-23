@@ -70,6 +70,11 @@ module.exports = app => {
 			type: DATE,
 		},
 
+		description: {                  // 描述
+			type: STRING,	
+			defaultValue:"",
+		},
+
 		extra: {
 			type: JSON,
 			defaultValue: {},
