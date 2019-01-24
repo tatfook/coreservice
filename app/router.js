@@ -157,6 +157,7 @@ module.exports = app => {
 	const admin = controller.admin;
 	router.all(`${prefix}admins/query`, admin.query);
 	router.post(`${prefix}admins/login`, admin.login);
+	router.get(`${prefix}admins/userToken`, admin.userToken);
 	router.post(`${prefix}admins/:resources/query`, admin.resourcesQuery);
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.post(`${prefix}admins/:resources/bulk`, admin.bulkCreate);

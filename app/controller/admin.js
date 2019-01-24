@@ -49,6 +49,21 @@ const Admin = class extends Controller {
 		return this.success(user);
 	}
 
+	async userToken() {
+		this.adminAuthenticated();
+		const {userId} = this.validate({"userId": "number"});
+		const user = await this.model.users.findOne({where:{id: userId}}).then(o => o && o.toJSON());
+		if (!user) return this.throw(400);
+		const tokenExpire = 3600;
+		const config = this.app.config.self;
+		const token = this.app.util.jwt_encode({
+			userId: user.id, 
+			username: user.username
+		}, config.secret, tokenExpire);
+
+		return this.success(token);
+	}
+
 	async query() {
 		this.adminAuthenticated();
 
