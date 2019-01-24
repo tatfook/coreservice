@@ -240,7 +240,7 @@ module.exports = app => {
 		data.statistics = newStatistics;
 		project.extend = data;
 
-		await app.model.projects.update(project, {where:{id}});
+		await app.model.projects.update(project, {where:{id}, silent: true});
 		
 		return;
 	}
