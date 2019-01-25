@@ -42,3 +42,44 @@ insert into projectRates(userId, projectId, rate, createdAt, updatedAt) values
 (137, 3, 40, current_time(), current_time());
 
 select avg(rate) from projectRates;
+
+
+
+-- release
+CREATE TABLE `paracraftDevices` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `deviceId` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '123456',
+  `username` varchar(64) COLLATE utf8mb4_bin DEFAULT '',
+  `cellphone` varchar(24) COLLATE utf8mb4_bin DEFAULT '',
+  `price` int(11) DEFAULT '0',
+  `purchaseTime` datetime DEFAULT NULL,
+  `gameCoin` int(11) DEFAULT '0',
+  `description` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `deviceId` (`deviceId`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+CREATE TABLE `paracraftGameCoinKeys` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `price` int(11) DEFAULT '0',
+  `active` int(11) DEFAULT '0',
+  `activeTime` datetime DEFAULT NULL,
+  `gameCoin` int(11) DEFAULT '0',
+  `deviceId` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `identity` int(11) DEFAULT '0',
+  `purchase` int(11) DEFAULT '0',
+  `purchaseName` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `purchaseCellphone` varchar(24) COLLATE utf8mb4_bin DEFAULT '',
+  `purchaseTime` datetime DEFAULT NULL,
+  `description` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
