@@ -21,7 +21,7 @@ const ParacraftGameCoinKey = class extends Controller {
 			activeTime: new Date(),
 		}, {where:{key}});
 
-		return this.success(ok[0] == 1);
+		return this.success(ok[0] == 1 ? data.gameCoin : 0);
 	}
 }
 
