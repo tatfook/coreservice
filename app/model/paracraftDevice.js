@@ -38,6 +38,11 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
+		price: {                       // 设备价格
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		purchaseTime: {                // 购买时间
 			type: DATE,
 		},

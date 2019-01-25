@@ -141,7 +141,22 @@ module.exports = app => {
 	app.model.projects.belongsTo(app.model.users, {
 		as: "users",
 		foreignKey:"userId",
-		sourceKey: "id",
+		targetKey: "id",
+		constraints: false,
+	});
+
+	// 探索APP
+	app.model.paracraftDevices.hasMany(app.model.paracraftGameCoinKeys, {
+		as: "paracraftGameCoinKeys",
+		foreignKey: "deviceId",
+		sourceKey: "deviceId",
+		constraints: false,
+	});
+
+	app.model.paracraftGameCoinKeys.belongsTo(app.model.paracraftDevices, {
+		as: "paracraftDevices",
+		foreignKey:"deviceId",
+		targetKey: "deviceId",
 		constraints: false,
 	});
 }

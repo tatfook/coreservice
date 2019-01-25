@@ -28,8 +28,12 @@ module.exports = app => {
 		},
 
 		active: {                      // 是否激活
-			type: BOOLEAN,
+			type: INTEGER,
 			defaultValue: false,
+		},
+
+		activeTime: {                  // 激活时间
+			type: DATE,
 		},
 
 		gameCoin: {                    // 游戏币数量
@@ -42,12 +46,13 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
-		activeTime: {                  // 激活时间
-			type: DATE,
+		identity: {                    // 购买者身份
+			type: INTEGER,
+			defaultValue: 0,
 		},
 
 		purchase: {                    // 是否购买
-			type: BOOLEAN,
+			type: INTEGER,
 			defaultValue: false,
 		},
 
@@ -63,6 +68,11 @@ module.exports = app => {
 		
 		purchaseTime: {                 // 购买时间
 			type: DATE,
+		},
+
+		description: {                  // 描述
+			type: STRING,	
+			defaultValue:"",
 		},
 
 		extra: {

@@ -157,9 +157,12 @@ module.exports = app => {
 	const admin = controller.admin;
 	router.all(`${prefix}admins/query`, admin.query);
 	router.post(`${prefix}admins/login`, admin.login);
+	router.get(`${prefix}admins/userToken`, admin.userToken);
 	router.post(`${prefix}admins/:resources/query`, admin.resourcesQuery);
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.post(`${prefix}admins/:resources/bulk`, admin.bulkCreate);
+	router.put(`${prefix}admins/:resources/bulk`, admin.bulkUpdate);
+	//router.delete(`${prefix}admins/:resources/bulk`, admin.bulkDestroy);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const order = controller.order;
@@ -190,6 +193,12 @@ module.exports = app => {
 	router.all(`${prefix}sensitiveWords/check`, sensitiveWord.check);
 	router.post(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);
 	router.resources(`${prefix}sensitiveWords`, sensitiveWord);
+
+	// 探索APP
+	const paracraftGameCoinKey = controller.paracraftGameCoinKey;
+	const paracraftDevice = controller.paracraftDevice;
+	router.get(`${prefix}paracraftDevices/pwdVerify`, paracraftDevice.pwdVerify);
+	router.post(`${prefix}paracraftGameCoinKeys/active`, paracraftGameCoinKey.active);
 
 	// wikicraft proxy
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
