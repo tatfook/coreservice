@@ -69,7 +69,6 @@ class BaseController extends Controller {
 
 		if (result.error) {
 			const errmsg = result.error.details[0].message.replace(/"/g, '');
-			console.log(params);
 			this.ctx.throw(400, "invalid params:" + errmsg);
 		}
 
