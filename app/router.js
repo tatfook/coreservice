@@ -141,7 +141,7 @@ module.exports = app => {
 
 	// 系统tag
 	const systemTag = controller.systemTag;
-	router.resources(`${prefix}systemTags`, systemTag);
+	router.post(`${prefix}systemTags/search`, systemTag.search);
 
 	const convert = controller.convert;
 	router.get(`${prefix}converts`, convert.convert);
