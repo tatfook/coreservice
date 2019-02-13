@@ -14,7 +14,7 @@ module.exports = {
 		const Op = app.Sequelize.Op;
 		this.loader = this.loader || {};
 		loaderName = loaderName || modelName;
-		batchFn = batchFn || (keys) => app[model][modelName].findAll({where: {id: {[Op.in], keys}}});
+		batchFn = batchFn || ((keys) => app[model][modelName].findAll({where: {id: {[Op.in]: keys}}}));
 		this.loader[loaderName] = this.loader[loaderName] || new DataLoader(batchFn);
 		return this.loader[loaderName];
 	},
