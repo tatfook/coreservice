@@ -22,6 +22,10 @@ type User {
 	roles: [Role]
 }
 
+#type Mutation {
+#	updateUser(): User
+#}
+
 type Contribution {
 	data: Json
 }

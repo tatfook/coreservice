@@ -11,6 +11,7 @@ class ProjectConnector {
 		this.ctx = ctx;
 		this.model = ctx.app.model;
 		this.loader = new DataLoader(this.fetch.bind(this));
+		this.loaderWorldByProjectId = new DataLoader(keys => this.model.worlds.findAll({where:{projectId:{[this.ctx.app.Sequelize.Op.in]:keys}}}).then(arr => arr.map(o => o.toJSON())));
 	}
 
 	fetch(ids) {
@@ -74,6 +75,10 @@ class ProjectConnector {
 				objectIds: objectIds,
 			}
 		});
+	}
+
+	async fetchWorldByProjectId(projectId) {
+		return this.loaderWorldByProjectId.load(projectId);
 	}
 }
 

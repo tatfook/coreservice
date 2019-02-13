@@ -1,7 +1,15 @@
 
 type Query {
+	test(arg: Json): Json
+	profile: User
 	user(id: ID!): User
 	projects(userId: Int): [Project]
 	joinProjects(userId: Int): [Project]
 	ranks(type: String = "user"): [UserRank]
+}
+
+type Mutation {
+	# 杂项
+	sendSmsCaptcha(cellphone: String): Boolean
+	verifySmsCaptcha(cellphone: String, captcha: String): Boolean
 }

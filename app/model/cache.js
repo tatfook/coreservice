@@ -50,7 +50,7 @@ module.exports = app => {
 
 		const curtime = (new Date()).getTime();
 
-		if (data.expire && curtime > data.expire) return console.log("cache 过期");
+		if (data.expire && curtime > data.expire) return;
 
 		return data.value;
 	}

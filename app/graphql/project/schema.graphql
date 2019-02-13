@@ -20,4 +20,19 @@ type Project {
 	choicenessNo: Int
 	description: String
 	extra: Json
+	world: World
+}
+
+type World {
+	id: Int!
+	userId: Int
+	worldName: String
+	revision: String
+	projectId: Int
+	commitId: String
+	archiveUrl: String
+	fileSize: Int
+	giturl: String
+	download: String
+	extra: Json
 }
