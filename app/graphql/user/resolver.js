@@ -11,6 +11,10 @@ module.exports = {
 			return ctx.connector.user.fetchRankByUserId(root.id);
 		},
 
+		info(root, {}, ctx) {
+			return ctx.connector.user.fetchInfoByUserId(root.id);
+		},
+
 		account(root, _, ctx) {
 			return ctx.connector.user.fetchAccountByUserId(root.id);
 		},
@@ -39,6 +43,12 @@ module.exports = {
 		roles(root, _, ctx) {
 			return ctx.connector.user.fetchRolesByUserId(root.id);
 		}
+	},
+
+	Mutation: {
+		async updateUser(root, {data={}}, ctx) {
+			return true;
+		},
 	},
 };
 

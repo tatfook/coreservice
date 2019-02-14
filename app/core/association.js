@@ -5,6 +5,19 @@ module.exports = app => {
 	const roles = app.model.roles;
 	const illegals = app.model.illegals;
 
+	app.model.users.hasOne(app.model.userinfos, {
+		as:"userinfos",
+		foreignKey:"userId",
+		constraints: false,
+	});
+
+	app.model.userinfos.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey: "userId",
+		targetKey: "id",
+		constraints: false,
+	});
+
 	users.hasOne(accounts, {
 		as: "accounts",
 		foreignKey: "userId",

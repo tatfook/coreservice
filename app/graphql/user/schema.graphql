@@ -14,6 +14,7 @@ type User {
 	rank: UserRank
 	contributions(years: String): Contribution 
 	account: Account
+	info: Userinfo
 	lesson: Lesson
 	projects: [Project]
 	joinProjects: [Project]
@@ -22,20 +23,27 @@ type User {
 	roles: [Role]
 }
 
-#type Mutation {
-#	updateUser(): User
-#}
-
 type Contribution {
 	data: Json
 }
 
+# 账户信息
 type Account {
 	userId: Int
 	rmb: Int
 	coin: Int
 	bean: Int
 	lockCoin: Int
+}
+
+# 用户附加属性
+type Userinfo {
+	userId: Int!
+	name: String
+	qq: String
+	birthdate: String
+	school: String
+	extra: Json
 }
 
 type Teacher {

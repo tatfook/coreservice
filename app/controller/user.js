@@ -82,9 +82,25 @@ const User = class extends Controller {
 		delete params.username;
 		delete params.roleId;
 
+		const info = params.info;
+		if (info) {
+			delete info.id;
+			await this.model.userinfos.upsert({...info, userId});
+		}
 		const ok = await ctx.model.users.update(params, {where:{id:userId}});
 
 		return this.success(ok && ok[0] == 1);
+	}
+
+	async setInfo() {
+		const {userId} = this.authenticated();
+		const params = this.validate();
+		delete params.id;
+		params.userId = userId;
+
+		await this.model.userinfos.upsert({...info, userId});
+		
+		return this.success(true);
 	}
 
 	async login() {

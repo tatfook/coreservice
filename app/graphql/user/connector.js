@@ -34,6 +34,11 @@ class UserConnector {
 		return await this.model.accounts.getByUserId(userId);
 	}
 
+	// 获取用户信息
+	async fetchInfoByUserId(userId) {
+		return await this.model.userinfos.findOne({where:{userId}}).then(o => o && o.toJSON());
+	}
+
 	// 获取用户活跃度信息
 	async fetchContributionsByUserId(userId, years) {
 		return {data:await this.model.contributions.getByUserId(userId, years)};

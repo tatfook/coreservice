@@ -34,21 +34,21 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		email: {
+		email: {      // 邮箱
 			type: STRING(64),
 			unique: true,
 		},
 
-		cellphone: {
+		cellphone: {  // 绑定手机号
 			type: STRING(24),
 			unique: true,
 		},
 
-		realname: {
+		realname: {    // 实名手机号
 			type: STRING(24),
 		},
 
-		nickname: {
+		nickname: {    // 昵称
 			type: STRING(48),
 		},
 
@@ -69,6 +69,7 @@ module.exports = app => {
 			defaultValue: {},
 		},
 	};
+
 	const opts = {
 		underscored: false,
 		charset: "utf8mb4",
