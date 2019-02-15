@@ -28,7 +28,10 @@ module.exports = {
 
 		ranks(root, {type}, ctx) {
 			return ctx.connector.userRank.fetchAll();
-		}
+		},
+
+		nplGameMembers(root, {query}, ctx) {
+		},
 	},
 
 	Mutation: {
