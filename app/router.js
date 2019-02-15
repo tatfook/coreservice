@@ -219,5 +219,6 @@ module.exports = app => {
 
 	// NPL 大赛 作品
 	const gameWorks = controller.gameWorks;
+	router.post(`${prefix}gameWorks/search`, gameWorks.search);
 	router.resources(`${prefix}gameWorks`, gameWorks);
 }

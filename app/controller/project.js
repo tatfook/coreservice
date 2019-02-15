@@ -378,6 +378,8 @@ const Project = class extends Controller {
 			},
 		}).then(o => o && o.toJSON());
 
+		if (!game) return this.throw(404);
+
 		return this.success(game);
 	}
 }
