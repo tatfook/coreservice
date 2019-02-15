@@ -111,6 +111,7 @@ module.exports = app => {
 	router.get(`${prefix}projects/importProjectCover`, project.importProjectCover);
 	router.get(`${prefix}projects/import`, project.importProject);
 	router.get(`${prefix}projects/:id/status`, project.status);
+	router.get(`${prefix}projects/:id/game`, project.game);
 	router.get(`${prefix}projects/join`, project.join);
 	router.post(`${prefix}projects/search`, project.search);
 	router.get(`${prefix}projects/:id/detail`, project.detail);
@@ -210,4 +211,13 @@ module.exports = app => {
 	router.all("/api/wiki/models/user/getBaseInfoByName", controller.proxyUser.getBaseInfoByName);
 	router.all("/api/wiki/models/oauth_app/agreeOauth", controller.proxyOauthApp.agreeOauth);
 	router.all("/api/wiki/models/oauth_app/getTokenByCode", controller.proxyOauthApp.getTokenByCode);
+
+
+	// NPL 大赛
+	const game = controller.game;
+	router.post(`${prefix}games/search`, game.search);
+
+	// NPL 大赛 作品
+	const gameWorks = controller.gameWorks;
+	router.resources(`${prefix}gameWorks`, gameWorks);
 }

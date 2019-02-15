@@ -172,4 +172,34 @@ module.exports = app => {
 		targetKey: "deviceId",
 		constraints: false,
 	});
+
+	// NPL 大赛
+	app.model.games.hasMany(app.model.gameWorks, {
+		as: "gameWorks",
+		foreignKey: "gameId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.gameWorks.belongsTo(app.model.games, {
+		as: "games",
+		foreignKey:"gameId",
+		targetKey: "id",
+		constraints: false,
+	});
+
+	app.model.projects.hasOne(app.model.gameWorks, {
+		as: "gameWorks",
+		foreignKey: "projectId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.gameWorks.belongsTo(app.model.projects, {
+		as: "projects",
+		foreignKey:"projectId",
+		targetKey: "id",
+		constraints: false,
+	});
 }
+

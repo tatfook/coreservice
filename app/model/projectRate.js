@@ -67,37 +67,37 @@ module.exports = app => {
 	}
 
 	model.statisticsRate = async function(data, oper) {
-		if (oper != "create") return;
-		const {projectId, rate} = data;
-		if (!projectId) return;
-		const project = await app.model.projects.getById(projectId);
-		if (!project) return;
-		const type = app.model.QueryTypes.SELECT;
-		//let arr = await app.model.query(`select avg(rate) as avgrate from projectRates`, {type});
+		//if (oper != "create") return;
+		//const {projectId, rate} = data;
+		//if (!projectId) return;
+		//const project = await app.model.projects.getById(projectId);
+		//if (!project) return;
+		//const type = app.model.QueryTypes.SELECT;
+		////let arr = await app.model.query(`select avg(rate) as avgrate from projectRates`, {type});
+		////if (arr.length != 1) return;
+		////const projectsAvgRate = _.toNumber(arr[0]["avgrate"]);
+		//const projectsAvgRate = 70;
+		//const arr = await app.model.query(`select avg(rate) as avgrate, count(*) as count from projectRates where projectId = :projectId`, {
+			//type,replacements: {projectId},
+		//});
 		//if (arr.length != 1) return;
-		//const projectsAvgRate = _.toNumber(arr[0]["avgrate"]);
-		const projectsAvgRate = 70;
-		const arr = await app.model.query(`select avg(rate) as avgrate, count(*) as count from projectRates where projectId = :projectId`, {
-			type,replacements: {projectId},
-		});
-		if (arr.length != 1) return;
-		const projectAvgRate = _.toNumber(arr[0]["avgrate"]);
-		const projectRateCount = _.toNumber(arr[0]["count"]);
-		const rateThreshold = 20;
-		const projectRate = projectRateCount < 8 ? 0 : (projectRateCount / (projectRateCount + rateThreshold) * projectAvgRate + rateThreshold / (projectRateCount + rateThreshold) *projectsAvgRate);
+		//const projectAvgRate = _.toNumber(arr[0]["avgrate"]);
+		//const projectRateCount = _.toNumber(arr[0]["count"]);
+		//const rateThreshold = 20;
+		//const projectRate = projectRateCount < 8 ? 0 : (projectRateCount / (projectRateCount + rateThreshold) * projectAvgRate + rateThreshold / (projectRateCount + rateThreshold) *projectsAvgRate);
 	
-		const extra = project.extra || {};
-		extra.rate = extra.rate || {};
-		const rateLevel = _.floor(rate / 20);
-		extra.rate[rateLevel] = (extra.rate[rateLevel] || 0) + 1;
-		extra.rate.count = projectRateCount;
+		//const extra = project.extra || {};
+		//extra.rate = extra.rate || {};
+		//const rateLevel = _.floor(rate / 20);
+		//extra.rate[rateLevel] = (extra.rate[rateLevel] || 0) + 1;
+		//extra.rate.count = projectRateCount;
 
-		await app.model.projects.update({rate:projectRate, rateCount:projectRateCount, extra}, {where:{id: projectId}});
+		//await app.model.projects.update({rate:projectRate, rateCount:projectRateCount, extra}, {where:{id: projectId}});
 
-		project.rate = projectRate;
-		project.extra = extra;
+		//project.rate = projectRate;
+		//project.extra = extra;
 
-		app.api.projectsUpsert(project);
+		//app.api.projectsUpsert(project);
 	}
 
 	app.model.projectRates = model;

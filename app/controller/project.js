@@ -327,7 +327,6 @@ const Project = class extends Controller {
 
 	async importProjectCover() {
 		//const worlds = await this.model.worlds.findAll({limit:100000});
-
 		for (let i = 0; i < worlds.length; i++) {
 			//const world = worlds[i].get({plain:true});
 			const world = worlds[i];
@@ -356,6 +355,30 @@ const Project = class extends Controller {
 		console.log(worlds.length);
 
 		return this.success("OK");
+	}
+
+	// 获取项目参加的赛事
+	async game() {
+		const {id} = this.validate({id:"int"});
+		const curdate = new Date();
+		const Op = this.app.Sequelize.Op;
+		const game = await this.model.games.findOne({
+			include: [
+			{
+				as: "gameWorks",
+				model: this.model.gameWorks,
+				where: {
+					projectId:id,
+				},
+			},
+			],
+			where: {
+				startDate: {[Op.lte]: curdate},
+				endDate: {[Op.gte]: curdate},
+			},
+		}).then(o => o && o.toJSON());
+
+		return this.success(game);
 	}
 }
 

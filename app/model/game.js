@@ -28,6 +28,10 @@ module.exports = app => {
 			type: STRING(48), // 大赛名称
 		},
 
+		no: {                 // 期号
+			type: INTEGER
+		},
+
 		startDate: {
 			type: STRING(24), // 开始日期
 		},
