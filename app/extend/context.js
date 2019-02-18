@@ -9,6 +9,15 @@ module.exports = {
 		return user;
 	},
 
+	adminAuthenticated() {
+		const config = this.config.self;
+		const token = this.ctx.token;
+		const user = this.app.util.jwt_decode(token || "", config.adminSecret, true);
+		if (!user) return this.throw(401);
+		
+		return user;
+	},
+
 	getLoader({modelName, batchFn, loaderName, model="model"}) {
 		const app = this.app;
 		const Op = app.Sequelize.Op;

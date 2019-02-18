@@ -7,7 +7,7 @@ type Query {
 	joinProjects(userId: Int): [Project]
 	ranks(type: String = "user"): [UserRank]
 
-	nplGameMembers(query Json): Json
+	games: Boolean
 }
 
 type Mutation {

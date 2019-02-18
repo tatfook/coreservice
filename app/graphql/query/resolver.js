@@ -32,6 +32,13 @@ module.exports = {
 
 		nplGameMembers(root, {query}, ctx) {
 		},
+
+		games(root, {query = {}}, ctx) {
+			return [];
+			//return ctx.model.games.search({
+				//where: query
+			//});
+		},
 	},
 
 	Mutation: {
