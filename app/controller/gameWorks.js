@@ -18,12 +18,14 @@ const GameWorks = class extends Controller {
 			{
 				as: "projects",
 				model: this.model.projects,
+				include: [
+					{
+						as: "users",
+						attributes,
+						model: this.model.users,
+					},
+				]
 			}, 
-			{
-				as: "users",
-				attributes,
-				model: this.model.users,
-			},
 			],
 			where: query,
 		});
