@@ -202,16 +202,16 @@ module.exports = app => {
 		constraints: false,
 	});
 
-	app.model.gameWorks.hasOne(app.model.users, {
-		as: "users",
+	app.model.users.hasMany(app.model.gameWorks, {
+		as:"gameWorks",
 		foreignKey: "userId",
 		sourceKey: "id",
 		constraints: false,
 	});
 
-	app.model.users.belongsTo(app.model.gameWorks, {
-		as: "gameWorks",
-		foreignKey:"userId",
+	app.model.gameWorks.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey: "userId",
 		targetKey: "id",
 		constraints: false,
 	});

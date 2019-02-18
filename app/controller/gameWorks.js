@@ -11,17 +11,18 @@ const GameWorks = class extends Controller {
 
 	async search() {
 		const query = this.validate();
-		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
+		const attributes = ["id", "username", "nickname", "portrait"];
 
 		const list = await this.model.gameWorks.findAndCount({
 			include: [
 			{
 				as: "projects",
 				model: this.model.projects,
-			}, {
+			}, 
+			{
 				as: "users",
 				attributes,
-				module: this.model.users,
+				model: this.model.users,
 			},
 			],
 			where: query,
