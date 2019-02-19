@@ -29,8 +29,13 @@ const GameWorks = class extends Controller {
 			],
 			where: query,
 		}).then(x => {
-			x = x.toJSON();
-			x.projects.user = x.projects.users;
+			x.rows = _.map(x.rows, o => {
+				o = o.toJSON();
+				if (!o.projects) return o;
+				o.projects.user = o.projects.users;
+				return o;
+			});
+			return x;
 		});
 		//}).then(list => list.map(o => o.toJSON()));
 		return this.success(list);

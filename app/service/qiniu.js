@@ -26,29 +26,29 @@ class Qiniu extends Service {
 		}
 	}
 
-	storage.getUploadToken = function(key, isPublic = false) {
-		const config = app.config.self;
-		const {bucketName, publicBucketName, mac} = this.getConfig();
-		let scope = isPublic ? publicBucketName : bucketName;
-		if (key) scope += ":" + key;
-		const options = {
-			scope: scope,
-			expires: 3600 * 24, // 一天
-			//returnBody: '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}',
-		}
-		if (isPublic) {
-			options.returnBody = '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}';
-		} else {
-			options.callbackUrl = config.origin + config.baseUrl + "files/qiniu";
-			options.callbackBody =  '{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)","filename":"$(x:filename)","siteId":$(x:siteId)}';
-			options.callbackBodyType = 'application/json';
-		}
+	//storage.getUploadToken = function(key, isPublic = false) {
+		//const config = app.config.self;
+		//const {bucketName, publicBucketName, mac} = this.getConfig();
+		//let scope = isPublic ? publicBucketName : bucketName;
+		//if (key) scope += ":" + key;
+		//const options = {
+			//scope: scope,
+			//expires: 3600 * 24, // 一天
+			////returnBody: '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}',
+		//}
+		//if (isPublic) {
+			//options.returnBody = '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}';
+		//} else {
+			//options.callbackUrl = config.origin + config.baseUrl + "files/qiniu";
+			//options.callbackBody =  '{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)","filename":"$(x:filename)","siteId":$(x:siteId)}';
+			//options.callbackBodyType = 'application/json';
+		//}
 
-		const putPolicy = new qiniu.rs.PutPolicy(options);
-		const token = putPolicy.uploadToken(mac);
+		//const putPolicy = new qiniu.rs.PutPolicy(options);
+		//const token = putPolicy.uploadToken(mac);
 
-		return token;
-	}
+		//return token;
+	//}
 }
 
 module.exports = Qiniu;
