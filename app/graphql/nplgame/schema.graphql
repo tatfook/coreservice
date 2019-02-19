@@ -13,7 +13,6 @@ type Game {
 
 	works: [GameWorks]
 	members: [Json]
-	#members: [GameMember]
 }
 
 type GameWorks {
@@ -35,6 +34,6 @@ type GameWorks {
 	user: User
 }
 
-type GameMember {
-
-}
+#type GameMember {
+#
+#}

@@ -30,14 +30,10 @@ module.exports = {
 			return ctx.connector.userRank.fetchAll();
 		},
 
-		nplGameMembers(root, {query}, ctx) {
-		},
-
 		games(root, {query = {}}, ctx) {
-			return [];
-			//return ctx.model.games.search({
-				//where: query
-			//});
+			return ctx.model.games.findAndCount({
+				where: query
+			});
 		},
 	},
 
