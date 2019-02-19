@@ -496,7 +496,7 @@ const User = class extends Controller {
 		const {userId} = this.authenticated();
 
 		const user = await this.model.users.getById(userId);
-		const info = await this.model.userinfos.findOne({userId});
+		const info = await this.model.userinfos.findOne({where: {userId}});
 		user.info = info;
 
 		return this.success(user);
