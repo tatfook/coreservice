@@ -84,6 +84,9 @@ module.exports = app => {
 	router.resources(`${prefix}comments`, comment);
 
 	const qiniu = controller.qiniu;
+	router.get(`${prefix}qinius/test`, qiniu.test);
+	router.post(`${prefix}qinius/fop`, qiniu.fop);
+	router.post(`${prefix}qinius/fopCallback`, qiniu.fopCallback);
 	router.get(`${prefix}qinius/token`, qiniu.token);
 
 	const file = controller.file;

@@ -19,6 +19,27 @@ const Qiniu = class extends Controller {
 
 		return this.success(token);
 	}
+
+	async fop() {
+		const {key, bucket, fop} = this.validate({
+			key:"string",
+			fop:"string",
+		});
+
+		const result = await this.ctx.service.qiniu.persistentHandle({key, bucket, fop});
+	}
+
+	async fopCallback() {
+		const params = this.validate();
+		this.ctx.service.qiniu.persistentHandleCallback(params);
+		return this.success();
+	}
+
+	async test() {
+		this.ctx.service.qiniu.persistentHandle({key:"FvTkwCHFQDrqCiHMbBHThnTix1Jy.png", fop:"imageView2/2/w/200"});
+
+		return this.success();
+	}
 }
 
 module.exports = Qiniu;
