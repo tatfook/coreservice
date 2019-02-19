@@ -32,6 +32,17 @@ const Game = class extends Controller {
 
 		return this.success(list);
 	}
+
+	async projects() {
+		const {userId} = this.authenticated();
+		const sql = `select * from projects where userId = :userId and id not in (select projectId from gameWorks);`;
+		const list = await this.model.query(sql, {
+			type: this.model.QueryTypes.SELECT,
+			replacements: {userId},
+		});
+
+		return this.success(list);
+	}
 }
 
 module.exports = Game;

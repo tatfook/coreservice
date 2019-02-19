@@ -36,7 +36,7 @@ const Qiniu = class extends Controller {
 	}
 
 	async test() {
-		this.ctx.service.qiniu.persistentHandle({key:"FvTkwCHFQDrqCiHMbBHThnTix1Jy.png", fop:"imageView2/2/w/200"});
+		this.ctx.service.qiniu.persistentHandle({key:"abc.png", fop:"imageView2/3/w/380/h270"});
 
 		return this.success();
 	}
