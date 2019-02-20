@@ -3,6 +3,7 @@ const _ = require('lodash');
 const DataLoader = require('dataloader');
 const qiniu = require("qiniu");
 const Service = require("../core/service.js");
+const uuidv1 = require('uuid/v1');
 
 class Qiniu extends Service {
 	getConfig() {
@@ -14,8 +15,8 @@ class Qiniu extends Service {
 		const publicBucketName = config.qiniuPublic.bucketName;
 		const publicBucketDomain = config.qiniuPublic.bucketDomain;
 
-		//const apiUrlPrefix = config.origin + config.baseUrl;
-		const apiUrlPrefix = "http://39.106.11.114:8002/api/v0/";
+		const apiUrlPrefix = config.origin + config.baseUrl;
+		//const apiUrlPrefix = "http://39.106.11.114:8002/api/v0/";
 		const mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
 		const qiniuConfig = new qiniu.conf.Config();
 		//config.zone = qiniu.zone.Zone_z2;
@@ -86,29 +87,165 @@ class Qiniu extends Service {
 		return result;
 	}
 
-	//storage.getUploadToken = function(key, isPublic = false) {
-		//const config = app.config.self;
-		//const {bucketName, publicBucketName, mac} = this.getConfig();
-		//let scope = isPublic ? publicBucketName : bucketName;
-		//if (key) scope += ":" + key;
-		//const options = {
-			//scope: scope,
-			//expires: 3600 * 24, // 一天
-			////returnBody: '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}',
-		//}
-		//if (isPublic) {
-			//options.returnBody = '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}';
-		//} else {
-			//options.callbackUrl = config.origin + config.baseUrl + "files/qiniu";
-			//options.callbackBody =  '{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)","filename":"$(x:filename)","siteId":$(x:siteId)}';
-			//options.callbackBodyType = 'application/json';
-		//}
+	getUploadToken({key, bucket}) {
+		const {bucketName, publicBucketName, mac, apiUrlPrefix} = this.getConfig();
 
-		//const putPolicy = new qiniu.rs.PutPolicy(options);
-		//const token = putPolicy.uploadToken(mac);
+		key = key || uuidv1();
+		bucket = bucket || publicBucketName;
 
-		//return token;
-	//}
+		const scope = (bucket || publicBucketName) + ":" + key;
+		const options = {scope: scope};
+
+		if (bucket == publicBucketName) {
+			options.returnBody = '{"key":"$(key)","hash":"$(etag)","fsize":$(fsize),"bucket":"$(bucket)"}';
+		} else {
+			options.expires = 3600 * 24;
+			options.callbackUrl = apiUrlPrefix + "files/qiniu";
+			options.callbackBody =  '{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)","filename":"$(x:filename)","siteId":$(x:siteId)}';
+			options.callbackBodyType = 'application/json';
+		}
+
+		const putPolicy = new qiniu.rs.PutPolicy(options);
+		const token = putPolicy.uploadToken(mac);
+
+		return token;
+	}
+
+	getDownloadUrl({key, domain, expires = 3600 * 24}) {
+		const {bucketManager, bucketDomain} = this.getConfig();
+		const privateBucketDomain = domain || bucketDomain;
+		const deadline = parseInt(Date.now() / 1000) + expires; 
+		const privateDownloadUrl = bucketManager.privateDownloadUrl(privateBucketDomain, key, deadline);
+		return privateDownloadUrl;
+	}
+
+	async upload({key, content, bucket}) {
+		const {mac, publicBucketName} = this.getConfig();
+		const putPolicy = new qiniu.rs.PutPolicy({scope: (bucket || publicBucketName) + ":" + key});
+		const token = putPolicy.uploadToken(mac);
+
+		const putExtra = new qiniu.form_up.PutExtra();
+		const config = new qiniu.conf.Config();
+		config.zone = qiniu.zone.Zone_z2; // 华南
+
+		const result = await new Promise((resolve, reject) => {
+			const formUploader = new qiniu.form_up.FormUploader(config);
+			formUploader.put(token, key, content, putExtra, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					//return resolve(false);
+					return reject({statusCode: respInfo.statusCode, body:respBody});
+				} 
+
+				//console.log(respBody);
+				return resolve(respBody);
+				//return resolve(true);
+			});
+		});
+
+		return result;
+	}
+
+	async delete({key, bucket}) {
+		const {publicBucketName, bucketManager} = this.getConfig();
+		
+		const result = await new Promise((resolve, reject) => {
+			bucketManager.delete(bucket || publicBucketName, key, function(respErr, respBody, respInfo){
+				if (respInfo.statusCode != 200 && respInfo.statusCode != 612) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					return resolve(false);
+				}
+				
+				return resolve(true);
+			});
+		});
+
+		return result;
+	}
+
+	async move({srcKey, dstKey, srcBucket, dstBucket}) {
+		const {publicBucketName, bucketManager} = this.getConfig();
+		
+		const result = await new Promise((resolve, reject) => {
+			bucketManager.move(srcBucket || publicBucketName, srcKey, dstBucket || publicBucketName, dstKey, {force:true}, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					return resolve(false);
+				}
+				
+				return resolve(true);
+			});
+		});
+
+		return result;
+	}
+
+	async batch(ops) {
+		const {bucketManager} = this.getConfig();
+		const result = await new Promise((resolve, reject) => {
+			bucketManager.batch(ops, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					return resolve(false);
+				}
+				
+				return resolve(true);
+			});
+		});
+
+		return result;
+	}
+
+	async batchMove(list) {
+		const {publicBucketName, bucketManager} = this.getConfig();
+		const moveOperations = [];
+		for (var i = 0; i < list.length; i++) {
+			moveOperations.push(qiniu.rs.moveOp(list[i].srcBucket || publicBucketName, list[i].srcKey, list[i].dstBucket || publicBucketName, list[i].dstKey));
+		}
+
+		return await this.batch(moveOperations);
+	}
+
+	async batchDelete(list) {
+		const {publicBucketName, bucketManager} = this.getConfig();
+		const deleteOps = [];
+
+		_.each(list, item => deleteOps.push(qiniu.rs.deleteOp(item.bucket || publicBucketName, item.key)));
+		
+		return await this.batch(deleteOps);
+	}
+
+	async get({key, bucket}) {
+		const url = this.getDownloadUrl({key, bucket});
+		const content = await axios.get(url).then(res => res.data);
+		return content;
+	}
+
+	async list({prefix = "", limit = 200, marker, bucket}) {
+		const options = {
+			limit: limit,
+			prefix: prefix,
+			marker: marker,
+		}
+
+		const {publicBucketName, bucketManager} = this.getConfig();
+		const result = await new Promise((resolve, reject) => {
+			bucketManager.listPrefix(bucket || publicBucketName, options, function(respErr, respBody, respInfo){
+				if (respErr || respInfo.statusCode != 200) {
+					//console.log(respErr, respInfo.statusCode, respBody);
+					//return resolve(false);
+					return reject({statusCode: respInfo.statusCode, body:respBody});
+				}
+				return resolve({
+					marker: respBody.marker,
+					prefix: respBody.commonPrefixes,
+					items: respBody.items,
+				});
+			});
+		});
+
+		return result;
+	}
 }
 
 module.exports = Qiniu;

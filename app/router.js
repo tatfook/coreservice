@@ -218,6 +218,7 @@ module.exports = app => {
 
 	// NPL 大赛
 	const game = controller.game;
+	router.get(`${prefix}games/projects`, game.projects);
 	router.get(`${prefix}games/members`, game.members);
 	router.post(`${prefix}games/search`, game.search);
 
