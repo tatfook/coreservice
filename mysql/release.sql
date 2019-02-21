@@ -1,8 +1,41 @@
 
 -- fix 分组选择问题
 set @@global.sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+CREATE TABLE `games` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `type` int(11) DEFAULT '0',
+  `name` varchar(48) COLLATE utf8mb4_bin DEFAULT NULL,
+  `no` int(11) DEFAULT NULL,
+  `startDate` varchar(24) COLLATE utf8mb4_bin DEFAULT NULL,
+  `endDate` datetime DEFAULT NULL,
+  `state` int(11) DEFAULT '0',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+CREATE TABLE `gameWorks` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) NOT NULL,
+  `gameId` bigint(20) NOT NULL,
+  `projectId` bigint(20) NOT NULL,
+  `worksName` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `worksSubject` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `worksLogo` varchar(512) COLLATE utf8mb4_bin DEFAULT NULL,
+  `worksDescription` varchar(2048) COLLATE utf8mb4_bin DEFAULT NULL,
+  `worksRate` int(11) DEFAULT NULL,
+  `worksRateCount` int(11) DEFAULT NULL,
+  `reward` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `game_works_project_id` (`projectId`)
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 
+-- -------------------------------------------------------------------------------
 use `keepwork-dev`;
 use `keepwork-rls`;
 
