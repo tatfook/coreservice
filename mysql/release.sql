@@ -34,7 +34,19 @@ CREATE TABLE `gameWorks` (
   UNIQUE KEY `game_works_project_id` (`projectId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
-
+CREATE TABLE `userinfos` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) NOT NULL,
+  `name` varchar(48) COLLATE utf8mb4_bin DEFAULT NULL,
+  `qq` varchar(24) COLLATE utf8mb4_bin DEFAULT NULL,
+  `birthdate` datetime DEFAULT NULL,
+  `school` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `userId` (`userId`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 -- -------------------------------------------------------------------------------
 use `keepwork-dev`;
 use `keepwork-rls`;
