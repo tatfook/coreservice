@@ -30,7 +30,7 @@ const Game = class extends Controller {
 		const total = totals[0] ? totals[0]["count"] : 0;
 
 		const sql = `select games.name as gameName, games.no as gameNo, userinfos.name as name, count(gameWorks.userId) as worksCount, users.sex as sex, 
-		userinfos.birthdate as birthdate, users.cellphone as cellphone, users.email as email, userinfos.qq as qq, userinfos.school as school, userinfosId as userinfos.id  
+		userinfos.birthdate as birthdate, users.cellphone as cellphone, users.email as email, userinfos.qq as qq, userinfos.school as school, userinfos.id as userinfosId  
 		from games, users, gameWorks, userinfos 
 		where gameWorks.userId = users.id and gameWorks.gameId = games.id and gameWorks.userId = userinfos.userId ${filterStr}
 		group by gameWorks.userId limit :limit offset :offset`;
