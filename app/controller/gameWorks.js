@@ -23,6 +23,12 @@ const GameWorks = class extends Controller {
 						as: "users",
 						attributes,
 						model: this.model.users,
+						include: [
+						{
+							as: "userinfos",
+							model: this.model.userinfos,
+						},
+						]
 					},
 				]
 			}, 
