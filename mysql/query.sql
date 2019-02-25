@@ -1,12 +1,21 @@
 
 
 
+use `keepwork`;
 use `keepwork-dev`;
 use `keepwork-rls`;
 
 select * from userinfos;
 select * from projects;
 
+select * from siteFiles where id = 2559;
+select * from files where id = 7078;
+select * from files order by id desc;
+select * from siteFiles order by id desc;
+
+select count(*) from projects where rate > 0 and visibility = 0 and type = 1;
+show table status where `name`='files'; 
+ 
 select @@global.sql_mode;
 --  games.no as gameNo, userinfos.name as `name`, 
 select games.name, games.no as gameNo, userinfos.name as `name`, count(gameWorks.userId) as worksCount, users.sex as sex, userinfos.birthdate as birthdate,
