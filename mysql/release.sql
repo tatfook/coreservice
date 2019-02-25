@@ -1,4 +1,6 @@
 
+use `keepwork`;
+
 -- fix 分组选择问题
 set @@global.sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 CREATE TABLE `games` (
@@ -47,6 +49,18 @@ CREATE TABLE `userinfos` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `userId` (`userId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+select userId from projects where id = 712;
+insert into games(`name`, `no`, startDate, endDate, createdAt, updatedAt) values("NPL大赛", 1, "2018-12-01", "2018-12-31", current_time(), current_time());
+insert into gameWorks(userId, gameId, projectId, createdAt, updatedAt) values
+(1234, 1, 709, current_time(), current_time()),
+(88, 1, 821, current_time(), current_time()),
+(180, 1, 840, current_time(), current_time()),
+(35571, 1, 779, current_time(), current_time()),
+(15653, 1, 717, current_time(), current_time()),
+(7054, 1, 736, current_time(), current_time()),
+(1, 1, 677, current_time(), current_time()),
+(20322, 1, 712, current_time(), current_time());
 -- -------------------------------------------------------------------------------
 use `keepwork-dev`;
 use `keepwork-rls`;
