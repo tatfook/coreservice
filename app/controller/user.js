@@ -266,6 +266,13 @@ const User = class extends Controller {
 			const isBindCellphone = await model.users.findOne({where:{cellphone}});
 			if (isBindCellphone) delete params.cellphone;
 		}
+		if (params.email && params.captcha) {
+			const cache = await this.app.model.caches.get(params.email) || {};
+			if (!params.captcha || !cache.captcha || cache.captcha != params.captcha){
+				if (!cache.captcha) return this.fail(4);
+				if (cache.captcha != params.captcha) return this.fail(5);
+			} 
+		}
 
 		// 同步用户到wikicraft
 		const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
@@ -282,6 +289,7 @@ const User = class extends Controller {
 			username: username,
 			password: util.md5(params.password),
 			realname: cellphone,
+			email: params.email,
 		});
 
 		if (!user) return this.fail(0);
