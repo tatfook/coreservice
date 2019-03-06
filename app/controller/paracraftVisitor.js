@@ -3,7 +3,7 @@ const _ = require("lodash");
 
 const Controller = require("../core/controller.js");
 
-const ParacraftDevice = class extends Controller {
+const ParacraftVisitors = class extends Controller {
 	get modelName() {
 		return "ParacraftVisitors";
 	}
@@ -15,4 +15,4 @@ const ParacraftDevice = class extends Controller {
 	}
 }
 
-module.exports = ParacraftDevice;
+module.exports = ParacraftVisitors;

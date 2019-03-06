@@ -206,8 +206,8 @@ module.exports = app => {
 	router.post(`${prefix}paracraftGameCoinKeys/active`, paracraftGameCoinKey.active);
 
 	// paracraft 官网
-	const paracraftVisitors = controller.paracraftVisitors;
-	router.post(`${prefix}ParacraftVisitors/upsert`, paracraftVisitors.upsert);
+	const paracraftVisitor = controller.paracraftVisitor;
+	router.post(`${prefix}paracraftVisitors/upsert`, paracraftVisitor.upsert);
 
 	// wikicraft proxy
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
