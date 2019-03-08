@@ -10,27 +10,20 @@ module.exports = app => {
 		DATE,
 	} = app.Sequelize;
 
-	const model = app.model.define("paracraftVisitors", {
+	const model = app.model.define("lessonOrganizationClasses", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
 			primaryKey: true,
 		},
 		
-		realname: {                    // 姓名
-			type:STRING(64),
-			defaultValue:"",
+		organizationId: {
+			type: BIGINT,
+			defaultValue: 0,
 		},
 
-		cellphone: {                   // 电话
-			type:STRING(24),
-			defaultValue:"",
-			unique: true,
-		},
-
-		organization: {                // 组织 机构
+		name: {
 			type: STRING,
-			defaultValue:"",
 		},
 
 		extra: {
@@ -42,11 +35,18 @@ module.exports = app => {
 		underscored: false,
 		charset: "utf8mb4",
 		collate: 'utf8mb4_bin',
+
+		indexes: [
+		{
+			unique: true,
+			fields: ["organizationId", "name"],
+		},
+		],
 	});
 
 	//model.sync({force:true});
 	
-	app.model.paracraftVisitors = model;
+	app.model.lessonOrganizationClasses = model;
 
 	return model;
 };

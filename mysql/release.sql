@@ -1,4 +1,14 @@
 
+
+use `lesson-dev`;
+
+alter table classrooms add column classId bigint default 0;
+alter table learnRecords add column classId bigint default 0;
+
+
+-- -------------------------------------------------------------------------------
+
+
 use `keepwork`;
 
 -- fix 分组选择问题

@@ -209,6 +209,9 @@ module.exports = app => {
 	const paracraftVisitor = controller.paracraftVisitor;
 	router.post(`${prefix}paracraftVisitors/upsert`, paracraftVisitor.upsert);
 
+	const paracraftNews = controller.paracrafNews;
+	router.get(`${prefix}paracraftNews`, paracraftVisitor.index);
+
 	// wikicraft proxy
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
 	router.all("/api/wiki/models/user/register", controller.proxyUser.register);
@@ -218,7 +221,6 @@ module.exports = app => {
 	router.all("/api/wiki/models/user/getBaseInfoByName", controller.proxyUser.getBaseInfoByName);
 	router.all("/api/wiki/models/oauth_app/agreeOauth", controller.proxyOauthApp.agreeOauth);
 	router.all("/api/wiki/models/oauth_app/getTokenByCode", controller.proxyOauthApp.getTokenByCode);
-
 
 	// NPL 大赛
 	const game = controller.game;
@@ -230,4 +232,19 @@ module.exports = app => {
 	const gameWorks = controller.gameWorks;
 	router.post(`${prefix}gameWorks/search`, gameWorks.search);
 	router.resources(`${prefix}gameWorks`, gameWorks);
+
+	// LESSON three 
+	const lessonOrganization = controller.lessonOrganization;
+	router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
+	router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
+	router.post(`${prefix}lessonOrganizations/login`, lessonOrganization.login);
+
+	// organization class
+	const lessonOrganizationClass = controller.lessonOrganizationClass;
+	router.get(`${prefix}lessonOrganizationClases`, lessonOrganizationClass.index);
+	router.post(`${prefix}lessonOrganizationClases`, lessonOrganizationClass.create);
+
+	// organization class member 
+	const lessonOrganizationClassMember = controller.lessonOrganizationClassMember;
+	router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
 }

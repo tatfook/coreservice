@@ -25,6 +25,8 @@ module.exports = {
 	ENTITY_TYPE_GROUP:3,       // 组
 	ENTITY_TYPE_ISSUE:4,       // 问题
 	ENTITY_TYPE_PROJECT:5,     // 项目
+	ENTITY_TYPE_ORGANIZATION:6, // lesson 机构
+	ENTITY_TYPE_ORGANIZATION_CLASS: 7,  // 机构班级
 
 	// 对象可见性
 	ENTITY_VISIBILITY_PUBLIC:0,   // 公开
@@ -88,7 +90,7 @@ module.exports = {
 
 	// 交易类型
 	TRADE_TYPE_DEFAULT:0,       // 默认类型
-	TRADE_TYPE_HAQI_EXCHANGE:1,      // 兑换
+	TRADE_TYPE_HAQI_EXCHANGE:1, // 兑换
 	TRADE_TYPE_PACKAGE_BUY:2,   // 购买课程包
 	TRADE_TYPE_LESSON_STUDY:3,  // 课程学习
 
@@ -126,6 +128,10 @@ module.exports = {
 
 	TAG_CLASSIFY_USER: 0,      // 用户类别TAG
 	TAG_CLASSIFY_PROJECT: 1,   // 项目类别TAG
+
+	CLASS_MEMBER_ROLE_STUDENT: 1,  // 学生
+	CLASS_MEMBER_ROLE_TEACHER: 2,  // 教师
+	CLASS_MEMBER_ROLE_ADMIN: 64,   // 管理员
 }
 
 
