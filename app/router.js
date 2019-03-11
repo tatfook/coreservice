@@ -235,6 +235,7 @@ module.exports = app => {
 
 	// LESSON three 
 	const lessonOrganization = controller.lessonOrganization;
+	router.get(`${prefix}lessonOrganizations/packages`, lessonOrganization.packages);
 	router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
 	router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
 	router.post(`${prefix}lessonOrganizations/login`, lessonOrganization.login);

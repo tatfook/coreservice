@@ -27,7 +27,8 @@ const LessonOrganization = class extends Controller {
 			organizationId = organ.id;
 		}
 
-		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, memberId: user.id}}).then(o => o.toJSON());
+		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, memberId: user.id}}).then(o => o && o.toJSON());
+		if (!member) return this.throw(400, "成员不存在");
 
 		const config = this.app.config.self;
 		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
@@ -132,7 +133,7 @@ const LessonOrganization = class extends Controller {
 	// 课程包
 	async packages() {
 		const {userId, roleId, organizationId} = this.authenticated();
-		const {classId} = this.validate({classId: "number"});
+		const {classId=0} = this.validate({classId: "number_optional"});
 
 		let list = [];
 		if (classId) {

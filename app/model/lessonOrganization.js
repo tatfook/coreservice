@@ -48,7 +48,7 @@ module.exports = app => {
 			type: DATE,
 		},
 
-		state: {
+		state: {                      // 0 - 开启  1 - 停用
 			type: INTEGER,
 		},
 

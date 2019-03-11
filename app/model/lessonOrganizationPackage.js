@@ -54,7 +54,7 @@ module.exports = app => {
 		],
 	});
 
-	model.sync({force:true});
+	//model.sync({force:true});
 	
 	app.model.lessonOrganizationPackages = model;
 

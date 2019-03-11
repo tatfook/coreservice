@@ -9,7 +9,7 @@ const ParacraftVisitors = class extends Controller {
 	}
 
 	async upsert() {
-		const data = this.validate({"username": "string", "cellphone": "string"});
+		const data = this.validate({"realname": "string", "cellphone": "string"});
 		await this.model.paracraftVisitors.upsert(data);
 		return this.success();
 	}
