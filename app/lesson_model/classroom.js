@@ -11,7 +11,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("classrooms", {
+	const model = app.lessonModel.define("classrooms", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,

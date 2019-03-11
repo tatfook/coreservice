@@ -27,8 +27,26 @@ const LessonOrganizationClass = class extends Controller {
 	}
 
 	async index() {
-		const {userId, organizationId} = this.authenticated();
-		const list = await this.model.findAll({where:{organizationId, memberId: userId}});
+		const {userId, organizationId, roleId} = this.authenticated();
+
+		if (roleId >= CLASS_MEMBER_ROLE_ADMIN) {
+			const list = await this.model.lessonOrganizationClasses.findAll({where:{organizationId}});
+			return this.success(list);
+		}
+
+		const list = await this.model.lessonOrganizationClasses.findAll({
+			include: [
+			{
+				as: "lessonOrganizationClassMembers",
+				model: this.model.lessonOrganizationClassMembers,
+				where: {
+					organizationId,
+					memberId: userId,
+				},
+			}
+			]
+			//where:{organizationId},
+		});
 
 		return this.success(list);
 	}
@@ -36,19 +54,20 @@ const LessonOrganizationClass = class extends Controller {
 	async create() {
 		const {roleId, organizationId} = this.authenticated();
 		const params = this.validate({name:"string"});
+		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
 
 		params.organizationId = organizationId;
 		const packages = params.packages || [];
 
-		const cls = await this.model.lessonOrganizationsClasses.create(params).then(o => o && o.toJSON());
+		const cls = await this.model.lessonOrganizationClasses.create(params).then(o => o && o.toJSON());
 		if (!cls) return this.throw(500);
 
 		const datas = [];
 		_.each(packages, pkg => {
 			datas.push({
-				objectId: cls.id,
-				objectType: ENTITY_TYPE_ORGANIZATION_CLASS,
+				organizationId,
+				classId: cls.id,
 				packageId: pkg.packageId,
 				lessons: pkg.lessons,
 			});

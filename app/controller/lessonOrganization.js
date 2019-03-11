@@ -92,14 +92,17 @@ const LessonOrganization = class extends Controller {
 	
 	// 禁止更新
 	async update() {
-		const {userId} = this.authenticated();
+		const {userId, organizationId, roleId} = this.authenticated();
 		const params = this.validate({id:'number'});
 		const id = params.id;
+
+		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411);
+
 		params.userId = userId;
 		await this.model.lessonOrganizations.update(params, {where:{userId, id}});
 
 		if (params.packages) {
-			await this.model.lessonOrganizationPackages.destroy({organizationId: id, classId:0});
+			await this.model.lessonOrganizationPackages.destroy({where:{organizationId: id, classId:0}});
 			const datas = _.map(params.packages, pkg => ({
 				organizationId: id,
 				classId: 0,
@@ -140,7 +143,7 @@ const LessonOrganization = class extends Controller {
 			list = await this.model.lessonOrganizationPackages.findAll({
 				organizationId,
 				classId,
-			}).then(list, _.map(list, o => o.toJSON()));
+			}).then(list => _.map(list, o => o.toJSON()));
 		} else {
 			list = await this.model.lessonOrganizationPackages.findAll({
 				include: [
@@ -153,13 +156,13 @@ const LessonOrganization = class extends Controller {
 				where: {
 					organizationId,
 				}
-			}).then(list, _.map(list, o => o.toJSON()));
+			}).then(list => _.map(list, o => o.toJSON()));
 		}
 
 		list = this.mergePackages(list);
 
 		const pkgIds = _.map(list, o => o.packageId);
-		const pkgs = await this.app.lessonModel.packages.findAll({where: {id: {[this.model.Op.in]:pkgIds}}}).then(list, _.map(list, o => o.toJSON()));
+		const pkgs = await this.app.lessonModel.packages.findAll({where: {id: {[this.model.Op.in]:pkgIds}}}).then(list => _.map(list, o => o.toJSON()));
 		_.each(list, o => o.package = _.find(pkgs, p => p.id == o.packageId));
 
 		return this.success(list);
@@ -194,14 +197,14 @@ const LessonOrganization = class extends Controller {
 	// 课程包详情页
 	async packageDetail() {
 		const {userId, organizationId, roleId} = this.authenticated();
-		const {packageId, classId} = this.validate({packageId: "number", "classId":"number"});
+		const {packageId, classId = 0} = this.validate({packageId: "number", "classId":"number_optional"});
 
 		const pkg = await this.getPackage(packageId, classId);
 		if (!pkg) return this.throw(400);
 
 		const pkginfo = await this.app.lessonModel.packages.findOne({where:{id: pkg.packageId}}).then(o => o && o.toJSON());
 		const lessonIds = _.map(pkg.lessons, o => o.lessonId);
-		const lessons = await this.app.lessonModel.lessons.findAll({where:{id:{[this.model.Op.in]: lessonIds}}}).then(list, _.map(list, o => o.toJSON()));
+		const lessons = await this.app.lessonModel.lessons.findAll({where:{id:{[this.model.Op.in]: lessonIds}}}).then(list => _.map(list, o => o.toJSON()));
 		_.each(pkg.lessons, o => o.lesson = _.find(lessons, l => l.id == o.lessonId));
 		// 授课记录
 		const classrooms = await this.app.lessonModel.classrooms.findAll({

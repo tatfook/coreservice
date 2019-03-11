@@ -9,7 +9,7 @@ module.exports = app => {
 		TEXT,
 	} = app.Sequelize;
 	
-	const model = app.model.define("lessons", {
+	const model = app.lessonModel.define("lessons", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,

@@ -236,16 +236,20 @@ module.exports = app => {
 	// LESSON three 
 	const lessonOrganization = controller.lessonOrganization;
 	router.get(`${prefix}lessonOrganizations/packages`, lessonOrganization.packages);
+	router.get(`${prefix}lessonOrganizations/packageDetail`, lessonOrganization.packageDetail);
 	router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
 	router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
+	router.put(`${prefix}lessonOrganizations/:id`, lessonOrganization.update);
 	router.post(`${prefix}lessonOrganizations/login`, lessonOrganization.login);
 
 	// organization class
 	const lessonOrganizationClass = controller.lessonOrganizationClass;
-	router.get(`${prefix}lessonOrganizationClases`, lessonOrganizationClass.index);
-	router.post(`${prefix}lessonOrganizationClases`, lessonOrganizationClass.create);
+	router.get(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.index);
+	router.post(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.create);
 
 	// organization class member 
 	const lessonOrganizationClassMember = controller.lessonOrganizationClassMember;
+	router.get(`${prefix}lessonOrganizationClassMembers/student`, lessonOrganizationClassMember.student);
+	router.get(`${prefix}lessonOrganizationClassMembers/teacher`, lessonOrganizationClassMember.teacher);
 	router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
 }

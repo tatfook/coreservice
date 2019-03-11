@@ -22,8 +22,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const {organizationId} = this.authenticated();
 
 		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_TEACHER} group by roleId`;
-		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT});
-
+		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
 		if (memberIds.length == 0) return this.success([]);
 
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
@@ -51,6 +50,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			map[o.memberId].classes = map[o.memberId].classes || [];
 			map[o.memberId].classes.push(o.lessonOrganizationClasses);
 			map[o.memberId].username = o.users.username;
+			delete o.lessonOrganizationClasses;
 		});
 		const datas = [];
 		_.each(map, o => datas.push(o));
