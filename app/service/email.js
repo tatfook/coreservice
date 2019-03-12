@@ -12,8 +12,8 @@ class Email extends Service {
 		const transporter = nodemailer.createTransport({
 			host: config.email.host,
 			port: config.email.port || 587,
-			//secure: false,
-			secure: true,
+			secure: false,
+			//secure: true,
 			auth: {
 				user: config.email.user,
 				pass: config.email.pass,
