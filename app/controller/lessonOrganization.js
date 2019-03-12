@@ -94,14 +94,17 @@ const LessonOrganization = class extends Controller {
 	
 	// 禁止更新
 	async update() {
-		const {userId, organizationId, roleId} = this.authenticated();
 		const params = this.validate({id:'number'});
 		const id = params.id;
 
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411);
-
-		params.userId = userId;
-		await this.model.lessonOrganizations.update(params, {where:{userId, id}});
+		if (this.ctx.state.admin && this.ctx.state.admin.userId) {
+			await this.model.lessonOrganizations.update(params, {where:{id}});
+		} else {
+			const {userId, roleId} = this.authenticated();
+			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411);
+			params.userId = userId;
+			await this.model.lessonOrganizations.update(params, {where:{userId, id}});
+		} 
 
 		if (params.packages) {
 			await this.model.lessonOrganizationPackages.destroy({where:{organizationId: id, classId:0}});

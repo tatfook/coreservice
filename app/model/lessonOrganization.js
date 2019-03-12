@@ -24,7 +24,7 @@ module.exports = app => {
 		},
 
 		logo: {
-			type: TEXT,
+			type: TEXT('long'),
 		},
 
 		cellphone: {

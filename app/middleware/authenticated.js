@@ -31,6 +31,7 @@ module.exports = (options, app) => {
 		ctx.state.token = token;
 		try {
 			ctx.state.user = token ? app.util.jwt_decode(token, config.secret, true) : {};
+			ctx.state.admin = token ? app.util.jwt_encode(token, config.adminSecret, true) : {};
 		} catch(e) {
 			ctx.state.user = {};
 		}
