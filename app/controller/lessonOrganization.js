@@ -40,6 +40,8 @@ const LessonOrganization = class extends Controller {
 		}, config.secret, tokenExpire);
 
 		user.token = token;
+		user.roleId = member.roleId;
+		user.organizationId = organizationId;
 		delete user.password;
 
 		return this.success(user);
