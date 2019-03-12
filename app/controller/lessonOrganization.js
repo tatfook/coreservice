@@ -59,35 +59,31 @@ const LessonOrganization = class extends Controller {
 		this.adminAuthenticated();
 
 		const params = this.validate();
-		if (!params.userId) {
-			if (!params.username) return this.throw(400, "缺少参数");
-			const user = await this.model.users.findOne({where:{username: params.username}}).then(o => o && o.toJSON());
-			if (!user) return this.throw(400, "用户不存在");
-			params.userId = user.id;
-		}
-
-		const packages = params.packages || [];
 
 		const organ = await this.model.lessonOrganizations.create(params).then(o => o && o.toJSON());
 		if (!organ) return this.throw(500);
 
-		const datas = [];
-		_.each(packages, pkg => {
-			datas.push({
+		if (params.packages) {
+			const packages = _.map(params.packages, pkg => ({
 				organizationId: organ.id,
 				classId: 0,
 				packageId: pkg.packageId,
 				lessons: pkg.lessons,
-			});
-		})
-		
-		await this.model.lessonOrganizationPackages.bulkCreate(datas);
-		await this.model.lessonOrganizationClassMembers.create({
-			classId: 0,
-			organizationId: organ.id,
-			memberId: params.userId,
-			roleId: CLASS_MEMBER_ROLE_ADMIN,
-		});
+			}));
+			await this.model.lessonOrganizationPackages.bulkCreate(packages);
+		}
+
+		if (params.usernames) {
+			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
+			const members = _.map(users, o => ({
+				classId: 0,
+				organizationId: organ.id,
+				memberId: o.id,
+				roleId: CLASS_MEMBER_ROLE_ADMIN,
+			}));
+			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
+		}
+
 
 		return this.success(organ);
 	}
@@ -100,8 +96,8 @@ const LessonOrganization = class extends Controller {
 		if (this.ctx.state.admin && this.ctx.state.admin.userId) {
 			await this.model.lessonOrganizations.update(params, {where:{id}});
 		} else {
-			const {userId, roleId} = this.authenticated();
-			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411);
+			const {userId, roleId = 0} = this.authenticated();
+			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411, "无效token");
 			params.userId = userId;
 			await this.model.lessonOrganizations.update(params, {where:{userId, id}});
 		} 
@@ -115,6 +111,19 @@ const LessonOrganization = class extends Controller {
 				lessons: pkg.lessons,
 			}));
 			await this.model.lessonOrganizationPackages.bulkCreate(datas);
+		}
+
+		if (params.usernames) {
+			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: 0}});
+			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
+			const members = _.map(users, o => ({
+				classId: 0,
+				organizationId: id,
+				memberId: o.id,
+				roleId: CLASS_MEMBER_ROLE_ADMIN,
+			}));
+
+			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
 		}
 
 		return this.success();
