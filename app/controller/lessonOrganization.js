@@ -55,6 +55,14 @@ const LessonOrganization = class extends Controller {
 		return this.success(organ);
 	}
 
+	async getByName() {
+		const {name} = this.validate({name:"string"});
+
+		const organ = await this.model.lessonOrganizations.findOne({where:{name}});
+
+		return this.success(organ);
+	}
+
 	async create() {
 		this.adminAuthenticated();
 
