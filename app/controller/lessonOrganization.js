@@ -114,7 +114,7 @@ const LessonOrganization = class extends Controller {
 		}
 
 		if (params.usernames) {
-			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: 0}});
+			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: id}});
 			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
 			const members = _.map(users, o => ({
 				classId: 0,
