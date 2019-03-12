@@ -28,7 +28,16 @@ module.exports = app => {
 			unique: true,
 		},
 
+		email: {                       // 邮箱
+			type: STRING,
+		},
+
 		organization: {                // 组织 机构
+			type: STRING,
+			defaultValue:"",
+		},
+
+		description: {                 // 描述
 			type: STRING,
 			defaultValue:"",
 		},
