@@ -52,12 +52,7 @@ module.exports = app => {
 			type: INTEGER,
 		},
 
-		teacherCount: {               // 教师数量
-			type: INTEGER,
-			defaultValue: 0,
-		},
-
-		studentCount: {               // 学生数量
+		count: {                      // 用户数量
 			type: INTEGER,
 			defaultValue: 0,
 		},
