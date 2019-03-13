@@ -1,24 +1,24 @@
 
 type Organization {
-	id: ID!
-	name: String
-	logo: String
-	cellphone: String
-	loginUrl: String
-	startDate: String
-	endDate: String
-	count: Int
-	privilege: Int
+	id: ID!                        # 机构ID
+	name: String                   # 机构名
+	logo: String                   # 机构LOGO
+	cellphone: String              # 联系电话
+	loginUrl: String               # 登录URL
+	startDate: String              # 开始日期
+	endDate: String                # 结束日期
+	count: Int                     # 机构允许的用户数
+	privilege: Int                 # 机构权限
 	extra: Json
 
-	studentCount: Int
-	teacherCount: Int
-	students: [OrganizationUser]
-	teachers: [OrganizationUser]
+	studentCount: Int              # 学生数量
+	teacherCount: Int              # 教师数量
+	students: [OrganizationUser]   # 机构学生
+	teachers: [OrganizationUser]   # 机构教师
 	
-	classes: [OrganizationClass]
-	packages: [OrganizationPackage]
-	managers: [OrganizationUser]
+	classes: [OrganizationClass]       # 机构班级
+	packages: [OrganizationPackage]    # 机构课程包
+	managers: [OrganizationUser]       # 机构管理员
 }
 
 type OrganizationClass {
