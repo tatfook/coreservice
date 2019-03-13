@@ -51,6 +51,7 @@ const LessonOrganization = class extends Controller {
 		const {id} = this.validate({id: "number"});
 
 		const organ = await this.model.lessonOrganizations.findOne({where: {id}});
+		if (!organ) return this.throw(404);
 
 		return this.success(organ);
 	}
@@ -59,6 +60,7 @@ const LessonOrganization = class extends Controller {
 		const {name} = this.validate({name:"string"});
 
 		const organ = await this.model.lessonOrganizations.findOne({where:{name}});
+		if (!organ) return this.throw(404);
 
 		return this.success(organ);
 	}
