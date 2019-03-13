@@ -14,44 +14,104 @@ const {
 module.exports = {
 	Organization: {
 		async studentCount(root, _, ctx) {
-			const sql = `select count(*) as count from lessonOrganizationClassMembers where organizationId=:organizationId and roleId & :roleId`;
-			const list = await ctx.model.query(sql, {
-				type: ctx.model.QueryTypes.SELECT,
-				replacements: {
-					organizationId: root.id,
-					roleId: CLASS_MEMBER_ROLE_STUDENT,
-				}
+			return await ctx.connector.organization.fetchOrganizationUserCount({
+				organizationId: root.id, 
+				roleId: CLASS_MEMBER_ROLE_STUDENT,
 			});
-			return list[0].count;
 		},
 
-		async packages(root, args, ctx) {
-			return await ctx.connector.organization.fetchOrganizationPackages(root.id);
+		async teacherCount(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationUserCount({
+				organizationId: root.id, 
+				roleId: CLASS_MEMBER_ROLE_TEACHER,
+			});
+		},
+
+		async teachers(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationMembers({
+				organizationId: root.id,
+				roleId: CLASS_MEMBER_ROLE_TEACHER,
+			});
+		},
+
+		async students(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationMembers({
+				organizationId: root.id,
+				roleId: CLASS_MEMBER_ROLE_STUDENT,
+			});
 		},
 
 		async managers(root, args, ctx) {
-			const sql = `select memberId from lessonOrganizationClassMembers where organizationId=:organizationId and roleId & :roleId and classId = 0`;
-			const list = await ctx.model.query(sql, {
-				type: ctx.model.QueryTypes.SELECT,
-				replacements: {
-					organizationId: root.id,
-					roleId: CLASS_MEMBER_ROLE_ADMIN,
-				}
+			return await ctx.connector.organization.fetchOrganizationMembers({
+				organizationId: root.id,
+				classId: 0,
+				roleId: CLASS_MEMBER_ROLE_ADMIN,
 			});
+		},
 
-			if (list.length == 0) return [];
+		async packages(root, args, ctx) {
+			return await ctx.connector.organization.fetchOrganizationPackages({
+				organizationId: root.id,
+			});
+		},
 
-			const userIds = _.map(list, o => o.memberId);
-			const users = await ctx.model.users.findAll({
-				attributes: ["id", "username", "nickname", "portrait"],
-				where:{id:{$in:userIds}}
-			}).then(list => list.map(o => o.toJSON()));
+		async classes(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationClasses({
+				organizationId: root.id,
+			});
+		}
+	},
 
-			return users;
+	OrganizationClass: {
+		async studentCount(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationUserCount({
+				organizationId: root.organizationId, 
+				roleId: CLASS_MEMBER_ROLE_STUDENT,
+				classId: root.id,
+			});
+		},
+
+		async teacherCount(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationUserCount({
+				organizationId: root.organizationId, 
+				roleId: CLASS_MEMBER_ROLE_TEACHER,
+				classId: root.id,
+			});
+		},
+
+		async teachers(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationMembers({
+				organizationId: root.organizationId, 
+				roleId: CLASS_MEMBER_ROLE_TEACHER,
+				classId: root.id,
+			});
+		},
+
+		async students(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationMembers({
+				organizationId: root.organizationId, 
+				roleId: CLASS_MEMBER_ROLE_STUDENT,
+				classId: root.id,
+			});
+		},
+
+		async packages(root, args, ctx) {
+			return await ctx.connector.organization.fetchOrganizationPackages({
+				organizationId: root.organizationId,
+				classId: root.id,
+			});
 		},
 	},
 
 	OrganizationPackage: {
+		async package(root, {}, ctx) {
+			return ctx.connector.organization.packageLoader.load(root.packageId);
+		},
+
+		async lessons(root, {}, ctx) {
+			const lessonIds = _.map(root.lessons, o => o.lessonId);
+			return ctx.connector.organization.lessonLoader.loadMany(lessonIds);
+		}
 
 	},
 

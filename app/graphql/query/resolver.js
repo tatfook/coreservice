@@ -38,14 +38,22 @@ module.exports = {
 			});
 		},
 
-		organization(root, {id, name}, ctx) {
+		async organization(root, {id, name}, ctx) {
 			if (!id && !name) return ctx.throw(400);
 			if (id) {
-				return ctx.connector.organization.fetchById(id);
+				return await ctx.connector.organization.fetchById(id);
 			} else {
-				return ctx.connector.organization.fetchByName(name);
+				return await ctx.connector.organization.fetchByName(name);
 			}
-		}
+		},
+
+		async organizationClass(root, {id}, ctx) {
+			return await ctx.model.lessonOrganizationClasses.findOne({where:{id}}).then(o => o && o.toJSON());
+		},
+
+		async organizationPackage(root, {id}, ctx) {
+			return await ctx.model.lessonOrganizationPackages.findOne({where:{id}}).then(o => o && o.toJSON());
+		},
 	},
 
 	Mutation: {

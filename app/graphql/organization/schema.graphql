@@ -12,9 +12,37 @@ type Organization {
 	extra: Json
 
 	studentCount: Int
+	teacherCount: Int
+	students: [OrganizationUser]
+	teachers: [OrganizationUser]
 	
+	classes: [OrganizationClass]
 	packages: [OrganizationPackage]
-	managers: [User]
+	managers: [OrganizationUser]
+}
+
+type OrganizationClass {
+	id: ID
+	organizationId: Int
+	name: String
+	
+	studentCount: Int
+	teacherCount: Int
+	students: [OrganizationUser]
+	teachers: [OrganizationUser]
+
+	packages: [OrganizationPackage]
+}
+
+type OrganizationUser {
+	id: ID
+	organizationId: Int
+	classId: Int
+	memberId: Int
+	realname: String
+	roleId: Int
+
+	user: User
 }
 
 type OrganizationPackage {
@@ -39,7 +67,6 @@ type Package {
 	auditAt: String
 	lastClassroomCount: Int
 	extra: Json
-#	lessons: [Lesson]
 }
 
 type Lesson {

@@ -10,6 +10,8 @@ type Query {
 	games(query: Json = "{}"): Json
 
 	organization(id: Int, name: String): Organization
+	organizationClass(id: Int!): OrganizationClass
+	organizationPackage(id: Int!): OrganizationPackage
 }
 
 type Mutation {
