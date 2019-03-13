@@ -230,6 +230,20 @@ module.exports = app => {
 		constraints: false,
 	});
 
+	app.model.lessonOrganizations.hasMany(app.model.lessonOrganizationPackages, {
+		as: "lessonOrganizationPackages",
+		foreignKey: "organizationId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationPackages.belongsTo(app.model.lessonOrganizations, {
+		as: "lessonOrganizations",
+		foreignKey: "organizationId",
+		targetKey: "id",
+		constraints: false,
+	});
+
 	app.model.lessonOrganizations.hasMany(app.model.lessonOrganizationClassMembers, {
 		as: "lessonOrganizationClassMembers",
 		foreignKey: "organizationId",
@@ -238,7 +252,7 @@ module.exports = app => {
 	});
 
 	app.model.lessonOrganizationClassMembers.belongsTo(app.model.lessonOrganizations, {
-		as: "lessonOrganizationClassMembers",
+		as: "lessonOrganizations",
 		foreignKey: "organizationId",
 		targetKey: "id",
 		constraints: false,

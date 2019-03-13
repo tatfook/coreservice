@@ -15,7 +15,6 @@ type User {
 	contributions(years: String): Contribution 
 	account: Account
 	info: Userinfo
-	lesson: Lesson
 	projects: [Project]
 	joinProjects: [Project]
 	tutor: Tutor

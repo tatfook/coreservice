@@ -1,0 +1,53 @@
+
+type Organization {
+	id: ID!
+	name: String
+	logo: String
+	cellphone: String
+	loginUrl: String
+	startDate: String
+	endDate: String
+	count: Int
+	privilege: Int
+	extra: Json
+
+	studentCount: Int
+	
+	packages: [OrganizationPackage]
+	managers: [User]
+}
+
+type OrganizationPackage {
+	id: ID
+	organizationId: Int
+	classId: Int
+	package: Package
+	lessons: [Lesson]
+}
+
+type Package {
+	id: ID
+	userId: Int
+	packageName: String
+	subjectId: Int
+	minAge: Int
+	maxAge: Int
+	state: Int
+	intro: String
+	rmb: Int
+	coin: Int
+	auditAt: String
+	lastClassroomCount: Int
+	extra: Json
+#	lessons: [Lesson]
+}
+
+type Lesson {
+	id: ID
+	userId: Int
+	lessonName: String
+	subjectId: Int
+	url: String
+	goals: String
+	extra: Json
+}

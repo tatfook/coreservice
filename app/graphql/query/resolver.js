@@ -1,6 +1,8 @@
 
 'use strict';
 
+const _ = require("lodash");
+
 module.exports = {
 	Query: {
 		test(root, arg, ctx) {
@@ -35,6 +37,15 @@ module.exports = {
 				where: query
 			});
 		},
+
+		organization(root, {id, name}, ctx) {
+			if (!id && !name) return ctx.throw(400);
+			if (id) {
+				return ctx.connector.organization.fetchById(id);
+			} else {
+				return ctx.connector.organization.fetchByName(name);
+			}
+		}
 	},
 
 	Mutation: {
