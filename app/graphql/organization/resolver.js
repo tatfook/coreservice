@@ -111,8 +111,16 @@ module.exports = {
 		async lessons(root, {}, ctx) {
 			const lessonIds = _.map(root.lessons, o => o.lessonId);
 			return ctx.connector.organization.lessonLoader.loadMany(lessonIds);
-		}
+		},
 
+		async learnedLessons(root, {}, ctx) {
+			const {userId} = ctx.authenticated();
+			return await ctx.connector.organization.fetchPackageLearned({userId, packageId});
+		},
+
+		async teachedLessons(root, {}, ctx) {
+			return [];
+		},
 	},
 
 	Package: {
@@ -132,13 +140,23 @@ module.exports = {
 					packageId: root.id,
 				},
 			});
+
 			const lessonIds = [];
 			_.each(pkgs, pkg => {
 				_.each(pkg.lessons, l => lessonIds.push(l.lessonId));
 			});
 
 			return await ctx.connector.organization.lessonLoader.loadMany(lessonIds);
-		}
+		},
+
+		async learnedLessons(root, {}, ctx) {
+			const {userId} = ctx.authenticated();
+			return await ctx.connector.organization.fetchPackageLearned({userId, packageId});
+		},
+
+		async teachedLessons(root, {}, ctx) {
+			return [];
+		},
 	},
 
 	Lesson: {

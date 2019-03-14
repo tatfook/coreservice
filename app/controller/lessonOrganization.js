@@ -56,6 +56,15 @@ const LessonOrganization = class extends Controller {
 		return this.success(organ);
 	}
 
+	async getByUrl() {
+		const {url} = this.validate({url:"string"});
+
+		const organ = await this.model.lessonOrganizations.findOne({where:{loginUrl: url}});
+		if (!organ) return this.throw(404);
+
+		return this.success(organ);
+	}
+
 	async getByName() {
 		const {name} = this.validate({name:"string"});
 

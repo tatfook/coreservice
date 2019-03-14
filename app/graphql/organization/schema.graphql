@@ -49,8 +49,25 @@ type OrganizationPackage {             # 机构课程包
 	id: ID                             # ID
 	organizationId: Int                # 机构ID
 	classId: Int                       # 班级ID
+	packageId: Int                     # 课程包ID
+	lessonNos: [Json]                  # 课程序号列表 {lessonId, lessonNo}
 	package: Package                   # 课程包信息
 	lessons: [Lesson]                  # 课程信息列表
+	
+	learnedLessons: [Int]              # 已学课程列表
+	teachedLessons: [Int]              # 已教课程列表
+	classrooms: [Classroom]            # 授课记录列表
+}
+
+type Classroom {                       # 教室
+	id: ID
+	userId: Int
+	classId: Int
+	packageId: Int
+	lessonId: Int
+	key: String
+	state: Int
+	extra: Json
 }
 
 type Package {                         # 课程包
@@ -69,6 +86,8 @@ type Package {                         # 课程包
 	extra: Json
 	
 	lessons: [Lesson]                  # 课程包的课程列表
+	learnedLessons: [Int]              # 已学课程列表
+	teachedLessons: [Int]              # 已教课程列表
 }
 
 type Lesson {                          # 课程

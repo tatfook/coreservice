@@ -36,7 +36,14 @@ class OrganizationConnector {
 	}
 
 	async fetchOrganizationPackages({organizationId, classId = 0}) {
-		const pkgs = await this.app.model.lessonOrganizationPackages.findAll({where:{organizationId, classId}}).then(list => list.map(o => o.toJSON()));
+		const pkgs = await this.app.model.lessonOrganizationPackages.findAll({
+			where:{organizationId, classId},
+		}).then(list => list.map(o => {
+			o = o.toJSON();
+			o.lessonNos = o.lessons;
+			return o;
+		}));
+
 		//const pkgIds = _.map(pkgs, o => o.packageId);
 		//const pkgsInfo = await this.packageLoader.loadMany(pkgIds);
 		//for (let i = 0; i < pkgs.length; i++) {
@@ -100,6 +107,17 @@ class OrganizationConnector {
 
 	async fetchPackage({id}) {
 		return await this.packageLoader.load(id);
+	}
+
+	async fetchPackageLearned({packageId, userId}) {
+		return await ctx.lessonModel.learnRecords.findAll({
+			attributes: ["lessonId"],
+			where: {
+				userId,
+				packageId,
+				state: 1,
+			}
+		}).then(list => list.map(o => o.lessonId));
 	}
 }
 

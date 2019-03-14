@@ -33,6 +33,7 @@ module.exports = app => {
 
 		loginUrl: {
 			type: STRING,
+			unique: true,
 		},
 
 		userId: {                     // 组织拥有者
