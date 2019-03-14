@@ -22,38 +22,38 @@ type Organization {
 }
 
 type OrganizationClass {
-	id: ID
-	organizationId: Int
-	name: String
+	id: ID                             # 机构班级ID
+	organizationId: Int                # 机构ID
+	name: String                       # 机构班级名称
 	
-	studentCount: Int
-	teacherCount: Int
-	students: [OrganizationUser]
-	teachers: [OrganizationUser]
+	studentCount: Int                  # 班级学生数量
+	teacherCount: Int                  # 班级教师数量
+	students: [OrganizationUser]       # 班级学生
+	teachers: [OrganizationUser]       # 班级教师
 
-	packages: [OrganizationPackage]
+	packages: [OrganizationPackage]    # 班级课程包
 }
 
 type OrganizationUser {
-	id: ID
-	organizationId: Int
-	classId: Int
-	memberId: Int
-	realname: String
-	roleId: Int
+	id: ID                             # 机构用户ID
+	organizationId: Int                # 机构ID
+	classId: Int                       # 班级ID
+	memberId: Int                      # 班级成员ID
+	realname: String                   # 班级成员姓名
+	roleId: Int                        # 班级成员角色
 
-	user: User
+	user: User                         # 班级成员用户信息
 }
 
-type OrganizationPackage {
-	id: ID
-	organizationId: Int
-	classId: Int
-	package: Package
-	lessons: [Lesson]
+type OrganizationPackage {             # 机构课程包
+	id: ID                             # ID
+	organizationId: Int                # 机构ID
+	classId: Int                       # 班级ID
+	package: Package                   # 课程包信息
+	lessons: [Lesson]                  # 课程信息列表
 }
 
-type Package {
+type Package {                         # 课程包
 	id: ID
 	userId: Int
 	packageName: String
@@ -67,9 +67,11 @@ type Package {
 	auditAt: String
 	lastClassroomCount: Int
 	extra: Json
+	
+	lessons: [Lesson]                  # 课程包的课程列表
 }
 
-type Lesson {
+type Lesson {                          # 课程
 	id: ID
 	userId: Int
 	lessonName: String

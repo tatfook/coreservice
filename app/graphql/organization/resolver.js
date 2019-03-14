@@ -116,6 +116,29 @@ module.exports = {
 	},
 
 	Package: {
+		async lessons(root, {}, ctx) {
+			const {userId} = ctx.authenticated();
+			const pkgs = await ctx.model.lessonOrganizationPackages.findAll({
+				include: [
+				{
+					as:"lessonOrganizationClassMembers",
+					model: ctx.model.lessonOrganizationClassMembers,
+					where: {
+						memberId: userId,
+					}
+				}
+				],
+				where: {
+					packageId: root.id,
+				},
+			});
+			const lessonIds = [];
+			_.each(pkgs, pkg => {
+				_.each(pkg.lessons, l => lessonIds.push(l.lessonId));
+			});
+
+			return await ctx.connector.organization.lessonLoader.loadMany(lessonIds);
+		}
 	},
 
 	Lesson: {

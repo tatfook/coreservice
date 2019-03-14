@@ -54,6 +54,10 @@ module.exports = {
 		async organizationPackage(root, {id}, ctx) {
 			return await ctx.model.lessonOrganizationPackages.findOne({where:{id}}).then(o => o && o.toJSON());
 		},
+
+		async package(root, {id}, ctx) {
+			return await ctx.connector.organization.fetchPackage({id});
+		},
 	},
 
 	Mutation: {

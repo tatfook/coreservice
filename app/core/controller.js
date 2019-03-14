@@ -82,8 +82,13 @@ class BaseController extends Controller {
 	}
 
 	authenticated() {
-		const user = this.getUser();
-		if (!user || !user.userId) this.ctx.throw(401);
+		const user = this.ctx.state.user;
+		const admin = this.ctx.state.admin;
+
+		if (!user || user.userId == undefined) {
+			if (!admin || admin.userId == undefined) return this.throw(401);
+			return admin;
+		} 
 
 		return user;
 	}

@@ -10,6 +10,7 @@ module.exports = app => {
 	router.resources(`${prefix}indexs`, index);
 
 	const keepwork = controller.keepwork;
+	router.post(`${prefix}keepworks/email`, keepwork.email);
 	router.get(`${prefix}keepworks/test`, keepwork.test);
 	router.get(`${prefix}keepworks/words`, keepwork.words);
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);

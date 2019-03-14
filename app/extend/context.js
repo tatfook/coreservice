@@ -5,7 +5,11 @@ const DataLoader = require('dataloader');
 module.exports = {
 	authenticated() {
 		const user = this.state.user;
-		if (!user || user.userId == undefined) return this.throw(401);
+		const admin = this.state.admin;
+		if (!user || user.userId == undefined) {
+			if (!admin || admin.userId == undefined) return this.throw(401);
+			return admin;
+		} 
 		return user;
 	},
 

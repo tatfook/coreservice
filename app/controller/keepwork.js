@@ -17,6 +17,18 @@ const {
 } = require("../core/consts.js");
 
 class Keepwork extends Controller {
+	async email() {
+		const  {html, to, from, subject} = this.validate({
+			html: "string",
+			to: "string",
+			subject: "string",
+		});
+
+		const ok = await this.ctx.service.email.send({html, to, from, subject});
+
+		return this.success(ok);
+	}
+
 	async statistics() {
 		const {app} = this;
 

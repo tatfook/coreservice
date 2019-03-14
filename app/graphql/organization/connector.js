@@ -97,6 +97,10 @@ class OrganizationConnector {
 			},
 		}).then(list => list.map(o => o.toJSON()));
 	}
+
+	async fetchPackage({id}) {
+		return await this.packageLoader.load(id);
+	}
 }
 
 module.exports = OrganizationConnector;

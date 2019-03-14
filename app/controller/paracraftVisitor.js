@@ -12,9 +12,9 @@ const ParacraftVisitors = class extends Controller {
 		const data = this.validate({"realname": "string", "cellphone": "string"});
 		await this.model.paracraftVisitors.upsert(data);
 
-		if (data.email) {
-			await this.ctx.service.email.send(data.email, "KEEPWORK合作邀请", "this is a test");
-		}
+		//if (data.email) {
+			//await this.ctx.service.email.send(data.email, "KEEPWORK合作邀请", "this is a test");
+		//}
 		return this.success();
 	}
 }

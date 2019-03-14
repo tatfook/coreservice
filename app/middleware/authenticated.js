@@ -37,6 +37,7 @@ module.exports = (options, app) => {
 
 		try {
 			ctx.state.admin = token ? app.util.jwt_decode(token, config.adminSecret, false) : {};
+			ctx.state.admin.admin = true;
 		} catch(e) {
 			ctx.state.admin = {};
 		}

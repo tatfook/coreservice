@@ -23,7 +23,7 @@ class Email extends Service {
 		return transporter;
 	}
 
-	async send(to, subject, html, from, provider = "QQ") {
+	async send({to, subject, html, from, provider = "QQ"}) {
 		const config = this.app.config.self;
 
 		const transporter = this.getTransporter(provider);
