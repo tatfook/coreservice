@@ -119,6 +119,12 @@ class OrganizationConnector {
 			}
 		}).then(list => list.map(o => o.lessonId));
 	}
+
+	async fetchClassrooms({userId, packageId, classId}) {
+		const where = {userId, packageId};
+		if (classId != undefined) where.classId = classId;
+		return await ctx.lessonModel.classrooms.findAll({where}).then(list => list.map(o => o.toJSON()));
+	}
 }
 
 module.exports = OrganizationConnector;

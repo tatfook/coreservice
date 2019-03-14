@@ -121,6 +121,15 @@ module.exports = {
 		async teachedLessons(root, {}, ctx) {
 			return [];
 		},
+
+		async classrooms(root, {}, ctx) {
+			const {userId} = ctx.authenticated();
+			return await ctx.connector.organization.fetchClassrooms({
+				userId,
+				packageId: root.packageId,
+				classId: root.classId,
+			});
+		},
 	},
 
 	Package: {

@@ -60,7 +60,7 @@ const LessonOrganizationClassMember = class extends Controller {
 	async student() {
 		const {organizationId} = this.authenticated();
 		const {classId} = this.validate({classId:"number"});
-		const list = await this.model.lessonOrganizationClassMembers.findAll({
+		const result = await this.model.lessonOrganizationClassMembers.findAndCount({
 			include: [
 			{
 				as: "users",
@@ -70,11 +70,12 @@ const LessonOrganizationClassMember = class extends Controller {
 			],
 			where: {
 				organizationId,
-				classId,
+				classId: classId ? classId : {$gt: 0},
+				roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
-		}).then(list => _.filter(list, o => o.roleId & CLASS_MEMBER_ROLE_STUDENT));
+		});
 		
-		return this.success(list);
+		return this.success(result);
 	}
 
 	async create() {
