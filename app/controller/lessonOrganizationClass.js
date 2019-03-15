@@ -84,24 +84,22 @@ const LessonOrganizationClass = class extends Controller {
 		const params = this.validate({id:"number"});
 		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
-
 		delete params.organizationId;
-		const packages = params.packages || [];
-
 		await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
 
-		const datas = [];
-		_.each(packages, pkg => {
-			datas.push({
-				organizationId,
-				classId: params.id,
-				packageId: pkg.packageId,
-				lessons: pkg.lessons,
-			});
-		})
-		
-		await this.model.lessonOrganizationPackages.destroy({where:{classId: params.id, organizationId}});
-		await this.model.lessonOrganizationPackages.bulkCreate(datas);
+		if (params.packages) {
+			const datas = [];
+			_.each(params.packages, pkg => {
+				datas.push({
+					organizationId,
+					classId: params.id,
+					packageId: pkg.packageId,
+					lessons: pkg.lessons,
+				});
+			})
+			await this.model.lessonOrganizationPackages.destroy({where:{classId: params.id, organizationId}});
+			await this.model.lessonOrganizationPackages.bulkCreate(datas);
+		}
 
 		return this.success(cls);
 	}

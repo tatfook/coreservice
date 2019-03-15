@@ -153,7 +153,7 @@ const LessonOrganization = class extends Controller {
 		// 合并课程
 		_.each(list, o => {
 			if (pkgmap[o.packageId]) {
-				pkgmap[o.packageId].lessons = pkgmap[o.packageId].lessons.concat(o.lessons);
+				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons);
 				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId], "lessonId");
 			} else {
 				pkgmap[o.packageId] = o;

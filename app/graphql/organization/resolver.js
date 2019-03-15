@@ -130,6 +130,15 @@ module.exports = {
 				classId: root.classId,
 			});
 		},
+
+		async lastTeachTime(root, {}, ctx) {
+			const classroom = await ctx.lessonModel.classrooms.findOne({
+				order:[["createdAt", "DESC"]],
+				where: {classId: root.classId, packageId: root.packageId},
+			}).then(o => o && o.toJSON());
+
+			return classroom ? "" : classroom.createdAt;
+		},
 	},
 
 	Package: {
