@@ -107,6 +107,23 @@ const LessonOrganization = class extends Controller {
 		return this.success(organ);
 	}
 	
+	async fixedClassPackage(organizationId, packages) {
+		const pkgs = await this.model.lessonOrganizationPackages.findAll({where:{organizationId, classId:{$gt:0}}}).then(list => list.map(o => o.toJSON()));
+		const datas = [];
+		_.each(pkgs, o => {
+			const pkg = _.find(packages, p => p.packageId == o.packageId);
+			if (!pkg) return;
+			const lessons = [];
+			_.each(o.lessons, l => {
+				if (_.find(pkg.lessons, pl => pl.lessonId == l.lessonId)) lessons.push(l);
+			});
+			o.lessons = lessons;
+			datas.push(o);
+		});
+		await this.model.lessonOrganizationPackages.destroy({where:{organizationId, classId:{$gt:0}}});
+		await this.model.lessonOrganizationPackages.bulkCreate(datas);
+	}
+
 	// 禁止更新
 	async update() {
 		const params = this.validate({id:'number'});
@@ -130,6 +147,7 @@ const LessonOrganization = class extends Controller {
 				lessons: pkg.lessons,
 			}));
 			await this.model.lessonOrganizationPackages.bulkCreate(datas);
+			await this.fixedClassPackage(id, params.packages);
 		}
 
 		if (params.usernames) {
@@ -141,7 +159,6 @@ const LessonOrganization = class extends Controller {
 				memberId: o.id,
 				roleId: CLASS_MEMBER_ROLE_ADMIN,
 			}));
-
 			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
 		}
 
@@ -153,8 +170,8 @@ const LessonOrganization = class extends Controller {
 		// 合并课程
 		_.each(list, o => {
 			if (pkgmap[o.packageId]) {
-				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons);
-				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId], "lessonId");
+				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
+				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
 			} else {
 				pkgmap[o.packageId] = o;
 			}
