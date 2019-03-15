@@ -249,6 +249,8 @@ module.exports = app => {
 	const lessonOrganizationClass = controller.lessonOrganizationClass;
 	router.get(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.index);
 	router.post(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.create);
+	router.put(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.update);
+	router.delete(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.destroy);
 
 	// organization class member 
 	const lessonOrganizationClassMember = controller.lessonOrganizationClassMember;

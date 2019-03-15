@@ -101,7 +101,20 @@ const LessonOrganizationClass = class extends Controller {
 			await this.model.lessonOrganizationPackages.bulkCreate(datas);
 		}
 
-		return this.success(cls);
+		return this.success();
+	}
+
+	// 删除班级
+	async destroy() {
+		const {roleId, organizationId} = this.authenticated();
+		const {id} = this.validate({id:"number"});
+		if (!organizationId) return this.throw(400);
+		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
+
+		await this.model.lessonOrganizationClasses.destroy({where:{id, organizationId}});
+		await this.model.lessonOrganizationPackages.destroy({where:{classId:id, organizationId}});
+
+		return this.success();
 	}
 }
 
