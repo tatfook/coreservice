@@ -16,9 +16,9 @@ type Organization {
 	students: [OrganizationUser]   # 机构学生
 	teachers: [OrganizationUser]   # 机构教师
 	
-	classes: [OrganizationClass]       # 机构班级
-	packages: [OrganizationPackage]    # 机构课程包
-	managers: [OrganizationUser]       # 机构管理员
+	organizationClasses: [OrganizationClass]       # 机构班级
+	organizationPackages: [OrganizationPackage]    # 机构课程包
+	organizationManagers: [OrganizationUser]       # 机构管理员
 }
 
 type OrganizationClass {

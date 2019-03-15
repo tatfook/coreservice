@@ -41,7 +41,7 @@ module.exports = {
 			});
 		},
 
-		async managers(root, args, ctx) {
+		async organizationManagers(root, args, ctx) {
 			return await ctx.connector.organization.fetchOrganizationMembers({
 				organizationId: root.id,
 				classId: 0,
@@ -49,13 +49,13 @@ module.exports = {
 			});
 		},
 
-		async packages(root, args, ctx) {
+		async organizationPackages(root, args, ctx) {
 			return await ctx.connector.organization.fetchOrganizationPackages({
 				organizationId: root.id,
 			});
 		},
 
-		async classes(root, {}, ctx) {
+		async organizationClasses(root, {}, ctx) {
 			return await ctx.connector.organization.fetchOrganizationClasses({
 				organizationId: root.id,
 			});
