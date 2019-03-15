@@ -95,7 +95,7 @@ module.exports = {
 			});
 		},
 
-		async packages(root, args, ctx) {
+		async organizationPackages(root, args, ctx) {
 			return await ctx.connector.organization.fetchOrganizationPackages({
 				organizationId: root.organizationId,
 				classId: root.id,

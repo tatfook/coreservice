@@ -31,7 +31,7 @@ type OrganizationClass {
 	students: [OrganizationUser]       # 班级学生
 	teachers: [OrganizationUser]       # 班级教师
 
-	packages: [OrganizationPackage]    # 班级课程包
+	organizationPackages: [OrganizationPackage]    # 班级课程包
 }
 
 type OrganizationUser {
