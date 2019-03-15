@@ -196,6 +196,14 @@ const LessonOrganization = class extends Controller {
 
 		const pkgIds = _.map(list, o => o.packageId);
 		const pkgs = await this.app.lessonModel.packages.findAll({where: {id: {[this.model.Op.in]:pkgIds}}}).then(list => _.map(list, o => o.toJSON()));
+		if (classId) {
+			const classrooms = await this.app.lessonModel.classrooms.findAll({where:{classId, packageId:{$in: pkgIds}}}).then(list => list.map(o => o.toJSON()));
+			_.each(list, o => {
+				const cls = classrooms.map(c => c.packageId == o.packageId);
+				const c = _.orderBy(cls, ['createdAt', 'desc'])[0]; 
+				if (c) o.lastTeachTime = c.createdAt;
+			});
+		}
 		_.each(list, o => o.package = _.find(pkgs, p => p.id == o.packageId));
 
 		return this.success(list);
