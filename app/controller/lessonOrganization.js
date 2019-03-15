@@ -112,13 +112,13 @@ const LessonOrganization = class extends Controller {
 		const params = this.validate({id:'number'});
 		const id = params.id;
 
+		delete params.userId;
 		if (this.ctx.state.admin && this.ctx.state.admin.userId) {
 			await this.model.lessonOrganizations.update(params, {where:{id}});
 		} else {
 			const {userId, roleId = 0} = this.authenticated();
 			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411, "无效token");
-			params.userId = userId;
-			await this.model.lessonOrganizations.update(params, {where:{userId, id}});
+			await this.model.lessonOrganizations.update(params, {where:{id}});
 		} 
 
 		if (params.packages) {
