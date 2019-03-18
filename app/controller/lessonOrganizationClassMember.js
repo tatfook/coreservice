@@ -118,7 +118,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (organ.privilege && 2 == 0) return this.throw(411, "无权限");
 		} 
 		
-		const member = await this.model.lessonOrganizationClassMembers.destroy({where:{id}});
+		await this.model.lessonOrganizationClassMembers.destroy({where:{id}});
 
 		return this.success("OK");
 	}
