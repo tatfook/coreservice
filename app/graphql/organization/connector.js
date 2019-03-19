@@ -13,15 +13,15 @@ class OrganizationConnector {
 		this.loader = new DataLoader(ids => this.fetch(ids));
 		this.packageLoader = new DataLoader(async ids => {
 			const list = await ctx.app.lessonModel.packages.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
-			return _.map(ids, id => _.find(list, id));
+			return _.map(ids, id => _.find(list, o => o.id == id));
 		});
 		this.lessonLoader = new DataLoader(async ids => {
 			const list = await ctx.app.lessonModel.lessons.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
-			return _.map(ids, id => _.find(list, id));
+			return _.map(ids, id => _.find(list, o => o.id == id));
 		});
 		this.classroomLoader = new DataLoader(async ids => {
 			const list = await ctx.app.lessonModel.classrooms.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
-			return _.map(ids, id => _.find(list, id));
+			return _.map(ids, id => _.find(list, o => o.id == id));
 		});
 	}
 
