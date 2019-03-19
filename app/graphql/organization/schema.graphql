@@ -21,11 +21,23 @@ type Organization {
 	organizationManagers: [OrganizationUser]       # 机构管理员
 }
 
+type OrganizationUser {
+	userId: Int                                    # 用户ID
+	organizationId: Int                            # 组织ID
+
+	classroom: Classroom                           # 当前课堂
+	organizationClasses: [OrganizationClass]       # 用户班级
+	#organizationClassMembers: [OrganizationClassMember]      # 用户班级成员信息
+
+	#user: User                                     # 用户信息
+}
+
 type OrganizationClass {
-	id: ID                             # 机构班级ID
+	id: Int                            # 机构班级ID
 	organizationId: Int                # 机构ID
-	name: String                       # 机构班级名称
-	
+	name: String                       # 机构班级名称	
+
+	classroom: Classroom,              # 当前课堂
 	studentCount: Int                  # 班级学生数量
 	teacherCount: Int                  # 班级教师数量
 	students: [OrganizationUser]       # 班级学生
@@ -34,7 +46,7 @@ type OrganizationClass {
 	organizationPackages: [OrganizationPackage]    # 班级课程包
 }
 
-type OrganizationUser {
+type OrganizationClassMember {
 	id: ID                             # 机构用户ID
 	organizationId: Int                # 机构ID
 	classId: Int                       # 班级ID
@@ -62,14 +74,14 @@ type OrganizationPackage {             # 机构课程包
 }
 
 type Classroom {                       # 教室
-	id: ID
-	userId: Int
-	classId: Int
-	packageId: Int
-	lessonId: Int
-	key: String
-	state: Int
-	extra: Json
+	id: Int                            # 记录Id
+	userId: Int                        # 用户Id
+	classId: Int                       # 课堂Id
+	packageId: Int                     # 课程包Id
+	lessonId: Int                      # 课程Id
+	key: String                        # 课堂Key 进入课堂使用
+	state: Int                         # 课堂状态 0 - 为上课  1 - 正在上课  2 - 课堂结束
+	extra: Json                        # 课堂附加信息
 }
 
 type Package {                         # 课程包

@@ -12,10 +12,16 @@ class OrganizationConnector {
 		this.lessonModel = ctx.app.lessonModel;
 		this.loader = new DataLoader(ids => this.fetch(ids));
 		this.packageLoader = new DataLoader(async ids => {
-			return await ctx.app.lessonModel.packages.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
+			const list = await ctx.app.lessonModel.packages.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
+			return _.map(ids, id => _.find(list, id));
 		});
 		this.lessonLoader = new DataLoader(async ids => {
-			return await ctx.app.lessonModel.lessons.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
+			const list = await ctx.app.lessonModel.lessons.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
+			return _.map(ids, id => _.find(list, id));
+		});
+		this.classroomLoader = new DataLoader(async ids => {
+			const list = await ctx.app.lessonModel.classrooms.findAll({where:{id:{$in: ids}}}).then(list => list.map(o => o.toJSON()));
+			return _.map(ids, id => _.find(list, id));
 		});
 	}
 
@@ -96,11 +102,22 @@ class OrganizationConnector {
 		return list;
 	}
 
-	async fetchOrganizationClasses({organizationId}) {
+	async fetchOrganizationClasses({organizationId, memberId}) {
+		const include = [];
+		if (memberId != undefined) {
+			include.push({
+				as: "lessonOrganizationClassMembers",
+				model: this.ctx.model.lessonOrganizationClassMembers,
+				where: {
+					memberId,
+					organizationId,
+				}
+			});
+		}
 		return await this.ctx.model.lessonOrganizationClasses.findAll({
-			where:{
+			include,
+			where: {
 				organizationId,
-				//classId:{$ne: 0},
 			},
 		}).then(list => list.map(o => o.toJSON()));
 	}
@@ -110,7 +127,7 @@ class OrganizationConnector {
 	}
 
 	async fetchPackageLearned({packageId, userId}) {
-		return await ctx.lessonModel.learnRecords.findAll({
+		return await this.ctx.lessonModel.learnRecords.findAll({
 			attributes: ["lessonId"],
 			where: {
 				userId,
@@ -123,7 +140,14 @@ class OrganizationConnector {
 	async fetchClassrooms({userId, packageId, classId}) {
 		const where = {userId, packageId};
 		if (classId != undefined) where.classId = classId;
-		return await ctx.lessonModel.classrooms.findAll({where}).then(list => list.map(o => o.toJSON()));
+		return await this.ctx.lessonModel.classrooms.findAll({where}).then(list => list.map(o => o.toJSON()));
+	}
+
+	async fetchCurrentClassroom({userId}) {
+		const user = await this.ctx.lessonModel.users.findOne({where:{id: userId}}).then(o => o && o.toJSON());
+		if (!user) return null;
+		const classroomId = user.extra.classroomId;
+		return await this.ctx.lessonModel.classrooms.findOne({where:{id: classroomId}}).then(o => o && o.toJSON());
 	}
 }
 

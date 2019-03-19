@@ -58,6 +58,11 @@ module.exports = {
 		async package(root, {id}, ctx) {
 			return await ctx.connector.organization.fetchPackage({id});
 		},
+
+		organizationUser(root, {}, ctx) {
+			const {userId, organizationId} = ctx.authenticated();
+			return {userId, organizationId};
+		},
 	},
 
 	Mutation: {

@@ -62,6 +62,18 @@ module.exports = {
 		}
 	},
 
+	OrganizationUser: {
+		async classroom(root, {}, ctx) {
+			return ctx.connector.organization.fetchCurrentClassroom({userId: root.userId});
+		},
+		async organizationClasses(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationClasses({
+				organizationId: root.organizationId,
+				memberId: root.userId,
+			});
+		},
+	},
+
 	OrganizationClass: {
 		async studentCount(root, {}, ctx) {
 			return await ctx.connector.organization.fetchOrganizationUserCount({
@@ -100,6 +112,10 @@ module.exports = {
 				organizationId: root.organizationId,
 				classId: root.id,
 			});
+		},
+
+		async classroom(root, args, ctx) {
+			return await ctx.connector.organization.classroomLoader.load(root.id);
 		},
 	},
 

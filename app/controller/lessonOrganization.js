@@ -232,7 +232,7 @@ const LessonOrganization = class extends Controller {
 		const {userId, organizationId, roleId} = this.authenticated();
 		let list = [];
 		if (classId) {
-			list = await this.model.lessonOrganizationPackages.findAll({where: {organizationId, packageId, classId}}).then(list, _.map(list, o => o.toJSON()));
+			list = await this.model.lessonOrganizationPackages.findAll({where: {organizationId, packageId, classId}}).then(list => _.map(list, o => o.toJSON()));
 		} else {
 			list = await this.model.lessonOrganizationPackages.findAll({
 				include: [
@@ -289,6 +289,7 @@ const LessonOrganization = class extends Controller {
 				},
 			}
 		});
+
 		pkg.package = pkginfo;
 
 		_.each(pkg.lessons, o => {

@@ -6,12 +6,12 @@ type Query {
 	projects(userId: Int): [Project]
 	joinProjects(userId: Int): [Project]
 	ranks(type: String = "user"): [UserRank]
-
 	games(query: Json = "{}"): Json
 
 	organization(id: Int, name: String): Organization
 	organizationClass(id: Int!): OrganizationClass
 	organizationPackage(id: Int!): OrganizationPackage
+	organizationUser: OrganizationUser
 	package(id: Int!): Package
 }
 
