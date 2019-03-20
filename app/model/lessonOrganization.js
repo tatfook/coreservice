@@ -27,6 +27,10 @@ module.exports = app => {
 			type: TEXT('long'),
 		},
 
+		email: {
+			type: STRING,
+		},
+
 		cellphone: {
 			type: STRING,
 		},
