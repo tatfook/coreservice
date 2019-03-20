@@ -1,10 +1,70 @@
 
-
+use `keepwork-dev`;
+use `keepwork-rls`;
 use `lesson-dev`;
 
+alter table lessonOrganizations add column email varchar(256);
+desc lessonOrganizations;
 alter table classrooms add column classId bigint default 0;
 alter table learnRecords add column classId bigint default 0;
 
+CREATE TABLE `lessonOrganizationClasses` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organizationId` bigint(20) DEFAULT '0',
+  `name` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lesson_organization_classes_organization_id_name` (`organizationId`,`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `lessonOrganizationClassMembers` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organizationId` bigint(20) DEFAULT '0',
+  `classId` bigint(20) DEFAULT '0',
+  `memberId` bigint(20) DEFAULT '0',
+  `realname` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `roleId` int(11) DEFAULT '0',
+  `privilege` int(11) DEFAULT '0',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `organizationId-classId-memberId` (`organizationId`,`classId`,`memberId`)
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `lessonOrganizationPackages` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organizationId` bigint(20) DEFAULT '0',
+  `classId` bigint(20) DEFAULT '0',
+  `packageId` bigint(20) DEFAULT '0',
+  `lessons` json DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lesson_organization_packages_organization_id_class_id_package_id` (`organizationId`,`classId`,`packageId`)
+) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `lessonOrganizations` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `logo` longtext COLLATE utf8mb4_bin,
+  `cellphone` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `loginUrl` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `userId` bigint(20) DEFAULT '0',
+  `startDate` datetime DEFAULT NULL,
+  `endDate` datetime DEFAULT NULL,
+  `state` int(11) DEFAULT NULL,
+  `count` int(11) DEFAULT '0',
+  `privilege` int(11) DEFAULT '0',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  `eamil` varchar(256) COLLATE utf8mb4_bin DEFAULT NULL,
+  `email` varchar(256) COLLATE utf8mb4_bin DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`),
+  UNIQUE KEY `loginUrl` (`loginUrl`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- -------------------------------------------------------------------------------
 
