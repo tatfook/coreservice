@@ -67,6 +67,10 @@ const LessonOrganizationClassMember = class extends Controller {
 				attributes: ["id", "username", "nickname", "portrait"],
 				model: this.model.users,
 			},
+			{
+				as: "lessonOrganizationClasses",
+				model: this.model.lessonOrganizationClasses,
+			}
 			],
 			where: {
 				organizationId,
