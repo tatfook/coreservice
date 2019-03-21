@@ -213,6 +213,19 @@ const LessonOrganization = class extends Controller {
 
 		list = this.mergePackages(list);
 
+		for(let i = 0; i < list.length; i++) {
+			const pkg = list[i];
+			const ids = _.map(pkg.lessons, o => o.lessonId);
+			const lrs = await this.app.lessonModel.userLearnRecords.findAll({
+				where: {
+					userId,
+					packageId: pkg.packageId,
+					lessonId: {$in:ids},
+				}
+			});
+			_.each(pkg.lessons, o => o.isLearned = _.find(lrs, lr => lr.lessonId == o.lessonId) ? true : false);
+		}
+
 		const pkgIds = _.map(list, o => o.packageId);
 		const pkgs = await this.app.lessonModel.packages.findAll({where: {id: {[this.model.Op.in]:pkgIds}}}).then(list => _.map(list, o => o.toJSON()));
 		if (classId) {

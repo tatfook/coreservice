@@ -59,7 +59,7 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async student() {
 		const {organizationId} = this.authenticated();
-		const {classId} = this.validate({classId:"number"});
+		const {classId} = this.validate({classId:"number_optional"});
 		const result = await this.model.lessonOrganizationClassMembers.findAndCount({
 			include: [
 			{
