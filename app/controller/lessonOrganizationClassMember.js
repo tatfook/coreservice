@@ -21,7 +21,7 @@ const LessonOrganizationClassMember = class extends Controller {
 	async teacher() {
 		const {organizationId} = this.authenticated();
 
-		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_TEACHER} group by roleId`;
+		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_TEACHER} group by memberId`;
 		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
 		if (memberIds.length == 0) return this.success([]);
 
