@@ -223,7 +223,9 @@ const LessonOrganization = class extends Controller {
 					lessonId: {$in:ids},
 				}
 			});
-			_.each(pkg.lessons, o => o.isLearned = _.find(lrs, lr => lr.lessonId == o.lessonId) ? true : false);
+			_.each(pkg.lessons, o => {
+				o.isLearned = _.find(lrs, lr => lr.lessonId == o.lessonId) ? true : false;
+			});
 		}
 
 		const pkgIds = _.map(list, o => o.packageId);
