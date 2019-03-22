@@ -261,7 +261,7 @@ const LessonOrganization = class extends Controller {
 					organizationId,
 					packageId,
 				}
-			}).then(list, _.map(list, o => o.toJSON()));
+			}).then(list => _.map(list, o => o.toJSON()));
 		}
 
 		list = this.mergePackages(list);
