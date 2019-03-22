@@ -60,7 +60,7 @@ const LessonOrganizationClassMember = class extends Controller {
 	async student() {
 		const {organizationId} = this.authenticated();
 		const {classId} = this.validate({classId:"number_optional"});
-		const result = await this.model.lessonOrganizationClassMembers.findAndCount({
+		const list = await this.model.lessonOrganizationClassMembers.findAll({
 			include: [
 			{
 				as: "users",
@@ -74,12 +74,25 @@ const LessonOrganizationClassMember = class extends Controller {
 			],
 			where: {
 				organizationId,
-				classId: classId ? classId : {$gt: 0},
+				//classId: classId ? classId : {$gt: 0},
 				roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
+		}).then(list => list.map(o => o.toJSON()));
+		const map = {};
+		const rows = [];
+		let count = 0;
+		_.each(list, member => {
+			if (map[member.memberId]) {
+				map[member.memberId].lessonOrganizationClasses.push(member.lessonOrganizationClasses);
+			} else {
+				count++;
+				map[member.memberId] = member;
+				member.lessonOrganizationClasses = [member.lessonOrganizationClasses];
+				rows.push(member);
+			}
 		});
-		
-		return this.success(result);
+	
+		return this.success({count, rows});
 	}
 
 	async create() {
