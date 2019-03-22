@@ -97,7 +97,7 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async create() {
 		const {organizationId, roleId} = this.authenticated();
-		const params = this.validate({classId:"number"});
+		const params = this.validate();
 		params.organizationId = organizationId;
 		params.roleId = params.roleId || CLASS_MEMBER_ROLE_STUDENT;
 
@@ -116,9 +116,19 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (organ.privilege && 1 == 0) return this.throw(411, "无权限");
 		} 
 		
-		const member = await this.model.lessonOrganizationClassMembers.create(params);
+		const classIds = params.classIds || [];
+		if (params.classId != undefined) classIds.push(params.classId); 
+		const datas = _.map(_.uniq(classIds), classId => ({
+			...params,
+			classId,
+		}));
 
-		return this.success(member);
+		if (datas.length == 0) return this.success();
+
+		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId}});
+		const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
+
+		return this.success(members);
 	}
 	
 	async destroy() {
