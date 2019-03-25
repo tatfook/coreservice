@@ -54,7 +54,7 @@ type OrganizationClassMember {
 	realname: String                   # 班级成员姓名
 	roleId: Int                        # 班级成员角色
 
-	user: User                         # 班级成员用户信息
+	#user: User                         # 班级成员用户信息
 }
 
 type OrganizationPackage {             # 机构课程包

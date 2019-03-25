@@ -1,6 +1,10 @@
 
-
 type User {
+	id: Int
+	username: String
+}
+
+type UserInfo {
 	id: ID!
 	username: String!
 	nickname: String

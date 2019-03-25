@@ -16,8 +16,10 @@ module.exports = {
 			return ctx.connector.user.fetchById(userId);
 		},
 
-		user(root, { id }, ctx) {
-			return ctx.connector.user.fetchById(id);
+		user(root, {id, name }, ctx) {
+			console.log(id,name);
+			return {id, username: name};
+			//return ctx.connector.user.fetchById(id);
 		},
 
 		projects(root, {userId}, ctx) {

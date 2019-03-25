@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-	User: {
+	UserInfo: {
 		async identify(root, _, ctx) {
 			const user = await ctx.connector.user.fetchLessonUserByUserId(root.id);
 			return user ? user.identify : 0;
