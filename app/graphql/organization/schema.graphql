@@ -1,6 +1,6 @@
 
 type Organization {
-	id: ID!                        # 机构ID
+	id: Int!                       # 机构ID
 	name: String                   # 机构名
 	logo: String                   # 机构LOGO
 	cellphone: String              # 联系电话
@@ -47,7 +47,7 @@ type OrganizationClass {
 }
 
 type OrganizationClassMember {
-	id: ID                             # 机构用户ID
+	id: Int                            # 机构用户ID
 	organizationId: Int                # 机构ID
 	classId: Int                       # 班级ID
 	memberId: Int                      # 班级成员ID
@@ -58,7 +58,7 @@ type OrganizationClassMember {
 }
 
 type OrganizationPackage {             # 机构课程包
-	id: ID                             # ID
+	id: Int                            # ID
 	organizationId: Int                # 机构ID
 	classId: Int                       # 班级ID
 	packageId: Int                     # 课程包ID
@@ -85,7 +85,7 @@ type Classroom {                       # 教室
 }
 
 type Package {                         # 课程包
-	id: ID
+	id: Int
 	userId: Int
 	packageName: String
 	subjectId: Int
@@ -105,7 +105,7 @@ type Package {                         # 课程包
 }
 
 type Lesson {                          # 课程
-	id: ID
+	id: Int
 	userId: Int
 	lessonName: String
 	subjectId: Int
