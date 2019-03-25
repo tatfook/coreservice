@@ -63,11 +63,6 @@ module.exports = {
 	},
 
 	OrganizationUser: {
-		async userId(root, {userId, username}, ctx) {
-			if (userId) return userId;
-			const user = await ctx.connector.user.fetchByName(username);
-			return (user || {}).id;
-		},
 		async classroom(root, {}, ctx) {
 			return ctx.connector.organization.fetchCurrentClassroom({userId: root.userId});
 		},

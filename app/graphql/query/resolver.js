@@ -64,8 +64,13 @@ module.exports = {
 			return await ctx.connector.organization.fetchPackage({id});
 		},
 
-		organizationUser(root, {organizationId, userId, username}, ctx) {
-			return {organizationId};
+		async organizationUser(root, {organizationId, userId, username}, ctx) {
+			if (!userId && !username) return ctx.throw(400);
+			if (!userId && username) {
+				const user = await ctx.connector.user.fetchByName(username);	
+				userId = user.id;
+			}
+			return {organizationId, userId};
 		},
 	},
 
