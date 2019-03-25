@@ -74,7 +74,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			],
 			where: {
 				organizationId,
-				//classId: classId ? classId : {$gt: 0},
+				classId: classId ? classId : {$gt: 0},
 				roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
 		}).then(list => list.map(o => o.toJSON()));
@@ -93,6 +93,12 @@ const LessonOrganizationClassMember = class extends Controller {
 		});
 	
 		return this.success({count, rows});
+	}
+
+	async getOrganizationTeacherAndStudentCount({organizationId}) {
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId > 0 group by memberId) as alias`;
+		const list = await this.model.query(sql, {type:this.model.QueryTypes.SELECT});
+		return list[0].count || 0;
 	}
 
 	async create() {

@@ -22,12 +22,12 @@ type Organization {
 }
 
 type OrganizationUser {
-	userId: Int                                    # 用户ID
-	organizationId: Int                            # 组织ID
+	userId(userId: Int, username: String): Int!    # 用户ID
+	organizationId: Int!                           # 组织ID
 
 	classroom: Classroom                           # 当前课堂
 	organizationClasses: [OrganizationClass]       # 用户班级
-	#organizationClassMembers: [OrganizationClassMember]      # 用户班级成员信息
+	organizationClassMembers: [OrganizationClassMember]      # 用户班级成员信息
 
 	#user: User                                     # 用户信息
 }

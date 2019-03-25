@@ -63,6 +63,11 @@ module.exports = {
 	},
 
 	OrganizationUser: {
+		async userId(root, {userId, username}, ctx) {
+			if (userId) return userId;
+			const user = await ctx.connector.user.fetchByName(username);
+			return (user || {}).id;
+		},
 		async classroom(root, {}, ctx) {
 			return ctx.connector.organization.fetchCurrentClassroom({userId: root.userId});
 		},
@@ -71,6 +76,12 @@ module.exports = {
 				organizationId: root.organizationId,
 				memberId: root.userId,
 			});
+		},
+		async organizationClassMembers(root, {}, ctx) {
+			return await ctx.model.lessonOrganizationClassMembers.findAll({where: {
+				organizationId: root.organizationId,
+				memberId: root.userId,
+			}}).then(list => list.map(o => o.toJSON()));
 		},
 	},
 

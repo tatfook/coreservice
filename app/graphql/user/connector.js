@@ -23,6 +23,11 @@ class UserConnector {
 	async fetchById(id) {
 		return await this.loader.load(id);
 	}
+	
+	// 获取指定用户
+	async fetchByName(name) {
+		return await this.ctx.model.users.findOne({where:{username: name}}).then(o => o && o.toJSON());
+	}
 
 	// 获取用户排名信息
 	async fetchRankByUserId(userId) {

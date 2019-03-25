@@ -17,9 +17,12 @@ module.exports = {
 		},
 
 		user(root, {id, name }, ctx) {
-			console.log(id,name);
-			return {id, username: name};
-			//return ctx.connector.user.fetchById(id);
+			if (!id && !name) return ctx.throw(400);
+			if (id) {
+				return ctx.connector.user.fetchById(id);
+			} else {
+				return ctx.connector.user.fetchByName(name);
+			}
 		},
 
 		projects(root, {userId}, ctx) {
@@ -61,9 +64,8 @@ module.exports = {
 			return await ctx.connector.organization.fetchPackage({id});
 		},
 
-		organizationUser(root, {}, ctx) {
-			const {userId, organizationId} = ctx.authenticated();
-			return {userId, organizationId};
+		organizationUser(root, {organizationId, userId, username}, ctx) {
+			return {organizationId};
 		},
 	},
 
