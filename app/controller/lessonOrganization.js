@@ -15,6 +15,23 @@ const LessonOrganization = class extends Controller {
 		return "lessonOrganizations";
 	}
 
+	async token() {
+		const {userId, username} = this.authenticated();
+		const {organizationId} = this.validate({organizationId: "number"});
+		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, memberId: userId}}).then(o => o && o.toJSON());
+		if (!member) return this.throw(400);
+		const roleId = member.roleId;
+		const config = this.app.config.self;
+		const token = this.app.util.jwt_encode({
+			userId, 
+			roleId,
+			username,
+			organizationId,
+		}, config.secret, config.tokenExpire || 3600 * 24 * 2);
+
+		return this.success(token);
+	}
+
 	async login() {
 		let {username, password, organizationId, organizationName} = this.validate({username:"string", password:"string"});
 		const user = await this.model.users.findOne({where: {[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}], password: this.app.util.md5(password)}}).then(o => o && o.toJSON());

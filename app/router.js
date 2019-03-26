@@ -236,6 +236,7 @@ module.exports = app => {
 
 	// LESSON three 
 	const lessonOrganization = controller.lessonOrganization;
+	router.get(`${prefix}lessonOrganizations/token`, lessonOrganization.token);
 	router.get(`${prefix}lessonOrganizations/packages`, lessonOrganization.packages);
 	router.get(`${prefix}lessonOrganizations/packageDetail`, lessonOrganization.packageDetail);
 	router.get(`${prefix}lessonOrganizations/getByName`, lessonOrganization.getByName);
