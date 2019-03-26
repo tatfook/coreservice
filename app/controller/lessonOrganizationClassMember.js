@@ -101,6 +101,26 @@ const LessonOrganizationClassMember = class extends Controller {
 		return list[0].count || 0;
 	}
 
+	async bulkCreate() {
+		const {organizationId, roleId} = this.authenticated();
+		const params = this.validate({roleId:"number"});
+		const members = params.members || [];
+		const memberIds = _.map(members, o => o.memberId);
+
+		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
+			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
+			const organ = await this.model.lessonOrganizations.findOne({where:{id: organizationId}}).then(o => o && o.toJSON());
+			if (!organ) return this.throw(500);
+			if (organ.privilege && 1 == 0) return this.throw(411, "无权限");
+		} 
+		
+		const datas = _.map(members, o => ({...o, organizationId, roleId: params.roleId}));
+		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: {$in: memberIds}}});
+		const result = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
+
+		return this.success(result);
+	}
+
 	async create() {
 		const {organizationId, roleId} = this.authenticated();
 		const params = this.validate();

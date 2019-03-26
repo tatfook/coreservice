@@ -257,5 +257,6 @@ module.exports = app => {
 	const lessonOrganizationClassMember = controller.lessonOrganizationClassMember;
 	router.get(`${prefix}lessonOrganizationClassMembers/student`, lessonOrganizationClassMember.student);
 	router.get(`${prefix}lessonOrganizationClassMembers/teacher`, lessonOrganizationClassMember.teacher);
+	router.post(`${prefix}lessonOrganizationClassMembers/bulk`, lessonOrganizationClassMember.bulkCreate);
 	router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
 }
