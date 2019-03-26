@@ -107,6 +107,9 @@ const LessonOrganizationClassMember = class extends Controller {
 		const members = params.members || [];
 		const memberIds = _.map(members, o => o.memberId);
 
+		const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: {$in: memberIds}, roleId:{$ne: params.roleId}}});
+		if (ok)	return this.throw(400, "存在其它身份");
+
 		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
 			const organ = await this.model.lessonOrganizations.findOne({where:{id: organizationId}}).then(o => o && o.toJSON());
@@ -134,6 +137,8 @@ const LessonOrganizationClassMember = class extends Controller {
 			params.memberId = user.id;
 		}
 		if (params.roleId >= roleId) return this.throw(411, "无权限");
+		const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: params.memberId, roleId:{$ne: params.roleId}}});
+		if (ok)	return this.throw(400, "存在其它身份");
 
 		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
