@@ -66,11 +66,16 @@ module.exports = {
 
 		async organizationUser(root, {organizationId, userId, username}, ctx) {
 			if (!userId && !username) return ctx.throw(400);
-			if (!userId && username) {
-				const user = await ctx.connector.user.fetchByName(username);	
-				userId = user.id;
+			let user = null;
+
+			if (userId) {
+				user = await ctx.connector.user.fetchById(userId);	
+			} else {
+				user = await ctx.connector.user.fetchByName(username);	
 			}
-			return {organizationId, userId};
+			if (!user) return ctx.throw(400);
+
+			return {organizationId, userId: user.id};
 		},
 	},
 

@@ -294,6 +294,9 @@ const User = class extends Controller {
 
 		if (!user) return this.fail(0);
 		user = user.get({plain:true});
+		
+		// 创建lesson用户
+		await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
 		// 创建用户账号记录
 		await this.model.accounts.upsert({userId: user.id});
