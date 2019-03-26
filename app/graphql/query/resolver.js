@@ -65,7 +65,7 @@ module.exports = {
 		},
 
 		async organizationUser(root, {organizationId, userId, username}, ctx) {
-			if (!userId && !username) return ctx.throw(400);
+			if (!userId && !username) return ctx.throw(400, "用户不存在");
 			let user = null;
 
 			if (userId) {
