@@ -189,7 +189,7 @@ const User = class extends Controller {
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
 			// 创建lesson用户
-			await this.app.lessonmodel.users.create({id: user.id, username: user.username});
+			await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
 			username = "qh" + moment().format("YYYYMMDD") + user.id;
 			await this.model.users.update({username}, {where:{id: user.id}});
@@ -299,7 +299,7 @@ const User = class extends Controller {
 		user = user.get({plain:true});
 		
 		// 创建lesson用户
-		await this.app.lessonmodel.users.create({id: user.id, username: user.username});
+		await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
 		// 创建用户账号记录
 		await this.model.accounts.upsert({userId: user.id});
