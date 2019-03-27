@@ -65,9 +65,16 @@ module.exports = {
 		},
 
 		async organizationUser(root, {organizationId, userId, username}, ctx) {
-			if (!userId && !username) return ctx.throw(400, "用户不存在");
+			if (!userId && !username){
+				if (!ctx.state.user.userId && !ctx.state.user.username)	 {
+					return ctx.throw(400, "用户不存在");
+				}
+				userId = ctx.state.user.userId;
+				username = ctx.state.user.username;
+			} 
 			let user = null;
 
+			organizationId = organizationId || ctx.state.user.organizationId;
 			if (userId) {
 				user = await ctx.connector.user.fetchById(userId);	
 			} else {
