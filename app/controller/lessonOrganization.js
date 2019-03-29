@@ -250,7 +250,7 @@ const LessonOrganization = class extends Controller {
 		if (classId) {
 			const classrooms = await this.app.lessonModel.classrooms.findAll({where:{classId, packageId:{$in: pkgIds}}}).then(list => list.map(o => o.toJSON()));
 			_.each(list, o => {
-				const cls = classrooms.map(c => c.packageId == o.packageId);
+				const cls = classrooms.filter(c => c.packageId == o.packageId);
 				const c = _.orderBy(cls, ['createdAt', 'desc'])[0]; 
 				if (c) o.lastTeachTime = c.createdAt;
 			});

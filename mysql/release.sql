@@ -65,6 +65,19 @@ CREATE TABLE `lessonOrganizations` (
   UNIQUE KEY `name` (`name`),
   UNIQUE KEY `loginUrl` (`loginUrl`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `paracraftVisitors` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `realname` varchar(64) COLLATE utf8mb4_bin DEFAULT '',
+  `cellphone` varchar(24) COLLATE utf8mb4_bin DEFAULT '',
+  `email` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `organization` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `description` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `cellphone` (`cellphone`)
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- -------------------------------------------------------------------------------
 
