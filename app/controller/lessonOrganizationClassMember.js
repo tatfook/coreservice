@@ -44,6 +44,7 @@ const LessonOrganizationClassMember = class extends Controller {
 				}
 			}
 		}).then(list => _.map(list, o => o.toJSON()));
+		console.log(list);
 		const map = {};
 		_.each(list, o => {
 			map[o.memberId] = map[o.memberId] || o;
@@ -153,7 +154,6 @@ const LessonOrganizationClassMember = class extends Controller {
 			const member = await this.model.lessonOrganizationClassMembers.upsert(params);
 			return this.success(member);
 		} else {
-			classIds.push(params.classId); 
 			const datas = _.map(_.uniq(classIds), classId => ({...params, classId}));
 			if (datas.length == 0) return this.success();
 			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId}});
