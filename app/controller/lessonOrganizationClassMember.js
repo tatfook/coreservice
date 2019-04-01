@@ -148,18 +148,17 @@ const LessonOrganizationClassMember = class extends Controller {
 		} 
 		
 		const classIds = params.classIds || [];
-		if (params.classId != undefined) classIds.push(params.classId); 
-		const datas = _.map(_.uniq(classIds), classId => ({
-			...params,
-			classId,
-		}));
 
-		if (datas.length == 0) return this.success();
-
-		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId}});
-		const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
-
-		return this.success(members);
+		if (params.classId != undefined) {
+			return await this.model.lessonOrganizationClassMembers.create(params);
+		} else {
+			classIds.push(params.classId); 
+			const datas = _.map(_.uniq(classIds), classId => ({...params, classId}));
+			if (datas.length == 0) return this.success();
+			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId}});
+			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
+			return this.success(members);
+		}
 	}
 	
 	async destroy() {
