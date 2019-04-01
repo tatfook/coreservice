@@ -150,7 +150,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const classIds = params.classIds || [];
 
 		if (params.classId != undefined) {
-			const member = await this.model.lessonOrganizationClassMembers.create(params);
+			const member = await this.model.lessonOrganizationClassMembers.upsert(params);
 			return this.success(member);
 		} else {
 			classIds.push(params.classId); 
