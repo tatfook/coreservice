@@ -150,7 +150,8 @@ const LessonOrganizationClassMember = class extends Controller {
 		const classIds = params.classIds || [];
 
 		if (params.classId != undefined) {
-			return await this.model.lessonOrganizationClassMembers.create(params);
+			const member = await this.model.lessonOrganizationClassMembers.create(params);
+			return this.success(member);
 		} else {
 			classIds.push(params.classId); 
 			const datas = _.map(_.uniq(classIds), classId => ({...params, classId}));
