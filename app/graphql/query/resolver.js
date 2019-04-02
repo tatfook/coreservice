@@ -60,10 +60,6 @@ module.exports = {
 			return await ctx.model.lessonOrganizationPackages.findOne({where:{id}}).then(o => o && o.toJSON());
 		},
 
-		async package(root, {id}, ctx) {
-			return await ctx.connector.organization.fetchPackage({id});
-		},
-
 		async organizationUser(root, {organizationId, userId, username}, ctx) {
 			if (!userId && !username){
 				if (!ctx.state.user.userId && !ctx.state.user.username)	 {
@@ -83,6 +79,10 @@ module.exports = {
 			if (!user) return ctx.throw(400);
 
 			return {organizationId, userId: user.id};
+		},
+
+		async lesson(root, {id}, ctx) {
+			return await ctx.connector.organization.lessonLoader.load(id);
 		},
 	},
 

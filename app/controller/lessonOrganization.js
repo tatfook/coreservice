@@ -331,6 +331,8 @@ const LessonOrganization = class extends Controller {
 		
 		return this.success(pkg);
 	}
+
+	// 课程推荐
 }
 
 module.exports = LessonOrganization;
