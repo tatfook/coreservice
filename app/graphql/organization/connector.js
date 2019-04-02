@@ -125,6 +125,22 @@ class OrganizationConnector {
 		return await this.packageLoader.load(id);
 	}
 
+	async fetchUserPackages(userId) {
+		const pkgs = await this.model.lessonOrganizationPackages.findAll({
+			include: [
+			{
+				as: "lessonOrganizationClassMembers",
+				model: this.model.lessonOrganizationClassMembers,
+				where: {
+					memberId:userId,
+				},
+				required: true,
+			},
+			]
+		}).then(list => list.map(o => o.toJSON()));
+		return pkgs;
+	}
+
 	async fetchPackageLearned({packageId, userId}) {
 		return await this.ctx.lessonModel.learnRecords.findAll({
 			attributes: ["lessonId"],
@@ -147,6 +163,25 @@ class OrganizationConnector {
 		if (!user) return null;
 		const classroomId = user.extra.classroomId;
 		return await this.ctx.lessonModel.classrooms.findOne({where:{id: classroomId}}).then(o => o && o.toJSON());
+	}
+
+	async fetchOrganizationsByLessonId(lessonId){
+		const pls = await this.lessonModel.packageLessons.findAll({where:{lessonId}}).then(list => list.map(o => o.toJSON()));
+		const pkgIds = _.map(pls, o => o.packageId);
+		const organs =await this.model.lessonOrganizations.findAll({
+			include: [
+			{
+				as: "lessonOrganizationPackages",
+				model: this.model.lessonOrganizationPackages,
+				where: {
+					packageId: {$in: pkgIds},
+					classId:0,
+				},
+			},
+			]
+		}).then(list => list.map(o => o.toJSON()));
+
+		return _.filter(organs, o => _.find(o.lessonOrganizationPackages, x => _.find(x.lessons, l => l.lessonId == lessonId)));
 	}
 }
 

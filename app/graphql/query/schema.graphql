@@ -13,6 +13,7 @@ type Query {
 	organizationPackage(id: Int!): OrganizationPackage
 	organizationUser(organizationId: Int, userId: Int, username: String): OrganizationUser
 	package(id: Int!): Package
+	lesson(id: Int): Lesson
 }
 
 type Mutation {

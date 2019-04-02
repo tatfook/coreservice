@@ -201,7 +201,17 @@ module.exports = {
 	},
 
 	Lesson: {
-
+		async authUserPrivilege(root, {}, ctx) {
+			const userId = ctx.state.user.userId;
+			if (!userId) return 0;
+			const pkgs = await  ctx.connector.organization.fetchUserPackages(userId);
+			const lessonId = root.id;
+			const pkg = await _.find(pkgs, o => _.find(o.lessons, l => l.lessonId == lessonId));
+			return pkg ? 1 : 0;
+		},
+		async organizations(root, {}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationsByLessonId(root.id);
+		},
 	},
 };
 
