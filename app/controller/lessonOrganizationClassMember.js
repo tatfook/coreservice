@@ -108,8 +108,8 @@ const LessonOrganizationClassMember = class extends Controller {
 		const members = params.members || [];
 		const memberIds = _.map(members, o => o.memberId);
 
-		const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: {$in: memberIds}, roleId:{$ne: params.roleId}}});
-		if (ok)	return this.throw(400, "存在其它身份");
+		//const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: {$in: memberIds}, roleId:{$ne: params.roleId}}});
+		//if (ok)	return this.throw(400, "存在其它身份");
 
 		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
@@ -138,8 +138,8 @@ const LessonOrganizationClassMember = class extends Controller {
 			params.memberId = user.id;
 		}
 		if (params.roleId >= roleId) return this.throw(411, "无权限");
-		const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: params.memberId, roleId:{$ne: params.roleId}}});
-		if (ok)	return this.throw(400, "存在其它身份");
+		//const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: params.memberId, roleId:{$ne: params.roleId}}});
+		//if (ok)	return this.throw(400, "存在其它身份");
 
 		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
@@ -148,15 +148,21 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (organ.privilege && 1 == 0) return this.throw(411, "无权限");
 		} 
 		
-		const classIds = params.classIds || [];
+		const classIds = _.uniq(params.classIds || []);
 
 		if (params.classId != undefined) {
 			const member = await this.model.lessonOrganizationClassMembers.upsert(params);
 			return this.success(member);
 		} else {
-			const datas = _.map(_.uniq(classIds), classId => ({...params, classId}));
+			const oldmembers = await this.model.lessonOrganizationClassMembers.findAll({where:{organizationId, memberId: params.memberId}}).then(list => list.map(o => o.toJSON()));
+			const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));
+			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId: params.roleId}});
+			if (classIds.length == 0) {
+				await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
+			} else {
+				await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
+			}
 			if (datas.length == 0) return this.success();
-			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId}});
 			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 			return this.success(members);
 		}
