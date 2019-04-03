@@ -61,6 +61,9 @@ const LessonOrganizationClassMember = class extends Controller {
 	async student() {
 		const {organizationId} = this.authenticated();
 		const {classId} = this.validate({classId:"number_optional"});
+		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_STUDENT} and classId ${classId ? ("=" + classId) : ("> 0")} group by memberId`;
+		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
+		if (memberIds.length == 0) return this.success([]);
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
 			include: [
 			{
@@ -75,8 +78,9 @@ const LessonOrganizationClassMember = class extends Controller {
 			],
 			where: {
 				organizationId,
-				classId: classId ? classId : {$gt: 0},
-				roleId: CLASS_MEMBER_ROLE_STUDENT,
+				memberId: {$in: memberIds}
+				//classId: classId ? classId : {$gt: 0},
+				//roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
 		}).then(list => list.map(o => o.toJSON()));
 		const map = {};
