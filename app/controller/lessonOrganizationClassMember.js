@@ -51,6 +51,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			map[o.memberId].classes = map[o.memberId].classes || [];
 			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
 			map[o.memberId].username = o.users.username;
+			map[o.memberId].realname = map[o.memberId].realname || o.realname;
 			delete o.lessonOrganizationClasses;
 		});
 		const datas = [];
@@ -87,14 +88,14 @@ const LessonOrganizationClassMember = class extends Controller {
 		const rows = [];
 		let count = 0;
 		_.each(list, member => {
-			if (map[member.memberId]) {
-				map[member.memberId].lessonOrganizationClasses.push(member.lessonOrganizationClasses);
-			} else {
+			if (!map[member.memberId]) {
 				count++;
 				map[member.memberId] = member;
-				member.lessonOrganizationClasses = [member.lessonOrganizationClasses];
+				member.lessonOrganizationClasses = [];
 				rows.push(member);
 			}
+			map[member.memberId].realname = map[member.memberId].realname || member.realname;
+			member.lessonOrganizationClasses && map[member.memberId].lessonOrganizationClasses.push(member.lessonOrganizationClasses);
 		});
 	
 		return this.success({count, rows});
@@ -167,6 +168,7 @@ const LessonOrganizationClassMember = class extends Controller {
 				await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
 			}
 			if (datas.length == 0) return this.success();
+			console.log(datas);
 			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 			return this.success(members);
 		}
