@@ -145,7 +145,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (!user) return this.throw(400, "成员不存在");
 			params.memberId = user.id;
 		}
-		if (params.roleId >= roleId) return this.throw(411, "无权限");
+		//if (params.roleId >= roleId) return this.throw(411, "无权限");
 		//const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: params.memberId, roleId:{$ne: params.roleId}}});
 		//if (ok)	return this.throw(400, "存在其它身份");
 
