@@ -16,6 +16,11 @@ module.exports = app => {
 			autoIncrement: true,
 			primaryKey: true,
 		},
+
+		handler: {
+			type: BIGINT,
+			defaultValue:0,
+		},
 		
 		realname: {                    // 姓名
 			type:STRING(64),
@@ -39,6 +44,16 @@ module.exports = app => {
 
 		description: {                 // 描述
 			type: STRING,
+			defaultValue:"",
+		},
+
+		state: {
+			type: INTEGER,
+			defaultValue:0,
+		},
+
+		remark: {
+			type: TEXT,
 			defaultValue:"",
 		},
 
