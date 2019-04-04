@@ -49,7 +49,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		_.each(list, o => {
 			map[o.memberId] = map[o.memberId] || o;
 			map[o.memberId].classes = map[o.memberId].classes || [];
-			map[o.memberId].classes.push(o.lessonOrganizationClasses);
+			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
 			map[o.memberId].username = o.users.username;
 			delete o.lessonOrganizationClasses;
 		});

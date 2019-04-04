@@ -18,9 +18,10 @@ const LessonOrganization = class extends Controller {
 	async token() {
 		const {userId, username} = this.authenticated();
 		const {organizationId} = this.validate({organizationId: "number"});
-		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, memberId: userId}}).then(o => o && o.toJSON());
-		if (!member) return this.throw(400);
-		const roleId = member.roleId;
+		const members = await this.model.lessonOrganizationClassMembers.findAll({where: {organizationId, memberId: userId}}).then(list => list.map(o => o.toJSON()));
+		if (members.length == 0) return this.throw(400);
+		let roleId = 0;
+		_.each(members, o => roleId = roleId | o.roleId);
 		const config = this.app.config.self;
 		const token = this.app.util.jwt_encode({
 			userId, 
@@ -44,20 +45,22 @@ const LessonOrganization = class extends Controller {
 			organizationId = organ.id;
 		}
 
-		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, memberId: user.id}}).then(o => o && o.toJSON());
-		if (!member) return this.throw(400, "成员不存在");
+		const members = await this.model.lessonOrganizationClassMembers.findAll({where: {organizationId, memberId: user.id}}).then(list => list.map(o => o.toJSON()));
+		if (members.length == 0) return this.throw(400, "成员不存在");
+		let roleId = 0;
+		_.each(members, o => roleId = roleId | o.roleId);
 
 		const config = this.app.config.self;
 		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
 		const token = this.app.util.jwt_encode({
 			userId: user.id, 
-			roleId: member.roleId,
+			roleId: roleId,
 			username: user.username,
 			organizationId: organizationId,
 		}, config.secret, tokenExpire);
 
 		user.token = token;
-		user.roleId = member.roleId;
+		user.roleId = roleId;
 		user.organizationId = organizationId;
 		delete user.password;
 
