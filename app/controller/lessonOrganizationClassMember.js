@@ -91,12 +91,14 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (!map[member.memberId]) {
 				count++;
 				map[member.memberId] = member;
-				member.lessonOrganizationClasses = [];
+				member.classes = [];
 				rows.push(member);
 			}
 			map[member.memberId].realname = map[member.memberId].realname || member.realname;
-			member.lessonOrganizationClasses && map[member.memberId].lessonOrganizationClasses.push(member.lessonOrganizationClasses);
+			member.lessonOrganizationClasses && map[member.memberId].classes.push(member.lessonOrganizationClasses);
+			delete member.lessonOrganizationClasses;
 		});
+		_.each(list, o => o.lessonOrganizationClasses = o.classes);
 	
 		return this.success({count, rows});
 	}
