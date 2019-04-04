@@ -44,9 +44,9 @@ const LessonOrganizationClassMember = class extends Controller {
 				}
 			}
 		}).then(list => _.map(list, o => o.toJSON()));
-		console.log(list);
 		const map = {};
 		_.each(list, o => {
+			if (!(o.roleId & CLASS_MEMBER_ROLE_TEACHER)) return;
 			map[o.memberId] = map[o.memberId] || o;
 			map[o.memberId].classes = map[o.memberId].classes || [];
 			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
@@ -87,18 +87,19 @@ const LessonOrganizationClassMember = class extends Controller {
 		const map = {};
 		const rows = [];
 		let count = 0;
-		_.each(list, member => {
-			if (!map[member.memberId]) {
+		_.each(list, o => {
+			if (!(o.roleId & CLASS_MEMBER_ROLE_STUDENT)) return;
+			if (!map[o.memberId]) {
 				count++;
-				map[member.memberId] = member;
-				member.classes = [];
-				rows.push(member);
+				map[o.memberId] = o;
+				o.classes = [];
+				rows.push(o);
 			}
-			map[member.memberId].realname = map[member.memberId].realname || member.realname;
-			member.lessonOrganizationClasses && map[member.memberId].classes.push(member.lessonOrganizationClasses);
-			delete member.lessonOrganizationClasses;
+			map[o.memberId].realname = map[o.memberId].realname || o.realname;
+			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
+			delete o.lessonOrganizationClasses;
 		});
-		_.each(list, o => o.lessonOrganizationClasses = o.classes);
+		_.each(rows, o => o.lessonOrganizationClasses = o.classes);
 	
 		return this.success({count, rows});
 	}
@@ -118,7 +119,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		//const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: {$in: memberIds}, roleId:{$ne: params.roleId}}});
 		//if (ok)	return this.throw(400, "存在其它身份");
 
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
+		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
 			const organ = await this.model.lessonOrganizations.findOne({where:{id: organizationId}}).then(o => o && o.toJSON());
 			if (!organ) return this.throw(500);
@@ -148,7 +149,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		//const ok = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: organizationId, memberId: params.memberId, roleId:{$ne: params.roleId}}});
 		//if (ok)	return this.throw(400, "存在其它身份");
 
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
+		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) {
 			if (roleId <= CLASS_MEMBER_ROLE_STUDENT)	return this.throw(411, "无权限");
 			const organ = await this.model.lessonOrganizations.findOne({where:{id: organizationId}}).then(o => o && o.toJSON());
 			if (!organ) return this.throw(500);
@@ -170,7 +171,6 @@ const LessonOrganizationClassMember = class extends Controller {
 				await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
 			}
 			if (datas.length == 0) return this.success();
-			console.log(datas);
 			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 			return this.success(members);
 		}
