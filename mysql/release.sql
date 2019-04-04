@@ -2,10 +2,11 @@
 use `keepwork-dev`;
 use `keepwork-rls`;
 use `lesson-dev`;
-
+use `lesson-rls`;
 alter table lessonOrganizations add column email varchar(256);
 desc lessonOrganizations;
 alter table classrooms add column classId bigint default 0;
+alter table classrooms add column organizationId bigint default 0;
 alter table learnRecords add column classId bigint default 0;
 
 CREATE TABLE `lessonOrganizationClasses` (

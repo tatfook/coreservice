@@ -107,8 +107,11 @@ const Site = class extends Controller {
 		const site = await model.sites.getById(id, userId);
 		const user = await model.users.getById(userId);
 		if (!user || !site) this.throw(400);
+
 		this.app.api.deleteGitProject({username:user.username, sitename:site.sitename});
 
+		await this.model.siteGroups.destroy({where:{userId, siteId:id}});
+		await this.model.siteFiles.destroy({where:{userId, siteId:id}});
 		const data = await model.sites.destroy({where:{id, userId}});
 		return this.success(data);
 	}
