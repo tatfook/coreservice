@@ -1,0 +1,37 @@
+
+type Package {                         # 课程包
+	id: Int
+	userId: Int
+	packageName: String
+	subjectId: Int
+	minAge: Int
+	maxAge: Int
+	state: Int
+	intro: String
+	rmb: Int
+	coin: Int
+	auditAt: String
+	lastClassroomCount: Int
+	extra: Json
+
+	tags: Json                         # 课程包tags 
+	
+	lessonCount: Int                   # 课程包包含的课程数
+
+	lessons: [Lesson]                  # 课程包的课程列表
+	learnedLessons: [Int]              # 已学课程列表
+	teachedLessons: [Int]              # 已教课程列表
+}
+
+type Lesson {                          # 课程
+	id: Int
+	userId: Int
+	lessonName: String
+	subjectId: Int
+	url: String
+	goals: String
+	extra: Json
+
+	authUserPrivilege: Int             # 0 - 不可用  1 - 可用
+	organizations: [Organization]      # 拥有该课程的机构
+}

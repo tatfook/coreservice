@@ -81,8 +81,16 @@ module.exports = {
 			return {organizationId, userId: user.id};
 		},
 
+		async package(root, {id}, ctx) {
+			return await ctx.connector.organization.packageLoader.load(id);
+		},
+
 		async lesson(root, {id}, ctx) {
 			return await ctx.connector.organization.lessonLoader.load(id);
+		},
+
+		async tag(root, {id}, ctx) {
+			return await ctx.connector.keepwork.tagLoader.load(id);
 		},
 	},
 
