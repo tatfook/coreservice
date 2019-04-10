@@ -179,6 +179,11 @@ const Project = class extends Controller {
 
 		const data = await this.model.projects.destroy({where:{id, userId}});
 
+		// 前面已确保项目是属于自己的
+		await this.model.favorites.destroy({where:{objectId:id, objectType:ENTITY_TYPE_PROJECT}});
+		await this.model.comments.destroy({where:{objectId:id, objectType:ENTITY_TYPE_PROJECT}});
+		await this.model.issues.destroy({where:{objectId:id, objectType:ENTITY_TYPE_PROJECT}});
+
 		return this.success(data);
 	}
 
