@@ -67,6 +67,14 @@ const LessonOrganization = class extends Controller {
 		return this.success(user);
 	}
 
+	async index() {
+		const {userId} = this.authenticated();
+		const sql = `select organizationId from lessonOrganizationClassMembers where memberId = ${userId} group by organizationId`;
+		const ids = await this.model.query(sql, {type: this.model.QueryTypes.SELECT}).then(list => list.map(o => o.organizationId));
+		const list = await this.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		return this.success(list);
+	}
+
 	async show() {
 		const {id} = this.validate({id: "number"});
 
