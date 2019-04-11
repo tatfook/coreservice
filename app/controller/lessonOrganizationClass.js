@@ -27,26 +27,26 @@ const LessonOrganizationClass = class extends Controller {
 	}
 
 	async index() {
-		const {userId, organizationId, roleId} = this.authenticated();
+		const {userId, organizationId} = this.authenticated();
+		const {roleId} = this.validate({roleId:"number_optional"});
 
-		//if (roleId >= CLASS_MEMBER_ROLE_ADMIN) {
-			//const list = await this.model.lessonOrganizationClasses.findAll({where:{organizationId}});
-			//return this.success(list);
-		//}
+		if (!roleId) {
+			const list = await this.model.lessonOrganizationClasses.findAll({where:{organizationId}});
+			return this.success(list);
+		}
+
+		const sql = `select classId from lessonOrganizationClassMembers where organizationId = :organizationId and roleId & :roleId and memberId = :memberId`;
+		const ids = await this.ctx.model.query(sql, {
+			type: this.ctx.model.QueryTypes.SELECT,
+			replacements: {
+				organizationId,
+				roleId,
+				memberId: userId,
+			}
+		}).then(list => list.map(o => o.classId));
 
 		const list = await this.model.lessonOrganizationClasses.findAll({
-			include: [
-			{
-				as: "lessonOrganizationClassMembers",
-				model: this.model.lessonOrganizationClassMembers,
-				where: {
-					organizationId,
-					memberId: userId,
-					classId: {$gt: 0},
-				},
-			}
-			]
-			//where:{organizationId},
+			where:{id:{$in:ids}},
 		});
 
 		return this.success(list);
