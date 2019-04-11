@@ -29,10 +29,10 @@ const LessonOrganizationClass = class extends Controller {
 	async index() {
 		const {userId, organizationId, roleId} = this.authenticated();
 
-		if (roleId >= CLASS_MEMBER_ROLE_ADMIN) {
-			const list = await this.model.lessonOrganizationClasses.findAll({where:{organizationId}});
-			return this.success(list);
-		}
+		//if (roleId >= CLASS_MEMBER_ROLE_ADMIN) {
+			//const list = await this.model.lessonOrganizationClasses.findAll({where:{organizationId}});
+			//return this.success(list);
+		//}
 
 		const list = await this.model.lessonOrganizationClasses.findAll({
 			include: [
@@ -42,6 +42,7 @@ const LessonOrganizationClass = class extends Controller {
 				where: {
 					organizationId,
 					memberId: userId,
+					classId: {$gt: 0},
 				},
 			}
 			]
