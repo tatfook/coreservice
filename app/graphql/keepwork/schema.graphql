@@ -1,0 +1,8 @@
+
+type Tag {
+	id: Int
+	tagname: String
+	extra: Json
+
+	packages: [Package]
+}

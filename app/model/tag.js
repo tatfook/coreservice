@@ -18,10 +18,9 @@ module.exports = app => {
 		
 		userId: {                    // 评论者
 			type: BIGINT,
-			allowNull: false,
 		},
 
-		tagname: {
+		tagId: {
 			type: STRING(24),
 			allowNull: false,
 		},
@@ -43,7 +42,7 @@ module.exports = app => {
 		indexes: [
 		{
 			unique: true,
-			fields: ["tagname", "objectId", "objectType"],
+			fields: ["tagId", "objectId", "objectType"],
 		},
 		],
 	});
@@ -52,32 +51,6 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	model.getObjectTags = async function(objectId, objectType) {
-		const list = await app.model.tags.findAll({where:{
-			objectId, 
-			objectType,
-		}});
-
-		const tags = [];
-		for (let i = 0; i < list.length; i++) {
-			const t = list[i].get({plain:true});
-			tags.push(t.tagname);
-		}
-
-		return tags;
-	}
-	
-	model.setObjectTags = async function(objectId, objectType, tags, userId) {
-		await app.model.tags.destroy({where:{objectId, objectType}});
-
-		for (let i = 0; i < tags.length; i++) {
-			await app.model.tags.create({
-				objectId, objectType, userId,
-				tagname: tags[i],
-			});
-		}
-	}
-
 	app.model.tags = model;
 	return model;
 };

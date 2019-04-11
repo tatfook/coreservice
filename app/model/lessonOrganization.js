@@ -67,6 +67,16 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		location: {                  // xxx xxx xxx
+			type: STRING,
+			defaultValue:"",
+		},
+
+		visibility: {                // 0 - 公开  1 - 不公开
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		extra: {
 			type: JSON,
 			defaultValue: {},

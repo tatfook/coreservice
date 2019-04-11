@@ -299,5 +299,19 @@ module.exports = app => {
 		targetKey: "classId",
 		constraints: false,
 	});
+
+	app.model.systemTags.hasMany(app.model.tags, {
+		as: "tags",
+		foreignKey: "tagId",
+		sourceKey: "id",
+		constraints: false,
+	});
+	
+	app.model.tags.belongsTo(app.model.systemTags, {
+		as: "systemTags",
+		foreignKey: "tagId",
+		targetKey: "id",
+		constraints: false,
+	});
 }
 

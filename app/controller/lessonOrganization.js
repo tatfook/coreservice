@@ -67,6 +67,14 @@ const LessonOrganization = class extends Controller {
 		return this.success(user);
 	}
 
+	async index() {
+		const {userId} = this.authenticated();
+		const sql = `select organizationId from lessonOrganizationClassMembers where memberId = ${userId} group by organizationId`;
+		const ids = await this.model.query(sql, {type: this.model.QueryTypes.SELECT}).then(list => list.map(o => o.organizationId));
+		const list = await this.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		return this.success(list);
+	}
+
 	async show() {
 		const {id} = this.validate({id: "number"});
 
@@ -254,7 +262,7 @@ const LessonOrganization = class extends Controller {
 			const classrooms = await this.app.lessonModel.classrooms.findAll({where:{userId, classId, packageId:{$in: pkgIds}}}).then(list => list.map(o => o.toJSON()));
 			_.each(list, o => {
 				const cls = classrooms.filter(c => c.packageId == o.packageId);
-				const c = _.orderBy(cls, ['createdAt', 'desc'])[0]; 
+				const c = _.orderBy(cls, ['createdAt'], ['desc'])[0]; 
 				if (c) o.lastTeachTime = c.createdAt;
 			});
 		}
