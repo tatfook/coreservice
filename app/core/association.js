@@ -313,5 +313,14 @@ module.exports = app => {
 		targetKey: "id",
 		constraints: false,
 	});
+
+	app.model.testTable1.hasOne(app.model.testTable2, {
+		foreignKey:"userId",
+		sourceKey:"id",
+	});
+	app.model.testTable2.belongsTo(app.model.testTable1, {
+		foreignKey:"userId",
+		sourceKey:"id",
+	});
 }
 

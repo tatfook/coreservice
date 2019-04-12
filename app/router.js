@@ -168,7 +168,7 @@ module.exports = app => {
 	router.post(`${prefix}admins/:resources/search`, admin.search);
 	router.post(`${prefix}admins/:resources/bulk`, admin.bulkCreate);
 	router.put(`${prefix}admins/:resources/bulk`, admin.bulkUpdate);
-	//router.delete(`${prefix}admins/:resources/bulk`, admin.bulkDestroy);
+	router.delete(`${prefix}admins/:resources/bulk`, admin.bulkDestroy);
 	router.resources(`${prefix}admins/:resources`, admin);
 
 	const order = controller.order;
