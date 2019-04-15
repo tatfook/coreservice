@@ -3,6 +3,24 @@ use `keepwork-dev`;
 use `keepwork-rls`;
 use `lesson-dev`;
 use `lesson-rls`;
+
+alter table lessonOrganizations add column location varchar(256) default "";
+alter table lessonOrganizations add column visibility int default 0;
+drop table tags;
+CREATE TABLE `tags` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) DEFAULT NULL,
+  `tagId` varchar(24) COLLATE utf8mb4_bin NOT NULL,
+  `objectType` int(11) NOT NULL,
+  `objectId` bigint(20) NOT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `tags_tag_id_object_id_object_type` (`tagId`,`objectId`,`objectType`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+
+-- -------------------------------------------------------------------------
 alter table lessonOrganizations add column email varchar(256);
 desc lessonOrganizations;
 alter table classrooms add column classId bigint default 0;

@@ -314,13 +314,17 @@ module.exports = app => {
 		constraints: false,
 	});
 
-	app.model.testTable1.hasOne(app.model.testTable2, {
-		foreignKey:"userId",
-		sourceKey:"id",
-	});
-	app.model.testTable2.belongsTo(app.model.testTable1, {
-		foreignKey:"userId",
-		sourceKey:"id",
-	});
+	//app.model.testUsers.hasMany(app.model.testProjects, {
+		//as: "testProjects",
+		//foreignKey:"userId",
+		//sourceKey:"id",
+		//onDelete: 'cascade', hooks: true ,
+	//});
+
+	//app.model.testProjects.belongsTo(app.model.testUsers, {
+		//as: "testUsers",
+		//foreignKey:"userId",
+		//targetKey:"id",
+	//});
 }
 

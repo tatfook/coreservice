@@ -1,4 +1,3 @@
-
 module.exports = app => {
 	const {
 		BIGINT,
@@ -10,19 +9,17 @@ module.exports = app => {
 		DATE,
 	} = app.Sequelize;
 
-	const model = app.model.define("testTable1", {
+	const model = app.model.define("testProjects", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
 			primaryKey: true,
 		},
-		
-		username: {
-			type: STRING,
+
+		userId: {
+			type: BIGINT,
 			allowNull: false,
 		},
-
-		// 默认字段 updatedAt修改日期  createdAt创建日期
 	}, {
 		underscored: false,
 		charset: "utf8mb4",
@@ -33,7 +30,12 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	app.model.testTable1 = model;
+	//model.beforeBulkDestroy((where, ) => {
+		//console.log("-------");
+	//});
+
+	app.model.testProjects = model;
+
 	return model;
 };
 
