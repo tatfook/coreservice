@@ -25,6 +25,10 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
+	//model.beforeBulkDestroy((where) => {
+		//console.log("------- user");
+	//});
+	
 	app.model.testUsers = model;
 	return model;
 };
