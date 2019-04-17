@@ -43,6 +43,7 @@ type OrganizationClass {
 	students: [OrganizationUser]       # 班级学生
 	teachers: [OrganizationUser]       # 班级教师
 
+	organization: Organization         # 机构
 	organizationPackages: [OrganizationPackage]    # 班级课程包
 }
 

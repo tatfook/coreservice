@@ -81,6 +81,10 @@ module.exports = {
 	},
 
 	OrganizationClass: {
+		async organization(root, {}, ctx) {
+			return await ctx.connector.organization.fetchById(root.organizationId);
+		},
+
 		async studentCount(root, {}, ctx) {
 			return await ctx.connector.organization.fetchOrganizationUserCount({
 				organizationId: root.organizationId, 
