@@ -83,11 +83,21 @@ module.exports = {
 			if (!userId) return 0;
 			const pkgs = await  ctx.connector.organization.fetchUserPackages(userId);
 			const lessonId = root.id;
-			const pkg = await _.find(pkgs, o => _.find(o.lessons, l => l.lessonId == lessonId));
+			const pkg = await _.find(pkgs, o => {
+				if (root.packageId && root.packageId != o.packageId) return false;
+				return _.find(o.lessons, l => l.lessonId == lessonId)
+			});
 			return pkg ? 1 : 0;
 		},
 		async organizations(root, {}, ctx) {
-			return await ctx.connector.organization.fetchOrganizationsByLessonId(root.id);
+			const list = await ctx.connector.organization.fetchOrganizationsByLessonId(root.id);
+			if (!root.packageId)  return list;
+			return _.filter(list, o => _.find(o.lessonOrganizationPackages, x => {
+				return x.packageId == root.packageId && _.find(x.lessons, l => l.lessonId == root.id);
+			}));
 		},
 	},
 }
+
+
+

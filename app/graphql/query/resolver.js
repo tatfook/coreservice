@@ -93,11 +93,12 @@ module.exports = {
 			return await ctx.connector.organization.packageLoader.load(id);
 		},
 
-		async lesson(root, {id}, ctx) {
-			return await ctx.connector.organization.lessonLoader.load(id);
+		async lesson(root, {id, packageId}, ctx) {
+			const l = await ctx.connector.organization.lessonLoader.load(id);
+			return {...l, packageId};
 		},
 
-		async tag(root, {id}, ctx) {
+		async tag(root, {id, packageId}, ctx) {
 			return await ctx.connector.keepwork.tagLoader.load(id);
 		},
 	},

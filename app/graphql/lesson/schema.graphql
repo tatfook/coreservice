@@ -31,6 +31,8 @@ type Lesson {                          # 课程
 	url: String
 	goals: String
 	extra: Json
+	
+	packageId: Int
 
 	authUserPrivilege: Int             # 0 - 不可用  1 - 可用
 	organizations: [Organization]      # 拥有该课程的机构
