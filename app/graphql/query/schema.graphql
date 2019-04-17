@@ -8,7 +8,9 @@ type Query {
 	ranks(type: String = "user"): [UserRank]
 	games(query: Json = "{}"): Json
 
+	organizations(userId: Int): [Organization]
 	organization(id: Int, name: String): Organization
+	organizationClasses(userId: Int): [OrganizationClass]
 	organizationClass(id: Int!): OrganizationClass
 	organizationPackage(id: Int!): OrganizationPackage
 	organizationUser(organizationId: Int, userId: Int, username: String): OrganizationUser

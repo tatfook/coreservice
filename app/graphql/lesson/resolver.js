@@ -56,6 +56,25 @@ module.exports = {
 		async teachedLessons(root, {}, ctx) {
 			return [];
 		},
+
+		//async authUserLessonIds(root, {}, ctx) {
+			//const userId = ctx.state.user.userId;
+			//if (!userId) return [];
+			//const list = ctx.model.lessonOrganizationPackages({
+				//include:[
+				//{
+					//as:"lessonOrganizationClassMembers",
+					//model: ctx.model.lessonOrganizationClassMembers,
+					//where: {
+						//memberId: userId,
+					//}
+				//},
+				//],
+				//where: {
+					//packageId: root.id,
+				//},
+			//}).then(list => list.map(o => o.toJSON()));
+		//},
 	},
 
 	Lesson: {

@@ -43,6 +43,10 @@ module.exports = {
 			});
 		},
 
+		async organizations(root, {userId}, ctx) {
+			return [];
+		},
+
 		async organization(root, {id, name}, ctx) {
 			if (!id && !name) return ctx.throw(400);
 			if (id) {
@@ -50,6 +54,10 @@ module.exports = {
 			} else {
 				return await ctx.connector.organization.fetchByName(name);
 			}
+		},
+
+		async organizationClasses(root, {userId}, ctx) {
+			return await ctx.connector.organization.fetchOrganizationClasses({memberId:userId});
 		},
 
 		async organizationClass(root, {id}, ctx) {

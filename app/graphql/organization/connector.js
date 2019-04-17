@@ -107,17 +107,12 @@ class OrganizationConnector {
 			include.push({
 				as: "lessonOrganizationClassMembers",
 				model: this.ctx.model.lessonOrganizationClassMembers,
-				where: {
-					memberId,
-					organizationId,
-				}
+				where: organizationId == undefined ? {memberId} : {memberId, organizationId},
 			});
 		}
 		return await this.ctx.model.lessonOrganizationClasses.findAll({
 			include,
-			where: {
-				organizationId,
-			},
+			where: organizationId == undefined ? {} : {organizationId},
 		}).then(list => list.map(o => o.toJSON()));
 	}
 
