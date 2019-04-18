@@ -164,17 +164,10 @@ const LessonOrganizationClassMember = class extends Controller {
 		} else {
 			const oldmembers = await this.model.lessonOrganizationClassMembers.findAll({where:{organizationId, memberId: params.memberId}}).then(list => list.map(o => o.toJSON()));
 			const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));
-			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId: params.roleId}});
-			if (classIds.length == 0) {
-				await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
-			} else {
-				const ids = oldmembers.map(o => o.id);
-				if (ids.length) {
-					const idsstr = ids.join(",");
-					await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where id in (${idsstr})`, {type: this.model.QueryTypes.UPDATE});
-				}
-				await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
-			}
+			// 删除要创建的
+			classIds.length && await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
+			// 取消其它身份
+			await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
 			if (datas.length == 0) return this.success();
 			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 			return this.success(members);
