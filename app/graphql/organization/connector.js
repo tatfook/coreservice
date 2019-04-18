@@ -101,19 +101,28 @@ class OrganizationConnector {
 		return list;
 	}
 
-	async fetchOrganizationClasses({organizationId, memberId}) {
+	async fetchOrganizationClasses({organizationId, memberId, roleId}) {
 		const include = [];
 		if (memberId != undefined) {
 			include.push({
 				as: "lessonOrganizationClassMembers",
 				model: this.ctx.model.lessonOrganizationClassMembers,
-				where: organizationId == undefined ? {memberId} : {memberId, organizationId},
+				where: {memberId},
 			});
 		}
-		return await this.ctx.model.lessonOrganizationClasses.findAll({
+		const list = await this.ctx.model.lessonOrganizationClasses.findAll({
 			include,
 			where: organizationId == undefined ? {} : {organizationId},
 		}).then(list => list.map(o => o.toJSON()));
+
+		// 返回用户的roleId
+		list.map(o => {
+			if (o.lessonOrganizationClassMembers, o.lessonOrganizationClassMembers.length) {
+				o.roleId = o.lessonOrganizationClassMembers[0].roleId;
+			}
+		});
+
+		return list;
 	}
 
 	async fetchPackage({id}) {
