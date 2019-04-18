@@ -16,7 +16,7 @@ module.exports = {
 				objectType: ENTITY_TYPE_PACKAGE,
 			}}).then(list => list.map(o => o.toJSON()));
 			const pkgIds = list.map(o => o.objectId);
-			const pkgs = await ctx.lessonModel.packages.findAll({where:{id:{$in: pkgIds, state:2}}}).then(list => list.map(o => o.toJSON()));
+			const pkgs = await ctx.lessonModel.packages.findAll({where:{id:{$in: pkgIds}, state:2}}).then(list => list.map(o => o.toJSON()));
 			return pkgs;
 		},
 	}
