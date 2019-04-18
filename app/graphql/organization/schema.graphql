@@ -36,6 +36,9 @@ type OrganizationClass {
 	id: Int                            # 机构班级ID
 	organizationId: Int                # 机构ID
 	name: String                       # 机构班级名称	
+	roleId: Int                        # 查询用户的roleId
+
+	# members: [OrganizationClassMember] # 班级成员
 
 	classroom: Classroom,              # 当前课堂
 	studentCount: Int                  # 班级学生数量
