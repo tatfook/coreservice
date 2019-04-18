@@ -168,6 +168,11 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (classIds.length == 0) {
 				await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
 			} else {
+				const ids = oldmembers.map(o => o.id);
+				if (ids.length) {
+					const idsstr = ids.join(",");
+					await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where id in (${idsstr})`, {type: this.model.QueryTypes.UPDATE});
+				}
 				await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
 			}
 			if (datas.length == 0) return this.success();
