@@ -26,7 +26,8 @@ class OrganizationConnector {
 	}
 
 	async fetch(ids) {
-		return await this.ctx.app.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		const list = await this.ctx.app.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		return _.map(ids, id => _.find(list, o => o.id == id));
 	}
 
 	async fetchByIds(ids) {
