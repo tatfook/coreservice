@@ -262,4 +262,14 @@ module.exports = app => {
 	router.get(`${prefix}lessonOrganizationClassMembers/teacher`, lessonOrganizationClassMember.teacher);
 	router.post(`${prefix}lessonOrganizationClassMembers/bulk`, lessonOrganizationClassMember.bulkCreate);
 	router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
+
+	// organization activate code
+	const lessonOrganizationActivateCode = controller.lessonOrganizationActivateCode;
+	router.post(`${prefix}lessonOrganizationActivateCodes/activate`, lessonOrganizationActivateCode.activate);
+	router.resources(`${prefix}lessonOrganizationActivateCodes`, lessonOrganizationActivateCode);
+
+	// Message
+	const userMessage = controller.userMessage;
+	router.post(`${prefix}userMessages/state`, userMessage.setState);
+	router.resources(`${prefix}userMessages`, userMessage);
 }

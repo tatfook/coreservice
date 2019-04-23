@@ -26,6 +26,20 @@ module.exports = app => {
 			type: STRING,
 		},
 
+		begin: {
+			type: DATE, 
+			defaultValue: function() {
+				return new Date();
+			},
+		},
+
+		end: {
+			type: DATE,
+			defaultValue: function() {
+				return new Date();
+			},
+		},
+
 		extra: {
 			type: JSON,
 			defaultValue: {},

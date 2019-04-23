@@ -326,5 +326,33 @@ module.exports = app => {
 		//foreignKey:"userId",
 		//targetKey:"id",
 	//});
+	
+	app.model.users.hasMany(app.model.userMessages, {
+		as: "userMessages",
+		foreignKey: "userId",
+		sourceKey: "id",
+		//constraints: false,
+	});
+
+	app.model.userMessages.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey: "userId",
+		targetKey: "id",
+		//constraints: false,
+	});
+
+	app.model.messages.hasMany(app.model.userMessages, {
+		as: "userMessages",
+		foreignKey: "messageId",
+		sourceKey: "id",
+		//constraints: false,
+	});
+
+	app.model.userMessages.belongsTo(app.model.messages, {
+		as: "messages",
+		foreignKey: "messageId",
+		targetKey: "id",
+		//constraints: false,
+	});
 }
 
