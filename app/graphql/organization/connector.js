@@ -118,12 +118,12 @@ class OrganizationConnector {
 
 		// 返回用户的roleId
 		list.map(o => {
-			if (o.lessonOrganizationClassMembers, o.lessonOrganizationClassMembers.length) {
+			if (o.lessonOrganizationClassMembers && o.lessonOrganizationClassMembers.length) {
 				o.roleId = o.lessonOrganizationClassMembers[0].roleId;
 			}
 		});
 
-		return list;
+		return list.filter(o => o.roleId);
 	}
 
 	async fetchPackage({id}) {

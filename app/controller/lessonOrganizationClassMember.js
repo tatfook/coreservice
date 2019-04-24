@@ -168,6 +168,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			classIds.length && await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
 			// 取消其它身份
 			await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
+			await this.model.LessonOrganizationClassMember.destroy({where:{organizationId, memberId: params.memberId, roleId:0}});
 			if (datas.length == 0) return this.success();
 			const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 			return this.success(members);
