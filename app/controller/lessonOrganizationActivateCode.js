@@ -51,24 +51,28 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const {key, realname} = this.validate({key:"string"});
 
 		const curtime = new Date().getTime();
-		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key}}).then(o => o && o.toJSON());
-		if (!data) return this.throw(400);
+		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key, state:0}}).then(o => o && o.toJSON());
+		if (!data) return this.throw(400, "激活码已失效");
 
 		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id: data.classId}}).then(o => o && o.toJSON());
 		if (!cls) return this.throw(400);
 		const begin = new Date(cls.begin).getTime();
 		const end = new Date(cls.end).getTime();
-		if (curtime < begin || curtime > end) this.throw(401);
+		if (curtime > end) this.throw(400, "班级结束");
+		if (curtime < begin) this.throw(400, "班级未开始");
 
 		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
 		if (!organ) return this.throw(400);
 	
 		const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
-		if (organ.count <= usedCount) return this.throw(401);
+		if (organ.count <= usedCount) return this.throw(400, "人数已达上限");
 
-		await this.model.lessonOrganizationActivateCodes.update({activateTime: curdate, activateUserId: userId, state:1}, {where:{key}});
+		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1}, {where:{key}});
 
-		const member = await this.model.lessonOrganizationClassMembers({
+		const m = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: data.organizationId, classId:data.classId, memberId: userId}}).then(o => o && o.toJSON());
+		if (m && m.roleId & CLASS_MEMBER_ROLE_STUDENT) return this.throw(400, "已是班级学生");
+
+		const member = await this.model.lessonOrganizationClassMembers.create({
 			organizationId: data.organizationId,
 			classId: data.classId,
 			memberId: userId,
