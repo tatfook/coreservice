@@ -32,6 +32,11 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		msg: {
+			type: JSON,
+			defaultValue:{},
+		},
+
 		//recvIds: {
 			//type: 
 		//}
