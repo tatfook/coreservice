@@ -50,9 +50,15 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const {userId} = this.authenticated();
 		const {key, realname} = this.validate({key:"string"});
 
-		const curdate = new Date();
-		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key, begin:{$lte: curdate}, end:{$gte: curdate}}}).then(o => o && o.toJSON());
+		const curtime = new Date().getTime();
+		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key}}).then(o => o && o.toJSON());
 		if (!data) return this.throw(400);
+
+		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id: data.classId}}).then(o => o && o.toJSON());
+		if (!cls) return this.throw(400);
+		const begin = new Date(cls.begin).getTime();
+		const end = new Date(cls.end).getTime();
+		if (curtime < begin || curtime > end) this.throw(401);
 
 		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
 		if (!organ) return this.throw(400);
