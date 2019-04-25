@@ -75,13 +75,17 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
 		if (!organ) return this.fail({code:2, message:"无效激活码"});
 	
-		const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
-		if (organ.count <= usedCount) return this.fail({code:5, message: "人数已达上限"});
+		const ms = await this.model.lessonOrganizationClassMembers.findAll({where:{organizationId: data.organizationId, memberId: userId}}).then(list => list.map(o => o.toJSON()));
+		const isClassStudent = _.find(ms, o => o.classId == data.classId && o.roleId & CLASS_MEMBER_ROLE_STUDENT);
+		if (isClassStudent) return this.fail(6, "已经是该班级学生");
+		const isStudent = _.find(ms, o.roleId & CLASS_MEMBER_ROLE_STUDENT);
+		if (!isStudent) {
+			const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
+			if (organ.count <= usedCount) return this.fail({code:5, message: "人数已达上限"});
+		}
 
 		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, extra:{username, realname}}, {where:{key}});
 
-		const m = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: data.organizationId, classId:data.classId, memberId: userId}}).then(o => o && o.toJSON());
-		if (m && m.roleId & CLASS_MEMBER_ROLE_STUDENT) return this.fail({code:6, message:"已是班级学生"});
 		const roleId = m ? (m.roleId | CLASS_MEMBER_ROLE_STUDENT) : CLASS_MEMBER_ROLE_STUDENT;
 		const member = await this.model.lessonOrganizationClassMembers.upsert({
 			organizationId: data.organizationId,
