@@ -35,6 +35,11 @@ const LessonOrganizationClassMember = class extends Controller {
 			{
 				as: "lessonOrganizationClasses",
 				model: this.model.lessonOrganizationClasses,
+				where: {
+					//begin: {$lte: curtime},
+					end: {$gte: curtime},
+				},
+				required: false,
 			}
 			],
 			where: {
@@ -43,7 +48,7 @@ const LessonOrganizationClassMember = class extends Controller {
 					[this.model.Op.in]: memberIds,
 				}
 			}
-		}).then(list => _.map(list, o => o.toJSON()));
+		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		const map = {};
 		_.each(list, o => {
 			if (!(o.roleId & CLASS_MEMBER_ROLE_TEACHER)) return;
@@ -65,6 +70,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_STUDENT} and classId ${classId ? ("=" + classId) : ("> 0")} group by memberId`;
 		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
 		if (memberIds.length == 0) return this.success([]);
+		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
 			include: [
 			{
@@ -75,6 +81,11 @@ const LessonOrganizationClassMember = class extends Controller {
 			{
 				as: "lessonOrganizationClasses",
 				model: this.model.lessonOrganizationClasses,
+				where: {
+					//begin: {$lte: curtime},
+					end: {$gte: curtime},
+				},
+				required: false,
 			}
 			],
 			where: {
@@ -83,7 +94,8 @@ const LessonOrganizationClassMember = class extends Controller {
 				//classId: classId ? classId : {$gt: 0},
 				//roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
-		}).then(list => list.map(o => o.toJSON()));
+		//}).then(list => list.map(o => o.toJSON()));
+		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		const map = {};
 		const rows = [];
 		let count = 0;
@@ -102,12 +114,6 @@ const LessonOrganizationClassMember = class extends Controller {
 		_.each(rows, o => o.lessonOrganizationClasses = o.classes);
 	
 		return this.success({count, rows});
-	}
-
-	async getOrganizationTeacherAndStudentCount({organizationId}) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId > 0 group by memberId) as alias`;
-		const list = await this.model.query(sql, {type:this.model.QueryTypes.SELECT});
-		return list[0].count || 0;
 	}
 
 	async bulkCreate() {
@@ -166,7 +172,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));
 			// 删除要创建的
 			classIds.length && await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
-			// 取消其它身份
+			// 取消全部班级此身份
 			await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where organizationId = ${organizationId} and memberId = ${params.memberId}`, {type: this.model.QueryTypes.UPDATE});
 			await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId:0}});
 			if (datas.length == 0) return this.success();

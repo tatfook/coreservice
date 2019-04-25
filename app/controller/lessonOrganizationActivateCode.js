@@ -41,42 +41,51 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const where = this.validate();
 		where.organizationId = organizationId;
 
-		const data = await this.model.lessonOrganizationActivateCodes.findAndCount({...this.queryOptions, where});
+		const data = await this.model.lessonOrganizationActivateCodes.findAndCount({
+			...this.queryOptions, 
+			where,
+			include: [
+			{
+				as: "lessonOrganizationClasses",
+				model: this.model.lessonOrganizationClasses,
+			}
+			],
+		});
 
 		return this.success(data);
 	}
 
 	async activate() {
-		const {userId} = this.authenticated();
+		const {userId, username} = this.authenticated();
 		const {key, realname} = this.validate({key:"string"});
 
 		const curtime = new Date().getTime();
 		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key, state:0}}).then(o => o && o.toJSON());
-		if (!data) return this.throw(400, "激活码已失效");
+		if (!data) return this.fail({code:1, message:"激活码已失效"});
 
 		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id: data.classId}}).then(o => o && o.toJSON());
-		if (!cls) return this.throw(400);
+		if (!cls) return this.fail({code:2, message:"无效激活码"});
 		const begin = new Date(cls.begin).getTime();
 		const end = new Date(cls.end).getTime();
-		if (curtime > end) this.throw(400, "班级结束");
-		if (curtime < begin) this.throw(400, "班级未开始");
+		if (curtime > end) this.fail({code:3, message:"班级结束"});
+		if (curtime < begin) this.fail({code:4, message:"班级未开始"});
 
 		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
-		if (!organ) return this.throw(400);
+		if (!organ) return this.fail({code:2, message:"无效激活码"});
 	
 		const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
-		if (organ.count <= usedCount) return this.throw(400, "人数已达上限");
+		if (organ.count <= usedCount) return this.faile({code:5, message: "人数已达上限"});
 
-		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1}, {where:{key}});
+		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, extra:{username, realname}}, {where:{key}});
 
 		const m = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId: data.organizationId, classId:data.classId, memberId: userId}}).then(o => o && o.toJSON());
-		if (m && m.roleId & CLASS_MEMBER_ROLE_STUDENT) return this.throw(400, "已是班级学生");
-
-		const member = await this.model.lessonOrganizationClassMembers.create({
+		if (m && m.roleId & CLASS_MEMBER_ROLE_STUDENT) return this.fail({code:6, message:"已是班级学生"});
+		const roleId = m ? (m.roleId | CLASS_MEMBER_ROLE_STUDENT) : CLASS_MEMBER_ROLE_STUDENT;
+		const member = await this.model.lessonOrganizationClassMembers.upsert({
 			organizationId: data.organizationId,
 			classId: data.classId,
 			memberId: userId,
-			roleId: CLASS_MEMBER_ROLE_STUDENT,
+			roleId,
 			realname,
 		});
 

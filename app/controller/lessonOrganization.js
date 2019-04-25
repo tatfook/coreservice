@@ -45,7 +45,21 @@ const LessonOrganization = class extends Controller {
 			organizationId = organ.id;
 		}
 
-		const members = await this.model.lessonOrganizationClassMembers.findAll({where: {organizationId, memberId: user.id}}).then(list => list.map(o => o.toJSON()));
+		const curtime = new Date();
+		const members = await this.model.lessonOrganizationClassMembers.findAll({
+			include: [
+			{
+				as: "lessonOrganizationClasses",
+				model: this.model.lessonOrganizationClasses,
+				where: {
+					//begin: {$lte: curtime},
+					end: {$gte: curtime},
+				},
+				required: false,
+			}
+			],
+			where: {organizationId, memberId: user.id}
+		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		if (members.length == 0) return this.throw(400, "成员不存在");
 		let roleId = 0;
 		_.each(members, o => roleId = roleId | o.roleId);
@@ -200,6 +214,9 @@ const LessonOrganization = class extends Controller {
 			if (pkgmap[o.packageId]) {
 				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
 				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
+				if (pkgmap[o.packageId].lessonOrganizationClasses.end < o.lessonOrganizationClasses.end) {
+					pkgmap[o.packageId].lessonOrganizationClasses = o.lessonOrganizationClasses;
+				}
 			} else {
 				pkgmap[o.packageId] = o;
 			}
@@ -230,8 +247,12 @@ const LessonOrganization = class extends Controller {
 				{
 					as: "lessonOrganizationClassMembers",
 					model: this.model.lessonOrganizationClassMembers,
-					where: {memberId: userId},
-				}
+					where: {memberId: userId, classId:{$gt:0}},
+				},
+				{
+					as: "lessonOrganizationClasses",
+					model: this.model.lessonOrganizationClasses,
+				},
 				],
 				where: {
 					organizationId,

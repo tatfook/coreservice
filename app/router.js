@@ -252,6 +252,7 @@ module.exports = app => {
 	// organization class
 	const lessonOrganizationClass = controller.lessonOrganizationClass;
 	router.get(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.index);
+	router.get(`${prefix}lessonOrganizationClasses/history`, lessonOrganizationClass.history);
 	router.post(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.create);
 	router.put(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.update);
 	router.delete(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.destroy);
