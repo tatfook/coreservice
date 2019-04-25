@@ -74,7 +74,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 		if (!organ) return this.fail({code:2, message:"无效激活码"});
 	
 		const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
-		if (organ.count <= usedCount) return this.faile({code:5, message: "人数已达上限"});
+		if (organ.count <= usedCount) return this.fail({code:5, message: "人数已达上限"});
 
 		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, extra:{username, realname}}, {where:{key}});
 
