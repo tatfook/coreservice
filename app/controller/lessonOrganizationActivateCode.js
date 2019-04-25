@@ -35,7 +35,6 @@ const LessonOrganizationActivateCode = class extends Controller {
 
 	async index() {
 		const {userId, organizationId, roleId} = this.authenticated();
-
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
 
 		const where = this.validate();

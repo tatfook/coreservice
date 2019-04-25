@@ -25,6 +25,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
 		if (memberIds.length == 0) return this.success([]);
 
+		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
 			include: [
 			{
