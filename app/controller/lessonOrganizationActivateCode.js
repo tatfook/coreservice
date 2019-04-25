@@ -38,6 +38,9 @@ const LessonOrganizationActivateCode = class extends Controller {
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
 
 		const where = this.validate();
+
+		this.formatQuery(where);
+
 		where.organizationId = organizationId;
 
 		const data = await this.model.lessonOrganizationActivateCodes.findAndCount({
@@ -83,7 +86,6 @@ const LessonOrganizationActivateCode = class extends Controller {
 			if (organ.count <= usedCount) return this.fail({code:5, message: "人数已达上限"});
 		}
 
-		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, username, realname}, {where:{key}});
 
 		const m = _.find(ms, o => o.classId == data.classId);
 		const roleId = m ? (m.roleId | CLASS_MEMBER_ROLE_STUDENT) : CLASS_MEMBER_ROLE_STUDENT;
@@ -94,6 +96,8 @@ const LessonOrganizationActivateCode = class extends Controller {
 			roleId,
 			realname,
 		});
+
+		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, username, realname}, {where:{key}});
 
 		return this.success(member);
 	}
