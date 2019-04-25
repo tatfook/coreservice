@@ -77,7 +77,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 	
 		const ms = await this.model.lessonOrganizationClassMembers.findAll({where:{organizationId: data.organizationId, memberId: userId}}).then(list => list.map(o => o.toJSON()));
 		const isClassStudent = _.find(ms, o => o.classId == data.classId && o.roleId & CLASS_MEMBER_ROLE_STUDENT);
-		if (isClassStudent) return this.fail(6, "已经是该班级学生");
+		if (isClassStudent) return this.fail({code:6, message: "已经是该班级学生"});
 		const isStudent = _.find(ms, o => o.roleId & CLASS_MEMBER_ROLE_STUDENT);
 		if (!isStudent) {
 			const usedCount = await this.model.lessonOrganizations.getUsedCount(data.organizationId);
