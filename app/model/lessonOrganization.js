@@ -92,7 +92,7 @@ module.exports = app => {
 	
 	//获取机构已用人数
 	model.getUsedCount = async function(organizationId) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and (roleId & 1 or roleId & 2) group by memberId) as alias`;
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & 1 group by memberId) as alias`;
 		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
 		return list[0].count || 0;
 	}
