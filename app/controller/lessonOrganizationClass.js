@@ -40,7 +40,7 @@ const LessonOrganizationClass = class extends Controller {
 		});
 
 		return this.success(list);
-	},
+	}
 
 	async index() {
 		const {userId, organizationId} = this.authenticated();
