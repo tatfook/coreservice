@@ -86,6 +86,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 
 		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, extra:{username, realname}}, {where:{key}});
 
+		const m = _.find(ms, o => o.classId == data.classId);
 		const roleId = m ? (m.roleId | CLASS_MEMBER_ROLE_STUDENT) : CLASS_MEMBER_ROLE_STUDENT;
 		const member = await this.model.lessonOrganizationClassMembers.upsert({
 			organizationId: data.organizationId,
