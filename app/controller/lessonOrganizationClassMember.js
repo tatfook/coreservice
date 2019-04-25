@@ -169,7 +169,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		if (!organ) return this.throw(400);
 		const organCount = organ.count;
 		const isStudent = _.find(oldmembers, o => o.roleId & CLASS_MEMBER_ROLE_STUDENT) ? true : false;
-		if (!isStudent && (params.roleId & CLASS_MEMBER_ROLE_STUDENT) {
+		if (!isStudent && (params.roleId & CLASS_MEMBER_ROLE_STUDENT)) {
 			const usedCount = await this.model.lessonOrganizations.getUsedCount();
 			if (usedCount >= organCount && classIds.length > 0) return this.fail(1, "学生人数已达上限");
 		}
