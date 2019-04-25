@@ -185,6 +185,18 @@ const LessonOrganizationClassMember = class extends Controller {
 		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId:0}});
 		if (datas.length == 0) return this.success();
 		const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
+
+		if (params.realname && classIds.length) {
+			await this.model.lessonOrganizationActivateCodes.update({realname: params.realname}, {
+				where: {
+					organizationId,
+					activateUserId: params.memberId,
+					state:1,
+					classId: {$in: classIds},
+				}
+			});
+		}
+
 		return this.success(members);
 	}
 	
