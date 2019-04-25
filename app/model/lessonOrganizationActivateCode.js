@@ -47,6 +47,14 @@ module.exports = app => {
 			type: DATE,
 		},
 
+		username: {
+			type: STRING,
+		},
+
+		realname: {
+			type: STRING,
+		},
+
 		extra: {
 			type: JSON,
 			defaultValue: {},
