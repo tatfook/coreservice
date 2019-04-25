@@ -43,8 +43,8 @@ type OrganizationClass {
 	classroom: Classroom,              # 当前课堂
 	studentCount: Int                  # 班级学生数量
 	teacherCount: Int                  # 班级教师数量
-	students: [OrganizationUser]       # 班级学生
-	teachers: [OrganizationUser]       # 班级教师
+	students: [OrganizationClassMember]       # 班级学生
+	teachers: [OrganizationClassMember]       # 班级教师
 
 	organization: Organization         # 机构
 	organizationPackages: [OrganizationPackage]    # 班级课程包
@@ -58,7 +58,7 @@ type OrganizationClassMember {
 	realname: String                   # 班级成员姓名
 	roleId: Int                        # 班级成员角色
 
-	#user: User                         # 班级成员用户信息
+	user: Json                         # 班级成员用户信息
 }
 
 type OrganizationPackage {             # 机构课程包

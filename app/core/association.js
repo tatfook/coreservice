@@ -300,6 +300,20 @@ module.exports = app => {
 		constraints: false,
 	});
 
+	app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationPackages, {
+		as: "lessonOrganizationPackages",
+		foreignKey: "classId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationPackages.belongsTo(app.model.lessonOrganizationClasses, {
+		as: "lessonOrganizationClasses",
+		foreignKey: "classId",
+		targetKey: "id",
+		constraints: false,
+	});
+
 	app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationActivateCodes, {
 		as: "lessonOrganizationActivateCodes",
 		foreignKey: "classId",

@@ -11,8 +11,8 @@ type Query {
 	organizations(userId: Int): [Organization]
 	organization(id: Int, name: String): Organization
 	organizationClasses(userId: Int): [OrganizationClass]
-	organizationClass(id: Int!): OrganizationClass
-	organizationPackage(id: Int!): OrganizationPackage
+	organizationClass(id: Int): OrganizationClass
+	organizationPackage(id: Int): OrganizationPackage
 	organizationUser(organizationId: Int, userId: Int, username: String): OrganizationUser
 	package(id: Int): Package
 	lesson(id: Int, packageId: Int = 0): Lesson

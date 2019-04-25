@@ -67,7 +67,7 @@ class OrganizationConnector {
 	}
 
 	async fetchOrganizationUserCount({organizationId, classId, roleId}) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId ${classId == undefined ? "> 0" : ("=" + classId)} and roleId & ${roleId} group by memberId) as alias`;
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & ${roleId} group by memberId) as alias`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
@@ -81,8 +81,7 @@ class OrganizationConnector {
 	}
 	
 	async fetchOrganizationMembers({organizationId, classId, roleId}) {
-		let sql = `select id, organizationId, classId, memberId, realname, roleId from lessonOrganizationClassMembers where organizationId=:organizationId and roleId & :roleId group by memberId`;
-		if (classId != undefined) sql += ` and classId = ${classId}`;
+		let sql = `select id, organizationId, classId, memberId, realname, roleId from lessonOrganizationClassMembers where organizationId=:organizationId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & :roleId group by memberId`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
@@ -108,7 +107,7 @@ class OrganizationConnector {
 			include.push({
 				as: "lessonOrganizationClassMembers",
 				model: this.ctx.model.lessonOrganizationClassMembers,
-				where: {memberId},
+				where: {memberId, roleId:{$gt:0}},
 			});
 		}
 		const list = await this.ctx.model.lessonOrganizationClasses.findAll({
@@ -123,7 +122,7 @@ class OrganizationConnector {
 			}
 		});
 
-		return list.filter(o => o.roleId);
+		return list;
 	}
 
 	async fetchPackage({id}) {
