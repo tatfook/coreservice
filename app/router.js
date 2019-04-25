@@ -267,6 +267,7 @@ module.exports = app => {
 	// organization activate code
 	const lessonOrganizationActivateCode = controller.lessonOrganizationActivateCode;
 	router.post(`${prefix}lessonOrganizationActivateCodes/activate`, lessonOrganizationActivateCode.activate);
+	router.post(`${prefix}lessonOrganizationActivateCodes/search`, lessonOrganizationActivateCode.index);
 	router.resources(`${prefix}lessonOrganizationActivateCodes`, lessonOrganizationActivateCode);
 
 	// Message

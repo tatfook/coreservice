@@ -328,6 +328,20 @@ module.exports = app => {
 		constraints: false,
 	});
 
+	//app.model.lessonOrganizationClassMembers.hasMany(app.model.lessonOrganizationActivateCodes, {
+		//as: "lessonOrganizationActivateCodes",
+		//foreignKey:"activateUserId",
+		//sourceKey:"memberId",
+		//constraints: false,
+	//});
+
+	//app.model.lessonOrganizationActivateCodes.belongsTo(app.model.lessonOrganizationClassMembers, {
+		//as: "lessonOrganizationClassMembers",
+		//foreignKey: "activateUserId",
+		//targetKey: "memberId",
+		//constraints: false,
+	//});
+
 	app.model.systemTags.hasMany(app.model.tags, {
 		as: "tags",
 		foreignKey: "tagId",

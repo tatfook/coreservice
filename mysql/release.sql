@@ -4,6 +4,16 @@ use `keepwork-rls`;
 use `lesson-dev`;
 use `lesson-rls`;
 
+
+alter table lessonOrganizationClasses add column begin datetime;
+alter table lessonOrganizationClasses add column end datetime;
+alter table lessonOrganizationClassMembers add index classId_memberId_realname(classId, memberId, realname);
+alter table lessonOrganizationActivateCodes add foreign key(classId, activateUserId, realname) references lessonOrganizationClassMembers(classId, memberId, realname) on update cascade on delete set null;
+
+
+-- --------------------------------------------------------
+select * from `keepwork-rls`.users where username = "dsl4";
+
 alter table lessonOrganizations add column location varchar(256) default "";
 alter table lessonOrganizations add column visibility int default 0;
 drop table tags;
