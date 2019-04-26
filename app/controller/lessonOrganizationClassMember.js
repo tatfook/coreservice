@@ -49,7 +49,8 @@ const LessonOrganizationClassMember = class extends Controller {
 					[this.model.Op.in]: memberIds,
 				}
 			}
-		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
+		}).then(list => list.map(o => o.toJSON()));
+		//}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		const map = {};
 		_.each(list, o => {
 			if (!(o.roleId & CLASS_MEMBER_ROLE_TEACHER)) return;
@@ -95,8 +96,8 @@ const LessonOrganizationClassMember = class extends Controller {
 				//classId: classId ? classId : {$gt: 0},
 				//roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
-		//}).then(list => list.map(o => o.toJSON()));
-		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
+		}).then(list => list.map(o => o.toJSON()));
+		//}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		const map = {};
 		const rows = [];
 		let count = 0;
