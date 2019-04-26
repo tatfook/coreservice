@@ -171,7 +171,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const organCount = organ.count;
 		const isStudent = _.find(oldmembers, o => o.roleId & CLASS_MEMBER_ROLE_STUDENT) ? true : false;
 		if (!isStudent && (params.roleId & CLASS_MEMBER_ROLE_STUDENT)) {
-			const usedCount = await this.model.lessonOrganizations.getUsedCount();
+			const usedCount = await this.model.lessonOrganizations.getUsedCount(organizationId);
 			if (usedCount >= organCount && classIds.length > 0) return this.fail(1, "学生人数已达上限");
 		}
 
