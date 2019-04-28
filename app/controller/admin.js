@@ -108,7 +108,7 @@ const Admin = class extends Controller {
 
 		this.formatQuery(query);
 
-		const list = await this.resource.findAndCount({...this.queryOptions, where:query});
+		const list = await this.resource.findAndCountAll({...this.queryOptions, where:query});
 
 		this.success(list);
 	}
