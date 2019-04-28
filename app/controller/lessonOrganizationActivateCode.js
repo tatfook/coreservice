@@ -26,7 +26,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 			datas.push({
 				organizationId,
 				classId,
-				key: i + "" +  _.random(100,999) + "" + organizationId + "" + userId + (new Date()).getTime() + _.random(100,999),
+				key: classId + "" + i + "" +  (new Date()).getTime() + _.random(10,99),
 			});
 		}
 		const list = await this.model.lessonOrganizationActivateCodes.bulkCreate(datas);
