@@ -7,6 +7,9 @@ use `lesson-rls`;
 
 alter table lessonOrganizationClasses add column begin datetime;
 alter table lessonOrganizationClasses add column end datetime;
+update lessonOrganizationClasses set begin = "2019-01-01" where id > 0;
+update lessonOrganizationClasses set end = "2020-01-01" where id > 0;
+
 CREATE TABLE `lessonOrganizationActivateCodes` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `organizationId` bigint(20) DEFAULT '0',

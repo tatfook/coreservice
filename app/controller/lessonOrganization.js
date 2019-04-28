@@ -214,7 +214,7 @@ const LessonOrganization = class extends Controller {
 			if (pkgmap[o.packageId]) {
 				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
 				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
-				if (pkgmap[o.packageId].lessonOrganizationClasses.end < o.lessonOrganizationClasses.end) {
+				if (pkgmap[o.packageId].lessonOrganizationClasses && pkgmap[o.packageId].lessonOrganizationClasses.end < o.lessonOrganizationClasses.end) {
 					pkgmap[o.packageId].lessonOrganizationClasses = o.lessonOrganizationClasses;
 				}
 			} else {
