@@ -95,6 +95,8 @@ const LessonOrganizationActivateCode = class extends Controller {
 			realname,
 		});
 
+		await this.model.lessonOrganizationClassMembers.update({realname}, {where:{organizationId, memberId:userId}});
+
 		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, username, realname}, {where:{key}});
 
 		return this.success(member);
