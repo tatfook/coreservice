@@ -92,7 +92,11 @@ module.exports = app => {
 	
 	//获取机构已用人数
 	model.getUsedCount = async function(organizationId) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & 1 group by memberId) as alias`;
+		const sql = `select count(*) as count from (select memberId from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
+				where locm.organizationId = ${organizationId} and roleId & 1 
+				and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp() )) 
+				group by memberId) as alias`
+		//const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & 1 group by memberId) as alias`;
 		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
 		return list[0].count || 0;
 	}
