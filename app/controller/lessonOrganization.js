@@ -247,7 +247,7 @@ const LessonOrganization = class extends Controller {
 				{
 					as: "lessonOrganizationClassMembers",
 					model: this.model.lessonOrganizationClassMembers,
-					where: {memberId: userId, classId:{$gt:0}},
+					where: {memberId: userId, classId: roleId & CLASS_MEMBER_ROLE_ADMIN ? {$gte:0} : {$gt:0}},
 				},
 				{
 					as: "lessonOrganizationClasses",
