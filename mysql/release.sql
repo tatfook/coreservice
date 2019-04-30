@@ -3,7 +3,7 @@ use `keepwork-dev`;
 use `keepwork-rls`;
 use `lesson-dev`;
 use `lesson-rls`;
-
+use `keepwork`;
 
 alter table lessonOrganizationClasses add column begin datetime;
 alter table lessonOrganizationClasses add column end datetime;
@@ -25,7 +25,7 @@ CREATE TABLE `lessonOrganizationActivateCodes` (
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key` (`key`)
-) ENGINE=InnoDB AUTO_INCREMENT=267 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=812 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 CREATE TABLE `messages` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
