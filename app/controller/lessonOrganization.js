@@ -265,7 +265,6 @@ const LessonOrganization = class extends Controller {
 				where: {
 					organizationId,
 				}
-			//}).then(list => _.map(list, o => o.toJSON()).filter(o => _.find(o.lessonOrganizationClassMembers, m => m.roleId & roleId)));
 			}).then(list => _.map(list, o => o.toJSON()));
 		}
 
