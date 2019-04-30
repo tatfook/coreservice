@@ -70,8 +70,8 @@ const LessonOrganizationActivateCode = class extends Controller {
 		if (!cls) return this.fail({code:2, message:"无效激活码"});
 		const begin = new Date(cls.begin).getTime();
 		const end = new Date(cls.end).getTime();
-		if (curtime > end) this.fail({code:3, message:"班级结束"});
-		if (curtime < begin) this.fail({code:4, message:"班级未开始"});
+		if (curtime > end) return this.fail({code:3, message:"班级结束"});
+		if (curtime < begin) return this.fail({code:4, message:"班级未开始"});
 
 		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
 		if (!organ) return this.fail({code:2, message:"无效激活码"});
