@@ -45,7 +45,21 @@ const LessonOrganization = class extends Controller {
 			organizationId = organ.id;
 		}
 
-		const members = await this.model.lessonOrganizationClassMembers.findAll({where: {organizationId, memberId: user.id}}).then(list => list.map(o => o.toJSON()));
+		const curtime = new Date();
+		const members = await this.model.lessonOrganizationClassMembers.findAll({
+			include: [
+			{
+				as: "lessonOrganizationClasses",
+				model: this.model.lessonOrganizationClasses,
+				where: {
+					//begin: {$lte: curtime},
+					end: {$gte: curtime},
+				},
+				required: false,
+			}
+			],
+			where: {organizationId, memberId: user.id}
+		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		if (members.length == 0) return this.throw(400, "成员不存在");
 		let roleId = 0;
 		_.each(members, o => roleId = roleId | o.roleId);
@@ -193,13 +207,17 @@ const LessonOrganization = class extends Controller {
 		return this.success();
 	}
 
-	mergePackages(list = []) {
+	mergePackages(list = [], roleId) {
 		const pkgmap = {};
 		// 合并课程
 		_.each(list, o => {
+			if (roleId && o.lessonOrganizationClassMembers && (! o.lessonOrganizationClassMembers.roleId & roleId)) return;
 			if (pkgmap[o.packageId]) {
 				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
 				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
+				if (pkgmap[o.packageId].lessonOrganizationClasses && pkgmap[o.packageId].lessonOrganizationClasses.end < o.lessonOrganizationClasses.end) {
+					pkgmap[o.packageId].lessonOrganizationClasses = o.lessonOrganizationClasses;
+				}
 			} else {
 				pkgmap[o.packageId] = o;
 			}
@@ -213,10 +231,11 @@ const LessonOrganization = class extends Controller {
 
 	// 课程包
 	async packages() {
-		const {userId, roleId, organizationId} = this.authenticated();
-		const {classId=0} = this.validate({classId: "number_optional"});
+		const {userId, organizationId} = this.authenticated();
+		const {classId=0, roleId=67} = this.validate({classId: "number_optional", roleId:"number_optional"});
 
 		let list = [];
+		const curtime = new Date();
 		if (classId) {
 			list = await this.model.lessonOrganizationPackages.findAll({
 				where: {
@@ -230,8 +249,18 @@ const LessonOrganization = class extends Controller {
 				{
 					as: "lessonOrganizationClassMembers",
 					model: this.model.lessonOrganizationClassMembers,
-					where: {memberId: userId},
-				}
+					where: {
+						memberId: userId, 
+						classId: roleId & CLASS_MEMBER_ROLE_ADMIN ? {$gte:0} : {$gt:0}
+					},
+				},
+				{
+					as: "lessonOrganizationClasses",
+					model: this.model.lessonOrganizationClasses,
+					where: {
+						end: {$gte: curtime},
+					},
+				},
 				],
 				where: {
 					organizationId,
@@ -239,7 +268,7 @@ const LessonOrganization = class extends Controller {
 			}).then(list => _.map(list, o => o.toJSON()));
 		}
 
-		list = this.mergePackages(list);
+		list = this.mergePackages(list, roleId);
 
 		for(let i = 0; i < list.length; i++) {
 			const pkg = list[i];

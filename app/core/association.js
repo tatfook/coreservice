@@ -300,6 +300,48 @@ module.exports = app => {
 		constraints: false,
 	});
 
+	app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationPackages, {
+		as: "lessonOrganizationPackages",
+		foreignKey: "classId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationPackages.belongsTo(app.model.lessonOrganizationClasses, {
+		as: "lessonOrganizationClasses",
+		foreignKey: "classId",
+		targetKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationActivateCodes, {
+		as: "lessonOrganizationActivateCodes",
+		foreignKey: "classId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationActivateCodes.belongsTo(app.model.lessonOrganizationClasses, {
+		as: "lessonOrganizationClasses",
+		foreignKey:"classId",
+		targetKey:"id",
+		constraints: false,
+	});
+
+	//app.model.lessonOrganizationClassMembers.hasMany(app.model.lessonOrganizationActivateCodes, {
+		//as: "lessonOrganizationActivateCodes",
+		//foreignKey:"activateUserId",
+		//sourceKey:"memberId",
+		//constraints: false,
+	//});
+
+	//app.model.lessonOrganizationActivateCodes.belongsTo(app.model.lessonOrganizationClassMembers, {
+		//as: "lessonOrganizationClassMembers",
+		//foreignKey: "activateUserId",
+		//targetKey: "memberId",
+		//constraints: false,
+	//});
+
 	app.model.systemTags.hasMany(app.model.tags, {
 		as: "tags",
 		foreignKey: "tagId",
@@ -326,5 +368,33 @@ module.exports = app => {
 		//foreignKey:"userId",
 		//targetKey:"id",
 	//});
+	
+	app.model.users.hasMany(app.model.userMessages, {
+		as: "userMessages",
+		foreignKey: "userId",
+		sourceKey: "id",
+		//constraints: false,
+	});
+
+	app.model.userMessages.belongsTo(app.model.users, {
+		as: "users",
+		foreignKey: "userId",
+		targetKey: "id",
+		//constraints: false,
+	});
+
+	app.model.messages.hasMany(app.model.userMessages, {
+		as: "userMessages",
+		foreignKey: "messageId",
+		sourceKey: "id",
+		//constraints: false,
+	});
+
+	app.model.userMessages.belongsTo(app.model.messages, {
+		as: "messages",
+		foreignKey: "messageId",
+		targetKey: "id",
+		//constraints: false,
+	});
 }
 

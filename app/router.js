@@ -252,6 +252,7 @@ module.exports = app => {
 	// organization class
 	const lessonOrganizationClass = controller.lessonOrganizationClass;
 	router.get(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.index);
+	router.get(`${prefix}lessonOrganizationClasses/history`, lessonOrganizationClass.history);
 	router.post(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.create);
 	router.put(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.update);
 	router.delete(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.destroy);
@@ -262,4 +263,15 @@ module.exports = app => {
 	router.get(`${prefix}lessonOrganizationClassMembers/teacher`, lessonOrganizationClassMember.teacher);
 	router.post(`${prefix}lessonOrganizationClassMembers/bulk`, lessonOrganizationClassMember.bulkCreate);
 	router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
+
+	// organization activate code
+	const lessonOrganizationActivateCode = controller.lessonOrganizationActivateCode;
+	router.post(`${prefix}lessonOrganizationActivateCodes/activate`, lessonOrganizationActivateCode.activate);
+	router.post(`${prefix}lessonOrganizationActivateCodes/search`, lessonOrganizationActivateCode.index);
+	router.resources(`${prefix}lessonOrganizationActivateCodes`, lessonOrganizationActivateCode);
+
+	// Message
+	const userMessage = controller.userMessage;
+	router.post(`${prefix}userMessages/state`, userMessage.setState);
+	router.resources(`${prefix}userMessages`, userMessage);
 }

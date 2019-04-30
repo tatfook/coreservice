@@ -26,6 +26,22 @@ const LessonOrganizationClass = class extends Controller {
 		return this.success(organ);
 	}
 
+	async history() {
+		const {userId, organizationId, roleId} = this.authenticated();
+		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(400, "无权限");
+
+		const curtime = new Date();
+		const list = await this.model.lessonOrganizationClasses.findAndCount({
+			where: {
+				end: {
+					$lte: curtime,
+				}
+			}
+		});
+
+		return this.success(list);
+	}
+
 	async index() {
 		const {userId, organizationId} = this.authenticated();
 		const {roleId} = this.validate({roleId:"number_optional"});
@@ -45,8 +61,12 @@ const LessonOrganizationClass = class extends Controller {
 			}
 		}).then(list => list.map(o => o.classId));
 
+		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClasses.findAll({
-			where:{id:{$in:ids}},
+			where:{
+				id:{$in:ids},
+				end: {$gte: curtime},
+			},
 		});
 
 		return this.success(list);

@@ -26,7 +26,8 @@ class OrganizationConnector {
 	}
 
 	async fetch(ids) {
-		return await this.ctx.app.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		const list = await this.ctx.app.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
+		return _.map(ids, id => _.find(list, o => o.id == id));
 	}
 
 	async fetchByIds(ids) {
@@ -66,7 +67,12 @@ class OrganizationConnector {
 	}
 
 	async fetchOrganizationUserCount({organizationId, classId, roleId}) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId ${classId == undefined ? "> 0" : ("=" + classId)} and roleId & ${roleId} group by memberId) as alias`;
+		const sql = `select count(*) as count from (select memberId from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
+				where locm.organizationId = ${organizationId} and roleId & ${roleId} 
+				and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp())) 
+				and locm.classId ${classId == undefined ? ">= 0" : ("=" + classId)}
+				group by memberId) as alias`;
+		//const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & ${roleId} group by memberId) as alias`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
@@ -80,8 +86,12 @@ class OrganizationConnector {
 	}
 	
 	async fetchOrganizationMembers({organizationId, classId, roleId}) {
-		let sql = `select id, organizationId, classId, memberId, realname, roleId from lessonOrganizationClassMembers where organizationId=:organizationId and roleId & :roleId group by memberId`;
-		if (classId != undefined) sql += ` and classId = ${classId}`;
+		const sql = `select locm.* from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
+			where locm.organizationId = 1 and roleId & 1 
+			and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp() ))
+			and locm.classId ${classId == undefined ? ">= 0" : ("=" + classId)}
+			group by memberId`;
+		//let sql = `select id, organizationId, classId, memberId, realname, roleId from lessonOrganizationClassMembers where organizationId=:organizationId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & :roleId group by memberId`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
@@ -107,7 +117,7 @@ class OrganizationConnector {
 			include.push({
 				as: "lessonOrganizationClassMembers",
 				model: this.ctx.model.lessonOrganizationClassMembers,
-				where: {memberId},
+				where: {memberId, roleId:{$gt:0}},
 			});
 		}
 		const list = await this.ctx.model.lessonOrganizationClasses.findAll({
@@ -122,7 +132,7 @@ class OrganizationConnector {
 			}
 		});
 
-		return list.filter(o => o.roleId);
+		return list;
 	}
 
 	async fetchPackage({id}) {

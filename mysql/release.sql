@@ -4,6 +4,57 @@ use `keepwork-rls`;
 use `lesson-dev`;
 use `lesson-rls`;
 
+
+alter table lessonOrganizationClasses add column begin datetime;
+alter table lessonOrganizationClasses add column end datetime;
+update lessonOrganizationClasses set begin = "2019-01-01" where id > 0;
+update lessonOrganizationClasses set end = "2020-01-01" where id > 0;
+
+CREATE TABLE `lessonOrganizationActivateCodes` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `organizationId` bigint(20) DEFAULT '0',
+  `classId` bigint(20) DEFAULT '0',
+  `key` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `state` int(11) DEFAULT '0',
+  `activateUserId` bigint(20) DEFAULT '0',
+  `activateTime` datetime DEFAULT NULL,
+  `username` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `realname` varchar(255) COLLATE utf8mb4_bin DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `key` (`key`)
+) ENGINE=InnoDB AUTO_INCREMENT=267 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+CREATE TABLE `messages` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `sender` bigint(20) DEFAULT NULL,
+  `type` int(11) DEFAULT '0',
+  `all` int(11) DEFAULT '0',
+  `msg` json DEFAULT NULL,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `userMessages` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) DEFAULT NULL,
+  `messageId` bigint(20) DEFAULT NULL,
+  `state` int(11) DEFAULT '0',
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userId` (`userId`),
+  KEY `messageId` (`messageId`),
+  CONSTRAINT `userMessages_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `userMessages_ibfk_2` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
+-- --------------------------------------------------------
+select * from `keepwork-rls`.users where username = "dsl4";
+
 alter table lessonOrganizations add column location varchar(256) default "";
 alter table lessonOrganizations add column visibility int default 0;
 drop table tags;
