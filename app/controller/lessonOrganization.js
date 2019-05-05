@@ -212,7 +212,7 @@ const LessonOrganization = class extends Controller {
 		// 合并课程
 		_.each(list, o => {
 			if (roleId && o.lessonOrganizationClassMembers && (! o.lessonOrganizationClassMembers.roleId & roleId)) return;
-			if (o.lessonOrganizationClasses && new Date(o.lessonOrganizationClasses.end).getTime() < new Date().getTime()) return;
+			//if (o.lessonOrganizationClasses && new Date(o.lessonOrganizationClasses.end).getTime() < new Date().getTime()) return;
 			if (pkgmap[o.packageId]) {
 				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
 				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
@@ -265,7 +265,7 @@ const LessonOrganization = class extends Controller {
 				}
 			}).then(list => _.map(list, o => o.toJSON()));
 		}
-		console.log(list);
+		//console.log(list);
 
 		list = this.mergePackages(list, roleId);
 
