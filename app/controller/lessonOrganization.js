@@ -157,7 +157,8 @@ const LessonOrganization = class extends Controller {
 			if (!pkg) return;
 			const lessons = [];
 			_.each(o.lessons, l => {
-				if (_.find(pkg.lessons, pl => pl.lessonId == l.lessonId)) lessons.push(l);
+				const pl = _.find(pkg.lessons, pl => pl.lessonId == l.lessonId);
+				if (pl)	lessons.push(pl);
 			});
 			o.lessons = lessons;
 			datas.push(o);
