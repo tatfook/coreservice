@@ -69,7 +69,7 @@ class OrganizationConnector {
 	async fetchOrganizationUserCount({organizationId, classId, roleId}) {
 		const sql = `select count(*) as count from (select memberId from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
 				where locm.organizationId = ${organizationId} and roleId & ${roleId} 
-				and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp())) 
+				and (locm.classId = 0 or (locm.classId =  loc.id and loc.end >= current_timestamp())) 
 				and locm.classId ${classId == undefined ? ">= 0" : ("=" + classId)}
 				group by memberId) as alias`;
 		//const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & ${roleId} group by memberId) as alias`;
@@ -88,7 +88,7 @@ class OrganizationConnector {
 	async fetchOrganizationMembers({organizationId, classId, roleId}) {
 		const sql = `select locm.* from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
 			where locm.organizationId = 1 and roleId & 1 
-			and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp() ))
+			and (locm.classId = 0 or (locm.classId =  loc.id and loc.end >= current_timestamp()))
 			and locm.classId ${classId == undefined ? ">= 0" : ("=" + classId)}
 			group by memberId`;
 		//let sql = `select id, organizationId, classId, memberId, realname, roleId from lessonOrganizationClassMembers where organizationId=:organizationId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and roleId & :roleId group by memberId`;
