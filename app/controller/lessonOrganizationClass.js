@@ -32,6 +32,12 @@ const LessonOrganizationClass = class extends Controller {
 
 		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClasses.findAndCount({
+			include: [
+			{
+				as: "lessonOrganizationClassMembers",
+				model: this.model.lessonOrganizationClassMembers,
+			},
+			],
 			where: {
 				end: {
 					$lte: curtime,
