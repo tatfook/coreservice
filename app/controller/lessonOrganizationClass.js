@@ -39,6 +39,7 @@ const LessonOrganizationClass = class extends Controller {
 			},
 			],
 			where: {
+				organizationId,
 				end: {
 					$lte: curtime,
 				}
