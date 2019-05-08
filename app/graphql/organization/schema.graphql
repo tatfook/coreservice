@@ -37,6 +37,8 @@ type OrganizationClass {
 	organizationId: Int                # 机构ID
 	name: String                       # 机构班级名称	
 	roleId: Int                        # 查询用户的roleId
+	begin: String                      # 班级开始时间
+	end: String                        # 班级结束时间
 
 	# members: [OrganizationClassMember] # 班级成员
 
