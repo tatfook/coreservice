@@ -186,7 +186,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		// 删除要创建的
 		classIds.length && await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, classId:{$in:classIds}}});
 		// 取消全部班级此身份
-		await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where id in (:ids)`, {type: this.model.QueryTypes.UPDATE, replacements:{ids}});
+		ids.length && await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where id in (:ids)`, {type: this.model.QueryTypes.UPDATE, replacements:{ids}});
 		// 删除roleId=0为0的成员
 		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId:0}});
 		if (datas.length == 0) return this.success();
