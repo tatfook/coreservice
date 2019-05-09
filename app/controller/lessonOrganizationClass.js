@@ -31,7 +31,9 @@ const LessonOrganizationClass = class extends Controller {
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(400, "无权限");
 
 		const curtime = new Date();
-		const list = await this.model.lessonOrganizationClasses.findAndCount({
+		const count = await this.model.lessonOrganizationClasses.count({where:{organizationId, end:{$lte: curtime}}});
+		const list = await this.model.lessonOrganizationClasses.findAll({
+			...this.queryOptions,
 			include: [
 			{
 				as: "lessonOrganizationClassMembers",
@@ -53,7 +55,7 @@ const LessonOrganizationClass = class extends Controller {
 			}
 		});
 
-		return this.success(list);
+		return this.success({count, rows: list});
 	}
 
 	async index() {
