@@ -43,6 +43,7 @@ type OrganizationClass {
 	# members: [OrganizationClassMember] # 班级成员
 
 	classroom: Classroom,              # 当前课堂
+	classrooms: [Classroom],           # 班级正在开课的课堂列表
 	studentCount: Int                  # 班级学生数量
 	teacherCount: Int                  # 班级教师数量
 	students: [OrganizationClassMember]       # 班级学生

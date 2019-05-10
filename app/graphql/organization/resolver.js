@@ -125,8 +125,11 @@ module.exports = {
 		},
 
 		async classroom(root, args, ctx) {
-			return await ctx.lessonModel.classrooms.findOne({where:{classId: root.id, state: 1}}).then(o => o && o.toJSON()); console.log(cls, root.id);
-			//const data = await ctx.connector.organization.classroomLoader.load(root.id);
+			return await ctx.lessonModel.classrooms.findOne({where:{classId: root.id, state: 1}}).then(o => o && o.toJSON());
+		},
+
+		async classrooms(root, args, ctx) {
+			return await ctx.lessonModel.classrooms.findAll({where:{classId: root.id, state: 1}}).then(o => o && o.toJSON()); 
 		},
 	},
 
