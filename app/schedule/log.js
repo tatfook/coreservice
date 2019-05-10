@@ -9,24 +9,17 @@ class Log extends Subscription {
 			cron:"0 0 2 */3 * *",
 			type:"worker",
 			//disable:true,
+			immediate: true,
 		}
 	}
 
 	async subscribe() {
 		// 保留3天的日志量
-		const date = (new Date()).getTime() - 3 * 24 * 3600 * 1000;
-		const datestr = moment(date).format("YYYY-MM-DD HH:mm:ss");
-		console.log("清除日志:", datestr);
-		const model = this.app.model;
-		await model.logs.destroy({
-			where: {
-				createdAt: {
-					[model.Op.lt]: datestr
-				}
-			}
-		});
+		const sql = `delete from logs where DATE_SUB(NOW(), INTERVAL 3 DAY) > createdAt and id > 0`;
 
-		return Promise.resolve(true);
+		return await this.app.model.query(sql, {
+			type: this.app.model.QueryTypes.DELETE,
+		});
 	}
 }
 
