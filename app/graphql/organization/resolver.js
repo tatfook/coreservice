@@ -129,7 +129,7 @@ module.exports = {
 		},
 
 		async classrooms(root, args, ctx) {
-			return await ctx.lessonModel.classrooms.findAll({where:{classId: root.id, state: 1}}).then(o => o && o.toJSON()); 
+			return await ctx.lessonModel.classrooms.findAll({where:{classId: root.id, state: 1}}).then(list => list.map(o => o.toJSON())); 
 		},
 	},
 
