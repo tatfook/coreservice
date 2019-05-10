@@ -6,7 +6,7 @@ const Subscription = require('egg').Subscription;
 class Log extends Subscription {
 	static get schedule() {
 		return {
-			cron:"0 0 2 1/3 * *",
+			cron:"0 0 2 */3 * *",
 			type:"worker",
 			//disable:true,
 		}
