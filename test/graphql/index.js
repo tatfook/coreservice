@@ -29,6 +29,13 @@ describe("graphql", () => {
 			name:"organization",
 		});
 
+		await app.model.lessonOrganizationClasses.create({
+			organizationId:1,
+			name:"class",
+			begin: new Date(),
+			end: new Date(new Date().getTime() + 1000 * 60 * 60 * 24),
+		});
+
 		// 添加老师和学生
 		await app.model.lessonOrganizationClassMembers.bulkCreate([
 		{
@@ -55,7 +62,7 @@ describe("graphql", () => {
 	// 获取机构用户
 	it("lesson organization user", async () => {
 		const data = await app.httpRequest().post("/api/v0/graphql").send({
-			query: `query($id: Int, $name: String) {organization(id: $id, name: $name) {id, studentCount, teacherCount, count, students{userId} }}`,
+			query: `query($id: Int, $name: String) {organization(id: $id, name: $name) {id, studentCount, teacherCount, count, students{organizationId} }}`,
 			variables: {
 				id:1,
 			}
