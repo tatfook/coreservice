@@ -1,72 +1,93 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
 
+const initData = require("./data.js");
+
 describe("graphql", () => {
 	before(async () => {
-		//mock.consoleLevel('DEBUG');
-		// 初始化相关数据表
-		await app.model.users.sync({force:true});
-		await app.model.lessonOrganizations.sync({force:true});
-		await app.model.lessonOrganizationClasses.sync({force:true});
-		await app.model.lessonOrganizationClassMembers.sync({force:true});
-		await app.model.lessonOrganizationPackages.sync({force:true});
-
-		// 构建3个用户
-		await app.model.users.bulkCreate([{
-			username:"xiaoyao",
-			password:"wuxiangan",
-		}, {
-			username:"wxatest",
-			password:"wuxiangan",
-		}, {
-			username:"wxaxiaoyao",
-			password:"wuxiangan",
-		}]);
-
-		// 创建机构  id = 1 
-		await app.model.lessonOrganizations.create({
-			userId:1, 
-			name:"organization",
-		});
-
-		await app.model.lessonOrganizationClasses.create({
-			organizationId:1,
-			name:"class",
-			begin: new Date(),
-			end: new Date(new Date().getTime() + 1000 * 60 * 60 * 24),
-		});
-
-		// 添加老师和学生
-		await app.model.lessonOrganizationClassMembers.bulkCreate([
-		{
-			organizationId:1,
-			classId: 0,
-			roleId:1,
-			memberId:1,
-		},
-		{
-			organizationId:1,
-			classId: 0,
-			roleId:2,
-			memberId:2,
-		},
-		{
-			organizationId:1,
-			classId: 1,
-			roleId:3,
-			memberId:3,
-		},
-		]);
+		await initData(app);
 	});
 
-	// 获取机构用户
-	it("lesson organization user", async () => {
+	// 机构信息
+	it("lesson organization", async () => {
 		const data = await app.httpRequest().post("/api/v0/graphql").send({
-			query: `query($id: Int, $name: String) {organization(id: $id, name: $name) {id, studentCount, teacherCount, count, students{organizationId} }}`,
+			query: `query($id: Int, $name: String) {
+				organization(id: $id, name: $name) {
+					id, 
+					studentCount, 
+					teacherCount, 
+					count, 
+					students {
+						organizationId
+					},
+					teachers {
+						organizationId
+					},
+					organizationPackages {
+						package {
+							packageName,
+						},
+						lessons {
+							lessonName,
+						},
+						lessonNos
+					}
+				}
+			}`,
 			variables: {
 				id:1,
-			}
-		}).expect(200).then(res => res.body.data);
-		console.log(data);
+			},
+		}).expect(200).then(res => res.body.data).catch(e => console.log(e));
+	
+		//console.log(JSON.stringify(data, undefined, 4));
+
+		assert(data);
+		assert(data.organization);
+		assert(data.organization.id == 1);
+		assert(data.organization.studentCount == 3);
+		assert(data.organization.teacherCount == 2);
+		assert(data.organization.students.length == 3);
+		assert(data.organization.teachers.length == 3);
 	});
+
+	// 机构用户
+	it("lesson organization user", async () => {
+		const data = await app.httpRequest().post("/api/v0/graphql").send({
+			query: `query($organizationId: Int, $userId: Int, $username: String) {
+				organizationUser(organizationId: $organizationId, userId: $userId, username: $username) {
+					organizationId,
+					userId,
+					organizationClasses {
+						id, 
+						begin,
+						end,
+						classrooms {
+							id,
+							state,
+						},
+						organization {
+							name,
+						},
+						organizationPackages {
+							packageId,
+						},
+					},
+					organizationClassMembers {
+						classId,
+						roleId,
+					}
+				}
+			}`,
+			variables: {
+				organizationId:1,
+				userId:1,
+				username:"",
+			},
+		}).expect(200).then(res => res.body.data).catch(e => console.log(e));
+
+		assert(data);
+		//console.log(JSON.stringify(data, undefined, 4));
+	});
+
+	//
 });

@@ -90,14 +90,14 @@ class OrganizationConnector {
 			}
 		});
 
-		const userIds = _.map(list, o => o.memberId);
+		const userIds = _.uniq(_.map(list, o => o.memberId));
 		const users = await this.ctx.model.users.findAll({
 			attributes: ["id", "username", "nickname", "portrait"],
 			where:{id:{$in:userIds}}
 		}).then(list => list.map(o => o.toJSON()));
 		_.each(list, o => o.user = _.find(users, u => u.id == o.memberId));
 
-		console.log(list);
+		//console.log(list);
 
 		return list;
 	}
