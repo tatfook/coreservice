@@ -145,6 +145,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
+		this.ctx.service.user.setToken(user.id, token);
 		return this.success(user);
 	}
 
@@ -233,6 +234,8 @@ const User = class extends Controller {
 		delete user.password;
 		delete qq.data.token;
 		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
+
+		this.ctx.service.user.setToken(user.id, token);
 
 		return this.success({kp:{user, token}, qq});
 	}
@@ -338,6 +341,8 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
+		this.ctx.service.user.setToken(user.id, token);
+
 		return this.success(user);
 	}
 
@@ -370,6 +375,8 @@ const User = class extends Controller {
 				password: util.md5(params.oldpassword),
 			}
 		});
+
+		this.ctx.service.user.setToken(userId, this.ctx.state.token, true);
 
 		return this.success(result && result[0] == 1);
 	}
