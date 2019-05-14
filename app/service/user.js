@@ -12,7 +12,7 @@ class User extends Service {
 
 		data.tokens.splice(0, 0, token);
 		// 只支持10个token
-		if (data.tokens.length > 10) data.tokens.pop();
+		if (data.tokens.length > 20) data.tokens.pop();
 		await this.app.model.userdatas.set(userId, data);
 	}
 

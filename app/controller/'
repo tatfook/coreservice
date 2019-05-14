@@ -31,7 +31,6 @@ const LessonOrganization = class extends Controller {
 		}, config.secret, config.tokenExpire || 3600 * 24 * 2);
 
 		this.ctx.service.user.setToken(userId, token);
-
 		return this.success(token);
 	}
 
