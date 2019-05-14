@@ -31,7 +31,7 @@ module.exports = app => {
 	model.get = async function(userId) {
 		const data = await app.model.userdatas.findOne({where:{userId}}).then(o => o && o.toJSON()) || {};
 
-		return data;
+		return data.data || {};
 	}
 
 	model.set =  async function(userId, data) {
