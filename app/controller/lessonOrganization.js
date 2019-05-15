@@ -303,23 +303,18 @@ const LessonOrganization = class extends Controller {
 		return this.success(list);
 	}
 
-	async getPackage(packageId, classId) {
-		const {userId, organizationId, roleId} = this.authenticated();
+	async getPackage(packageId, classId, roleId) {
+		const {userId, organizationId} = this.authenticated();
 		let list = [];
-		if (classId) {
+		if (classId !== undefined) {
 			list = await this.model.lessonOrganizationPackages.findAll({where: {organizationId, packageId, classId}}).then(list => _.map(list, o => o.toJSON()));
 		} else {
+			const classes = await this.model.lessonOrganizationClassMembers.getClasses({memberId: userId, roleId, organizationId});
 			list = await this.model.lessonOrganizationPackages.findAll({
-				include: [
-				{
-					as: "lessonOrganizationClassMembers",
-					model: this.model.lessonOrganizationClassMembers,
-					where: {memberId: userId},
-				},
-				],
 				where: {
 					organizationId,
 					packageId,
+					classId:{$in: _.map(classes, o => o.id)},
 				}
 			}).then(list => _.map(list, o => o.toJSON()));
 		}
@@ -331,10 +326,10 @@ const LessonOrganization = class extends Controller {
 
 	// 课程包详情页
 	async packageDetail() {
-		const {userId, organizationId, roleId} = this.authenticated();
-		const {packageId, classId = 0} = this.validate({packageId: "number", "classId":"number_optional"});
+		const {userId, organizationId} = this.authenticated();
+		const {packageId, classId, roleId = 1} = this.validate({packageId: "number", "classId":"number_optional", roleId:"number_optional"});
 
-		const pkg = await this.getPackage(packageId, classId);
+		const pkg = await this.getPackage(packageId, classId, roleId);
 		if (!pkg) return this.throw(400);
 
 		const pkginfo = await this.app.lessonModel.packages.findOne({where:{id: pkg.packageId}}).then(o => o && o.toJSON());
