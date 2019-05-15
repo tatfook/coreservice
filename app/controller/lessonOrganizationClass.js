@@ -115,6 +115,12 @@ const LessonOrganizationClass = class extends Controller {
 		return this.success(cls);
 	}
 	
+	async checkLimit(id) {
+		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id}}).then(o => o && o.toJSON());
+		if (!cls) return;
+
+		if (new Date(cls.end).getTime() > new Date().getTime()) return;
+	}
 	// 禁止更新
 	async update() {
 		const {roleId, organizationId} = this.authenticated();
@@ -122,6 +128,8 @@ const LessonOrganizationClass = class extends Controller {
 		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
 		delete params.organizationId;
+
+		await this.checkLimit();
 		await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
 
 		if (params.packages) {
