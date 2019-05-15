@@ -115,12 +115,6 @@ const LessonOrganizationClass = class extends Controller {
 		return this.success(cls);
 	}
 	
-	async checkLimit(id) {
-		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id}}).then(o => o && o.toJSON());
-		if (!cls) return;
-
-		if (new Date(cls.end).getTime() > new Date().getTime()) return;
-	}
 	// 禁止更新
 	async update() {
 		const {roleId, organizationId} = this.authenticated();
@@ -129,8 +123,18 @@ const LessonOrganizationClass = class extends Controller {
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
 		delete params.organizationId;
 
-		await this.checkLimit();
-		await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
+		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id:params.id}}).then(o => o && o.toJSON());
+		// 针对过期班级做检查
+		if (new Date(cls.end).getTime() < new Date().getTime()) {
+			const organ = await this.model.lessonOrganizations.findOne({where:{id: cls.organizationId}}).then(o => o && o.toJSON());
+			await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
+			const studentCount = await this.model.lessonOrganizations.getStudentCount(cls.organizationId);
+			if (studentCount > organ.count) {
+				// 还原修改
+				await this.model.lessonOrganizationClasses.update(cls, {where:{id: params.id}});
+				return this.fail({code: -1, message:"人数已超上限"});
+			}
+		}
 
 		if (params.packages) {
 			const datas = [];
