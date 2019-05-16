@@ -20,9 +20,10 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async teacher() {
 		const {organizationId} = this.authenticated();
+		const {classId} = this.validate({classId:"number_optional"});
 		//const organizationId = 25;
 
-		const members = await this.model.lessonOrganizations.getMembers(organizationId, 2);
+		const members = await this.model.lessonOrganizations.getMembers(organizationId, 2, classId);
 		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 
@@ -71,7 +72,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const {organizationId} = this.authenticated();
 		//const organizationId = 15;
 		const {classId} = this.validate({classId:"number_optional"});
-		const members = await this.model.lessonOrganizations.getMembers(organizationId, 1);
+		const members = await this.model.lessonOrganizations.getMembers(organizationId, 1, classId);
 		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 		const curtime = new Date();

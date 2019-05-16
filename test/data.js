@@ -29,6 +29,8 @@ const datas = {
 	],
 
 	favorites:[],
+	illegalUsers:[],
+	userinfos:[],
 
 	// 机构
 	lessonOrganizations: [
@@ -61,6 +63,12 @@ const datas = {
 		name: "class3",
 		begin: new Date(),
 		end: new Date(new Date().getTime() + 1000 * 60 * 60 * 30),
+	},
+	{
+		organizationId: 1,
+		name: "class4",
+		begin: new Date("2019-01-01"),
+		end: new Date("2019-04-01"),
 	},
 	],
 	
@@ -101,6 +109,12 @@ const datas = {
 		classId: 1,
 		roleId:3,
 		memberId:3,
+	},
+	{
+		organizationId:1,
+		classId: 4,
+		roleId:3,
+		memberId:2,
 	},
 	],
 
