@@ -67,7 +67,7 @@ class OrganizationConnector {
 	}
 
 	async fetchOrganizationUserCount({organizationId, classId, roleId}) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = :organizationId and roleId & :roleId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId)) group by memberId) as t`;
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = :organizationId and roleId & :roleId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
@@ -80,7 +80,7 @@ class OrganizationConnector {
 	}
 	
 	async fetchOrganizationMembers({organizationId, classId, roleId}) {
-		const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = :organizationId and roleId & :roleId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId))`;
+		const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = :organizationId and roleId & :roleId and classId ${classId == undefined ? ">= 0" : ("=" + classId)} and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp()))`;
 		const list = await this.ctx.model.query(sql, {
 			type: this.ctx.model.QueryTypes.SELECT,
 			replacements: {
