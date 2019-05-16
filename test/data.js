@@ -1,23 +1,34 @@
+const md5 = require("blueimp-md5");
+
 const datas = {
 	// 用户
 	users: [
 	{
 		username:"user001",
-		password:"123456",
+		password:md5("123456"),
 	},
 	{
 		username:"user002",
-		password:"123456",
+		password:md5("123456"),
 	},
 	{
 		username:"user003",
-		password:"123456",
+		password:md5("123456"),
 	},
 	{
 		username:"user004",
-		password:"123456",
+		password:md5("123456"),
 	},
 	],
+
+	userdatas: [
+	{
+		userId:1,
+		data:{},
+	},
+	],
+
+	favorites:[],
 
 	// 机构
 	lessonOrganizations: [
@@ -55,6 +66,12 @@ const datas = {
 	
 	// 班级成员
 	lessonOrganizationClassMembers: [
+	{
+		organizationId:1,
+		classId: 0,
+		roleId:64,
+		memberId:1,
+	},
 	{
 		organizationId:1,
 		classId: 0,
@@ -174,17 +191,29 @@ const datas = {
 		lessonId:3,
 	},
 	],
+
+	// 课堂
+	classrooms: [
+	{
+		userId:3,
+		classId:1,
+		packageId: 2,
+		lessonId:2,
+		key:"123456",
+		state: 1,
+	},
+	],
 }
 
 module.exports = async (app) => {
 	for (let key in datas) {
 		if (app.model[key]){
 			await app.model[key].sync({force:true});
-			await app.model[key].bulkCreate(datas[key]);
+			datas[key].length && await app.model[key].bulkCreate(datas[key]);
 		} 
 		if (app.lessonModel[key]){
 			await app.lessonModel[key].sync({force:true});
-			await app.lessonModel[key].bulkCreate(datas[key]);
+			datas[key].length && await app.lessonModel[key].bulkCreate(datas[key]);
 		} 
 	}
 }

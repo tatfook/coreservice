@@ -31,15 +31,16 @@ module.exports = (options, app) => {
 		ctx.state.token = token;
 		try {
 			ctx.state.user = token ? app.util.jwt_decode(token, config.secret, false) : {};
-			console.log(ctx.state.user);
-			if (app.config.env !== "unittest") {
+			//if (app.config.env !== "unittest") {
 				const isValid = await ctx.service.user.validateToken(ctx.state.user.userId, token);
 				//console.log(isValid, token);
 				if (!isValid) ctx.state.user = {};
-			}
+			//}
 		} catch(e) {
 			ctx.state.user = {};
 		}
+
+		//console.log(ctx.state.user);
 
 		try {
 			ctx.state.admin = token ? app.util.jwt_decode(token, config.adminSecret, false) : {};

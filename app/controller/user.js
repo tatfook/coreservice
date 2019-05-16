@@ -33,7 +33,7 @@ const User = class extends Controller {
 			appId: appId,
 		}, config.secret, tokenExpire);
 
-		console.log(token);
+		//console.log(token);
 
 		return this.success(token);
 	}
@@ -145,7 +145,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
-		this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(user.id, token);
 		return this.success(user);
 	}
 
@@ -235,7 +235,7 @@ const User = class extends Controller {
 		delete qq.data.token;
 		const token = this.app.util.jwt_encode(payload, config.secret, config.tokenExpire);
 
-		this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(user.id, token);
 
 		return this.success({kp:{user, token}, qq});
 	}
@@ -341,7 +341,7 @@ const User = class extends Controller {
 			domain: "." + config.domain,
 		});
 
-		this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(user.id, token);
 
 		return this.success(user);
 	}
@@ -376,7 +376,7 @@ const User = class extends Controller {
 			}
 		});
 
-		this.ctx.service.user.setToken(userId, this.ctx.state.token, true);
+		await this.ctx.service.user.setToken(userId, this.ctx.state.token, true);
 
 		return this.success(result && result[0] == 1);
 	}

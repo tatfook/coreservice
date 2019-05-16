@@ -30,7 +30,7 @@ const LessonOrganization = class extends Controller {
 			organizationId,
 		}, config.secret, config.tokenExpire || 3600 * 24 * 2);
 
-		this.ctx.service.user.setToken(userId, token);
+		await this.ctx.service.user.setToken(userId, token);
 
 		return this.success(token);
 	}
@@ -80,7 +80,8 @@ const LessonOrganization = class extends Controller {
 		user.organizationId = organizationId;
 		delete user.password;
 
-		this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(user.id, token);
+
 		return this.success(user);
 	}
 
