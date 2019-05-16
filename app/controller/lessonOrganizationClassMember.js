@@ -23,7 +23,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		//const organizationId = 25;
 
 		const members = await this.model.lessonOrganizations.getMembers(organizationId, 2);
-		const memberIds = members.map(o => o.id);
+		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 
 		const curtime = new Date();
@@ -68,11 +68,11 @@ const LessonOrganizationClassMember = class extends Controller {
 	}
 
 	async student() {
-		const {organizationId} = this.authenticated();
+		//const {organizationId} = this.authenticated();
 		//const organizationId = 25;
 		const {classId} = this.validate({classId:"number_optional"});
 		const members = await this.model.lessonOrganizations.getMembers(organizationId, 1);
-		const memberIds = members.map(o => o.id);
+		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
