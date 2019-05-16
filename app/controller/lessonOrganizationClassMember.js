@@ -70,7 +70,7 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async student() {
 		const {organizationId} = this.authenticated();
-		//const organizationId = 15;
+		//const organizationId = 11;
 		const {classId} = this.validate({classId:"number_optional"});
 		const members = await this.model.lessonOrganizations.getMembers(organizationId, 1, classId);
 		const memberIds = members.map(o => o.memberId);

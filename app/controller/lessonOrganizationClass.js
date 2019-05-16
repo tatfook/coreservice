@@ -124,6 +124,7 @@ const LessonOrganizationClass = class extends Controller {
 		delete params.organizationId;
 
 		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id:params.id}}).then(o => o && o.toJSON());
+		if (!cls) return this.throw(400);
 		// 针对过期班级做检查
 		if (new Date(cls.end).getTime() < new Date().getTime()) {
 			const organ = await this.model.lessonOrganizations.findOne({where:{id: cls.organizationId}}).then(o => o && o.toJSON());
