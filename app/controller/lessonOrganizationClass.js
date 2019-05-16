@@ -134,6 +134,8 @@ const LessonOrganizationClass = class extends Controller {
 				await this.model.lessonOrganizationClasses.update(cls, {where:{id: params.id}});
 				return this.fail({code: -1, message:"人数已超上限"});
 			}
+		} else {
+			await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
 		}
 
 		if (params.packages) {
