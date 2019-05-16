@@ -214,6 +214,10 @@ module.exports = app => {
 	const paracraftNews = controller.paracrafNews;
 	router.get(`${prefix}paracraftNews`, paracraftVisitor.index);
 
+	// 反馈 投诉 举报
+	const feedback = controller.feedback;
+	router.resources(`${prefix}feedbacks`, feedback);
+
 	// wikicraft proxy
 	router.all("/api/wiki/models/user/login", controller.proxyUser.login);
 	router.all("/api/wiki/models/user/register", controller.proxyUser.register);

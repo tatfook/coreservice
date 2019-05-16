@@ -5,6 +5,29 @@ use `lesson-dev`;
 use `lesson-rls`;
 use `keepwork`;
 
+CREATE TABLE `userdatas` (
+  `userId` bigint(20) NOT NULL,
+  `data` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`userId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+CREATE TABLE `feedbacks` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) DEFAULT '0',
+  `username` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `type` int(11) DEFAULT '0',
+  `url` text COLLATE utf8mb4_bin,
+  `description` text COLLATE utf8mb4_bin,
+  `state` int(11) DEFAULT '0',
+  `result` int(11) DEFAULT '0',
+  `handle` bigint(20) DEFAULT '0',
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+-- -----------------------------------------------------------------------------------
+
 alter table lessonOrganizationClasses add column begin datetime;
 alter table lessonOrganizationClasses add column end datetime;
 update lessonOrganizationClasses set begin = "2019-01-01" where id > 0;

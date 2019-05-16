@@ -20,9 +20,11 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async teacher() {
 		const {organizationId} = this.authenticated();
+		const {classId} = this.validate({classId:"number_optional"});
+		//const organizationId = 25;
 
-		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_TEACHER} group by memberId`;
-		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
+		const members = await this.model.lessonOrganizations.getMembers(organizationId, 2, classId);
+		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 
 		const curtime = new Date();
@@ -68,9 +70,10 @@ const LessonOrganizationClassMember = class extends Controller {
 
 	async student() {
 		const {organizationId} = this.authenticated();
+		//const organizationId = 11;
 		const {classId} = this.validate({classId:"number_optional"});
-		const sql = `select memberId from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & ${CLASS_MEMBER_ROLE_STUDENT} and classId ${classId ? ("=" + classId) : ("> 0")} group by memberId`;
-		const memberIds = await this.model.query(sql, {type:this.model.QueryTypes.SELECT}).then(list => _.map(list, o => o.memberId));
+		const members = await this.model.lessonOrganizations.getMembers(organizationId, 1, classId);
+		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 		const curtime = new Date();
 		const list = await this.model.lessonOrganizationClassMembers.findAll({
@@ -80,8 +83,7 @@ const LessonOrganizationClassMember = class extends Controller {
 				attributes: ["id", "username", "nickname", "portrait"],
 				model: this.model.users,
 			},
-			{
-				as: "lessonOrganizationClasses",
+			{ as: "lessonOrganizationClasses",
 				model: this.model.lessonOrganizationClasses,
 				where: {
 					//begin: {$lte: curtime},
@@ -93,11 +95,8 @@ const LessonOrganizationClassMember = class extends Controller {
 			where: {
 				organizationId,
 				memberId: {$in: memberIds}
-				//classId: classId ? classId : {$gt: 0},
-				//roleId: CLASS_MEMBER_ROLE_STUDENT,
 			},
 		}).then(list => list.map(o => o.toJSON()));
-		//}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
 		const map = {};
 		const rows = [];
 		let count = 0;

@@ -122,7 +122,23 @@ const LessonOrganizationClass = class extends Controller {
 		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
 		delete params.organizationId;
-		await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
+
+		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id:params.id}}).then(o => o && o.toJSON());
+		if (!cls) return this.throw(400);
+		// 针对过期班级做检查
+		if (new Date(cls.end).getTime() < new Date().getTime()) {
+			const organ = await this.model.lessonOrganizations.findOne({where:{id: cls.organizationId}}).then(o => o && o.toJSON());
+			await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
+			const studentCount = await this.model.lessonOrganizations.getStudentCount(cls.organizationId);
+			if (studentCount > organ.count) {
+				// 还原修改
+				await this.model.lessonOrganizationClasses.update(cls, {where:{id: params.id}});
+				return this.fail({code: -1, message:"人数已超上限"});
+				//return this.throw(400, {code: -1, message:"人数已超上限"});
+			}
+		} else {
+			await this.model.lessonOrganizationClasses.update(params, {where:{id: params.id}});
+		}
 
 		if (params.packages) {
 			const datas = [];

@@ -92,13 +92,25 @@ module.exports = app => {
 	
 	//获取机构已用人数
 	model.getUsedCount = async function(organizationId) {
-		const sql = `select count(*) as count from (select memberId from lessonOrganizationClassMembers as locm, lessonOrganizationClasses as loc
-				where locm.organizationId = ${organizationId} and roleId & 1 
-				and (locm.classId = 0 or (locm.classId =  loc.id and loc.begin <= current_timestamp() and loc.end >= current_timestamp() )) 
-				group by memberId) as alias`
-		//const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers where organizationId = ${organizationId} and roleId & 1 group by memberId) as alias`;
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 1 and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
 		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
 		return list[0].count || 0;
+	}
+
+	model.getStudentCount = async function(organizationId) {
+		return await this.getMemberCount(organizationId, 1);
+	}
+
+	model.getMemberCount = async function(organizationId, roleId, classId) {
+		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId == undefined ? ">= 0" : ("= " + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
+		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
+		return list[0].count || 0;
+	}
+
+	model.getMembers = async function(organizationId, roleId, classId) {
+		const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId == undefined ? ">= 0" : ("= " + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId`;
+		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
+		return list;
 	}
 
 	app.model.lessonOrganizations = model;
