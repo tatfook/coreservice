@@ -1,7 +1,7 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
 
-const initData = require("./data.js");
+const initData = require("../data.js");
 
 describe("graphql", () => {
 	before(async () => {
