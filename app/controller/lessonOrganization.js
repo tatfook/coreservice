@@ -148,7 +148,6 @@ const LessonOrganization = class extends Controller {
 			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
 		}
 
-
 		return this.success(organ);
 	}
 	
