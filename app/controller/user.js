@@ -36,7 +36,7 @@ const User = class extends Controller {
 
 		//console.log(token);
 
-		await this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(user.userId, token);
 
 		return this.success(token);
 	}
