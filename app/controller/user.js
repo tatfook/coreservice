@@ -23,9 +23,10 @@ const User = class extends Controller {
 		}
 	}
 
-	token() {
+	async token() {
 		const {appId} = this.validate({appId:"int_optional"});
-		const user = this.getUser();
+		//const user = this.getUser();
+		const user = this.authenticated();
 		const config = this.app.config.self;
 		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
 		const token = this.app.util.jwt_encode({
@@ -34,6 +35,8 @@ const User = class extends Controller {
 		}, config.secret, tokenExpire);
 
 		//console.log(token);
+
+		await this.ctx.service.user.setToken(user.userId, token);
 
 		return this.success(token);
 	}
