@@ -149,6 +149,8 @@ const User = class extends Controller {
 		});
 
 		await this.ctx.service.user.setToken(user.id, token);
+
+		user.password = undefined;
 		return this.success(user);
 	}
 
@@ -240,6 +242,7 @@ const User = class extends Controller {
 
 		await this.ctx.service.user.setToken(user.id, token);
 
+		user.password = undefined;
 		return this.success({kp:{user, token}, qq});
 	}
 
@@ -346,6 +349,7 @@ const User = class extends Controller {
 
 		await this.ctx.service.user.setToken(user.id, token);
 
+		user.password = undefined;
 		return this.success(user);
 	}
 
