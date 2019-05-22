@@ -5,6 +5,7 @@ module.exports = app => {
     BIGINT,
     STRING,
     JSON,
+    DATE,
   } = app.Sequelize;
 
   const model = app.model.define('caches', {
@@ -27,6 +28,16 @@ module.exports = app => {
     expire: {
       type: BIGINT,
       defaultValue: 0,
+    },
+
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
     },
 
   }, {

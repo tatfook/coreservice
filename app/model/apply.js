@@ -21,6 +21,7 @@ module.exports = app => {
     INTEGER,
     STRING,
     JSON,
+    DATE,
   } = app.Sequelize;
 
   const model = app.model.define('applies', {
@@ -68,6 +69,16 @@ module.exports = app => {
     extra: {
       type: JSON,
       defaultValue: {},
+    },
+
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
     },
 
   }, {

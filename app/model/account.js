@@ -7,6 +7,7 @@ module.exports = app => {
     BIGINT,
     INTEGER,
     DECIMAL,
+    DATE,
   } = app.Sequelize;
 
   const model = app.model.define('accounts', {
@@ -43,6 +44,16 @@ module.exports = app => {
     lockCoin: { // 待解锁的知识币
       type: INTEGER,
       defaultValue: 0,
+    },
+
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
     },
 
   }, {

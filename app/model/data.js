@@ -6,6 +6,7 @@ module.exports = app => {
   const {
     BIGINT,
     JSON,
+    DATE,
   } = app.Sequelize;
 
   const model = app.model.define('datas', {
@@ -25,6 +26,17 @@ module.exports = app => {
       type: JSON,
       defaultValue: {},
     },
+
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
   }, {
     underscored: false,
     charset: 'utf8mb4',
