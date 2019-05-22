@@ -1,82 +1,79 @@
-
-const _ = require("lodash");
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    STRING,
+    JSON,
+  } = app.Sequelize;
 
-	const model = app.model.define("admins", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		username: {
-			type: STRING(48),
-			unique: true,
-			allowNull: false,
-		},
+  const model = app.model.define('admins', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		password: {
-			type: STRING(48),
-			allowNull: false,
-		},
+    username: {
+      type: STRING(48),
+      unique: true,
+      allowNull: false,
+    },
 
-		roleId: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    password: {
+      type: STRING(48),
+      allowNull: false,
+    },
 
-		email: {
-			type: STRING(64),
-			unique: true,
-		},
+    roleId: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		cellphone: {
-			type: STRING(24),
-			unique: true,
-		},
+    email: {
+      type: STRING(64),
+      unique: true,
+    },
 
-		realname: {
-			type: STRING(24),
-		},
+    cellphone: {
+      type: STRING(24),
+      unique: true,
+    },
 
-		nickname: {
-			type: STRING(48),
-		},
+    realname: {
+      type: STRING(24),
+    },
 
-		portrait: {
-			type: STRING(1024),
-		},
+    nickname: {
+      type: STRING(48),
+    },
 
-		sex: {
-			type: STRING(4),
-		},
+    portrait: {
+      type: STRING(1024),
+    },
 
-		description: {
-			type: STRING(512),
-		},
+    sex: {
+      type: STRING(4),
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+    description: {
+      type: STRING(512),
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	//model.sync({force:true});
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-	app.model.admins = model;
-	return model;
+  // model.sync({force:true});
+
+  app.model.admins = model;
+  return model;
 };
