@@ -54,6 +54,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('events');
+    return queryInterface.dropTable(tableName);
   },
 };

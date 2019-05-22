@@ -1,5 +1,7 @@
 'use strict';
 
+const tableName = 'comments';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     const {
@@ -11,7 +13,7 @@ module.exports = {
       DATE,
     } = Sequelize;
 
-    return queryInterface.createTable('comments', {
+    return queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -61,6 +63,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('comments');
+    return queryInterface.dropTable(tableName);
   },
 };

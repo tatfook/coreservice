@@ -1,5 +1,7 @@
 'use strict';
 
+const tableName = 'domains';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     const {
@@ -7,7 +9,7 @@ module.exports = {
       STRING,
       DATE,
     } = Sequelize;
-    return queryInterface.createTable('domains', {
+    return queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -48,6 +50,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('domains');
+    return queryInterface.dropTable(tableName);
   },
 };

@@ -1,7 +1,9 @@
 'use strict';
 
+const tableName = 'contributions';
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize) => {
     const {
       BIGINT,
       INTEGER,
@@ -9,7 +11,7 @@ module.exports = {
       DATE,
     } = Sequelize;
 
-    return queryInterface.createTable('contributions', {
+    await queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -53,9 +55,11 @@ module.exports = {
         },
       ],
     });
+
+    return queryInterface.addIndex(tableName, [ 'userId', 'year' ]);
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('contributions');
+    return queryInterface.dropTable(tableName);
   },
 };

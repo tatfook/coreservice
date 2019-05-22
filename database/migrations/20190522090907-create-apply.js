@@ -1,7 +1,9 @@
 'use strict';
 
+const tableName = 'applies';
+
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize) => {
     const {
       BIGINT,
       INTEGER,
@@ -10,7 +12,7 @@ module.exports = {
       DATE,
     } = Sequelize;
 
-    return queryInterface.createTable('applies', {
+    await queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -77,9 +79,13 @@ module.exports = {
         fields: [ 'objectId', 'objectType', 'applyId', 'applyType' ],
       }],
     });
+
+    return queryInterface.addIndex(tableName, [
+      'objectId', 'objectType', 'applyId', 'applyType',
+    ]);
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('applies');
+    return queryInterface.dropTable(tableName);
   },
 };

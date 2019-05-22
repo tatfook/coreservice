@@ -1,5 +1,7 @@
 'use strict';
 
+const tableName = 'caches';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     const {
@@ -9,7 +11,7 @@ module.exports = {
       DATE,
     } = Sequelize;
 
-    return queryInterface.createTable('caches', {
+    return queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -49,6 +51,6 @@ module.exports = {
   },
 
   down: queryInterface => {
-    return queryInterface.dropTable('caches');
+    return queryInterface.dropTable(tableName);
   },
 };
