@@ -1,73 +1,63 @@
-
-const _ = require("lodash");
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    STRING,
+    JSON,
+  } = app.Sequelize;
 
-	const model = app.model.define("caches", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		key: {  // 文件所属者
-			type: STRING,
-			allowNull: false,
-			unique: true,
-		},
+  const model = app.model.define('caches', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		value: {
-			type:JSON,
-		},
+    key: { // 文件所属者
+      type: STRING,
+      allowNull: false,
+      unique: true,
+    },
 
-		expire: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    value: {
+      type: JSON,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    expire: {
+      type: BIGINT,
+      defaultValue: 0,
+    },
 
-	//model.sync({force:true});
-	
-	model.get = async function(key) {
-		let data = await app.model.caches.findOne({where:{key}});
-		if (!data) return console.log("cache not found");
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-		data = data.get({plain:true});
+  model.get = async function(key) {
+    let data = await app.model.caches.findOne({ where: { key } });
+    if (!data) return console.log('cache not found');
 
-		const curtime = (new Date()).getTime();
+    data = data.get({ plain: true });
 
-		if (data.expire && curtime > data.expire) return;
+    const curtime = (new Date()).getTime();
 
-		return data.value;
-	}
+    if (data.expire && curtime > data.expire) return;
 
-	model.put = async function(key, value, expire) {
-		return await this.set(key, value, expire);
-	}
-	
-	model.set = async function(key, value, expire) {
-		if (expire) expire += (new Date()).getTime();
+    return data.value;
+  };
 
-		await app.model.caches.upsert({key, value, expire});
-	}
+  model.put = async function(key, value, expire) {
+    return await this.set(key, value, expire);
+  };
 
-	app.model.caches = model;
-	return model;
+  model.set = async function(key, value, expire) {
+    if (expire) expire += (new Date()).getTime();
+
+    await app.model.caches.upsert({ key, value, expire });
+  };
+
+  app.model.caches = model;
+  return model;
 };
-
-
-
