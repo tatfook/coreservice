@@ -1,93 +1,87 @@
-const _ = require("lodash");
+'use strict';
+
+const _ = require('lodash');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    JSON,
+  } = app.Sequelize;
 
-	const model = app.model.define("contributions", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 评论者
-			type: BIGINT,
-			allowNull: false,
-		},
+  const model = app.model.define('contributions', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		year: {
-			type: INTEGER,
-			defaultValue:0,
-		},
+    userId: { // 评论者
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		data: {
-			type: JSON,
-			defaultValue:{},
-		}
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+    year: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "year"],
-		},
-		],
-	});
+    data: {
+      type: JSON,
+      defaultValue: {},
+    },
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.addContributions = async function(userId, count = 1) {
-		const date = new Date();
-		const year = date.getFullYear();
-		const key = date.getFullYear() + '-' + _.padStart(date.getMonth() + 1, 2, "0") + '-' + _.padStart(date.getDate(), 2, "0");
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'userId', 'year' ],
+      },
+    ],
+  });
 
-		let data = await app.model.contributions.findOne({where:{userId, year}});
-		if (data) data = data.get({plain:true});
-		else data = {userId, year, data:{}};
+  model.addContributions = async function(userId, count = 1) {
+    const date = new Date();
+    const year = date.getFullYear();
+    const key = date.getFullYear() + '-' + _.padStart(date.getMonth() + 1, 2, '0') + '-' + _.padStart(date.getDate(), 2, '0');
 
-		data.data[key] = (data.data[key] || 0) + count;
+    let data = await app.model.contributions.findOne({ where: { userId, year } });
+    if (data) data = data.get({ plain: true });
+    else data = { userId, year, data: {} };
 
-		await app.model.contributions.upsert(data);
+    data.data[key] = (data.data[key] || 0) + count;
 
-		// 增加用户总的活跃度
-		await app.model.userRanks.increment({active: count}, {where:{userId}});
+    await app.model.contributions.upsert(data);
 
-		return;
-	}
+    // 增加用户总的活跃度
+    await app.model.userRanks.increment({ active: count }, { where: { userId } });
 
-	model.getByUserId = async function(userId, years = []) {
-		const date = new Date();
-		const year = date.getFullYear();
+    return;
+  };
 
-		years = years.length == 0 ? [year, year-1] : years;
-		const datas = await app.model.contributions.findAll({where:{
-			userId,
-			year: {
-				[app.Sequelize.Op.in]: years,
-			},
-		}});
-		
-		const data = {};
-		_.each(datas, o => _.merge(data, o.data));
+  model.getByUserId = async function(userId, years = []) {
+    const date = new Date();
+    const year = date.getFullYear();
 
-		return data;
-	}
+    years = years.length === 0 ? [ year, year - 1 ] : years;
+    const datas = await app.model.contributions.findAll({ where: {
+      userId,
+      year: {
+        [app.Sequelize.Op.in]: years,
+      },
+    } });
 
-	app.model.contributions = model;
+    const data = {};
+    _.each(datas, o => _.merge(data, o.data));
 
-	return model;
+    return data;
+  };
+
+  app.model.contributions = model;
+
+  return model;
 };
 
