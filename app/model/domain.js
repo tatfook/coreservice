@@ -4,6 +4,7 @@ module.exports = app => {
   const {
     BIGINT,
     STRING,
+    DATE,
   } = app.Sequelize;
 
   const model = app.model.define('domains', {
@@ -26,6 +27,16 @@ module.exports = app => {
 
     siteId: {
       type: BIGINT,
+      allowNull: false,
+    },
+
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
+
+    updatedAt: {
+      type: DATE,
       allowNull: false,
     },
 
