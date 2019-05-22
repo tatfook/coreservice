@@ -1,60 +1,57 @@
+'use strict';
 
-const _ = require("lodash");
+const _ = require('lodash');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    JSON,
+  } = app.Sequelize;
 
-	const model = app.model.define("datas", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 评论者
-			type: BIGINT,
-			allowNull: false,
-			unique: true,
-		},
+  const model = app.model.define('datas', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		data: {
-			type: JSON,
-			defaultValue: {},
-		},
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    userId: { // 评论者
+      type: BIGINT,
+      allowNull: false,
+      unique: true,
+    },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.put = async function(userId, data) {
-		const olddata = await this.get(userId);
-		_.merge(olddata, data);
-		return await this.set(userId, olddata);
-	}
+    data: {
+      type: JSON,
+      defaultValue: {},
+    },
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-	model.set = async function(userId, data = {}) {
-		return await app.model.datas.update({data}, {where:{userId}});
-	}
+  // model.sync({force:true}).then(() => {
+  // console.log("create table successfully");
+  // });
 
-	model.get = async function(userId) {
-		const data = await app.model.datas.findOne({where:{userId}});
+  model.put = async function(userId, data) {
+    const olddata = await this.get(userId);
+    _.merge(olddata, data);
+    return await this.set(userId, olddata);
+  };
 
-		return data ? data.get({plain:true}).data : {};
-	}
+  model.set = async function(userId, data = {}) {
+    return await app.model.datas.update({ data }, { where: { userId } });
+  };
 
-	app.model.datas = model;
-	return model;
+  model.get = async function(userId) {
+    const data = await app.model.datas.findOne({ where: { userId } });
+
+    return data ? data.get({ plain: true }).data : {};
+  };
+
+  app.model.datas = model;
+  return model;
 };
 
