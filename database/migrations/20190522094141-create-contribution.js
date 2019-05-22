@@ -6,6 +6,7 @@ module.exports = {
       BIGINT,
       INTEGER,
       JSON,
+      DATE,
     } = Sequelize;
 
     return queryInterface.createTable('contributions', {
@@ -29,6 +30,17 @@ module.exports = {
         type: JSON,
         defaultValue: {},
       },
+
+      createdAt: {
+        type: DATE,
+        allowNull: false,
+      },
+
+      updatedAt: {
+        type: DATE,
+        allowNull: false,
+      },
+
     }, {
       underscored: false,
       charset: 'utf8mb4',

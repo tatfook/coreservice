@@ -7,6 +7,7 @@ module.exports = {
       INTEGER,
       STRING,
       JSON,
+      DATE,
     } = Sequelize;
     return queryInterface.createTable('discounts', {
       id: {
@@ -81,6 +82,16 @@ module.exports = {
       extra: {
         type: JSON,
         defaultValue: {},
+      },
+
+      createdAt: {
+        type: DATE,
+        allowNull: false,
+      },
+
+      updatedAt: {
+        type: DATE,
+        allowNull: false,
       },
 
     }, {

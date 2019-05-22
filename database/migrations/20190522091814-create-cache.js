@@ -6,6 +6,7 @@ module.exports = {
       BIGINT,
       STRING,
       JSON,
+      DATE,
     } = Sequelize;
 
     return queryInterface.createTable('caches', {
@@ -28,6 +29,16 @@ module.exports = {
       expire: {
         type: BIGINT,
         defaultValue: 0,
+      },
+
+      createdAt: {
+        type: DATE,
+        allowNull: false,
+      },
+
+      updatedAt: {
+        type: DATE,
+        allowNull: false,
       },
 
     }, {

@@ -6,6 +6,7 @@ module.exports = {
       BIGINT,
       INTEGER,
       DECIMAL,
+      DATE,
     } = Sequelize;
 
     return queryInterface.createTable('accounts', {
@@ -39,6 +40,16 @@ module.exports = {
       lockCoin: { // 待解锁的知识币
         type: INTEGER,
         defaultValue: 0,
+      },
+
+      createdAt: {
+        type: DATE,
+        allowNull: false,
+      },
+
+      updatedAt: {
+        type: DATE,
+        allowNull: false,
       },
 
     }, {
