@@ -19,3 +19,5 @@ run/
 config/config.*.js
 
 yarn.lock
+
+database/config/config.js
