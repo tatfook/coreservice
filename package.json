@@ -35,14 +35,16 @@
   },
   "devDependencies": {
     "egg-bin": "^4.8.1",
-    "egg-mock": "^3.17.3"
+    "egg-mock": "^3.17.3",
+    "eslint": "^4.11.0",
+    "eslint-config-egg": "^6.0.0",
+    "sequelize-cli": "^5.4.0"
   },
   "scripts": {
     "dev": "egg-bin dev",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
     "start": "egg-scripts start",
-    "test": "egg-bin test ",
-    "migration": "node ./node_modules/sequelize-cli/lib/sequelize"
+    "test": "egg-bin test "
   },
   "repository": {
     "type": "git",
