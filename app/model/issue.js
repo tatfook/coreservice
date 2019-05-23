@@ -1,199 +1,205 @@
-const _ = require("lodash");
+'use strict';
+
+const _ = require('lodash');
 
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_PROJECT,
-
-	PROJECT_PRIVILEGE_RECRUIT_ENABLE,
-	PROJECT_PRIVILEGE_RECRUIT_DISABLE,
-
-	PROJECT_TYPE_PARACRAFT,
-	PROJECT_TYPE_SITE
-} = require("../core/consts.js");
+  ENTITY_TYPE_PROJECT,
+} = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    STRING,
+    TEXT,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("issues", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 所属者者
-			type: BIGINT,
-			allowNull: false,
-		},
+  const model = app.model.define('issues', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		objectType: {                // 所属对象类型  0 -- 用户  1 -- 站点  2 -- 页面 3 -- 组 4 -- 项目
-			type: INTEGER,
-			allowNull: false,
-		},
+    userId: { // 所属者者
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		objectId: {                  // 所属对象id
-			type: BIGINT,
-			allowNull: false,
-		},
+    objectType: { // 所属对象类型  0 -- 用户  1 -- 站点  2 -- 页面 3 -- 组 4 -- 项目
+      type: INTEGER,
+      allowNull: false,
+    },
 
-		title: {                    // 内容
-			type: STRING(256),
-			defaultValue:"",
-		},
+    objectId: { // 所属对象id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		content: {                   // 内容
-			type: TEXT,
-			defaultValue:"",
-		},
+    title: { // 内容
+      type: STRING(256),
+      defaultValue: '',
+    },
 
-		state: {                     // 0 -- 进行中  1 -- 已完成
-			type: INTEGER,
-			defaultValue:0,
-		},
+    content: { // 内容
+      type: TEXT,
+      defaultValue: '',
+    },
 
-		tags: {
-			type: STRING(256),
-			defaultValue: "|",
-		},
+    state: { // 0 -- 进行中  1 -- 已完成
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		assigns: {
-			type: STRING(256),
-			defaultValue: "|",
-		},
+    tags: {
+      type: STRING(256),
+      defaultValue: '|',
+    },
 
-		no: {                       // issue 序号
-			type: INTEGER,
-			defaultValue: 1,
-		},
+    assigns: {
+      type: STRING(256),
+      defaultValue: '|',
+    },
 
-		text: {
-			type: TEXT,             // issue 搜索文本
-		},
+    no: { // issue 序号
+      type: INTEGER,
+      defaultValue: 1,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+    text: {
+      type: TEXT, // issue 搜索文本
+    },
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["objectId", "objectType", "no"],
-		},
-		],
-	});
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.__hook__ = async function(data, oper) {
-		if (oper == "create" && data.objectType == ENTITY_TYPE_PROJECT) {
-			// ISSUE创建  活跃度加1
-			await app.model.contributions.addContributions(data.userId);
-		}
-	}
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getById = async function(id, userId) {
-		const where = {id};
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		if (userId) where.userId = userId;
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
 
-		const data = await app.model.issues.findOne({where: where});
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'objectId', 'objectType', 'no' ],
+      },
+    ],
+  });
 
-		return data && data.get({plain:true});
-	}
+  // model.sync({force:true}).then(() => {
+  // console.log("create table successfully");
+  // });
 
-	model.getObjectStatistics = async function(objectId, objectType) {
-		const sql = `select state, count(*) count from issues where objectId = :objectId and objectType = :objectType group by state`;
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				objectId,
-				objectType,
-			}
-		});
+  model.__hook__ = async function(data, oper) {
+    if (oper === 'create' && data.objectType === ENTITY_TYPE_PROJECT) {
+      // ISSUE创建  活跃度加1
+      await app.model.contributions.addContributions(data.userId);
+    }
+  };
 
-		return list;
-	}
+  model.getById = async function(id, userId) {
+    const where = { id };
 
-	model.getObjectIssues = async function(query, options = {}) {
-		const result = await app.model.issues.findAndCount({...options, where: query});
-		const issues = result.rows;
-		const total = result.count;
+    if (userId) where.userId = userId;
 
-		const userIds = [];
+    const data = await app.model.issues.findOne({ where });
 
-		_.each(issues, (val, index) => {
-			val = val.get ? val.get({plain:true}) : val;
-			issues[index] = val;
+    return data && data.get({ plain: true });
+  };
 
-			if (_.indexOf(userIds, val.userId) < 0) userIds.push(val.userId);
+  model.getObjectStatistics = async function(objectId, objectType) {
+    const sql = 'select state, count(*) count from issues where objectId = :objectId and objectType = :objectType group by state';
+    const list = await app.model.query(sql, {
+      type: app.model.QueryTypes.SELECT,
+      replacements: {
+        objectId,
+        objectType,
+      },
+    });
 
-			const ids = val.assigns.split("|");
-			val.assigns = [];
-			_.each(ids, id => {
-				id = id ? _.toNumber(id) : NaN;
-				if (_.isNaN(id)) return;
-				val.assigns.push(id);
-				if (_.indexOf(userIds, id) < 0) userIds.push(id);
-			});
-		});
+    return list;
+  };
 
-		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
-		const users = await app.model.users.findAll({
-			attributes,
-			where: {id:{[app.Sequelize.Op.in]:userIds}},
-		});
+  model.getObjectIssues = async function(query, options = {}) {
+    const result = await app.model.issues.findAndCount(_.assign({ where: query }, options));
+    const issues = result.rows;
+    const total = result.count;
 
-		const usermap = {};
-		_.each(users, user => {
-			user = user.get ? user.get({plain:true}) : user;
-			usermap[user.userId] = user;
-		});
+    const userIds = [];
 
-		_.each(issues, val => {
-			val.user = usermap[val.userId];
-			const assigns = val.assigns;
-			val.assigns = [];
-			_.each(assigns, id => val.assigns.push(usermap[id]));
-		});
+    _.each(issues, (val, index) => {
+      val = val.get ? val.get({ plain: true }) : val;
+      issues[index] = val;
 
-		return {issues, total};
-	}
+      if (_.indexOf(userIds, val.userId) < 0) userIds.push(val.userId);
 
-	model.getIssueAssigns = async function(assigns) {
-		const ids = assigns.split("|").filter(o => o);
-		const userIds = [];
-		_.each(ids, id => {
-			id = id ? _.toNumber(id) : NaN;
-			if (_.isNaN(id)) return;
-			if (_.indexOf(userIds, id) < 0) userIds.push(id);
-		});
-		
-		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
-		const users = await app.model.users.findAll({
-			attributes,
-			where: {id:{[app.Sequelize.Op.in]:userIds}},
-		});
+      const ids = val.assigns.split('|');
+      val.assigns = [];
+      _.each(ids, id => {
+        id = id ? _.toNumber(id) : NaN;
+        if (_.isNaN(id)) return;
+        val.assigns.push(id);
+        if (_.indexOf(userIds, id) < 0) userIds.push(id);
+      });
+    });
 
-		_.each(users, (val, index) => users[index] = val.get ? val.get({plain:true}) : val);
-		return users;
-	}
+    const attributes = [[ 'id', 'userId' ], 'username', 'nickname', 'portrait', 'description' ];
+    const users = await app.model.users.findAll({
+      attributes,
+      where: { id: { [app.Sequelize.Op.in]: userIds } },
+    });
 
-	app.model.issues = model;
-	return model;
+    const usermap = {};
+    _.each(users, user => {
+      user = user.get ? user.get({ plain: true }) : user;
+      usermap[user.userId] = user;
+    });
+
+    _.each(issues, val => {
+      val.user = usermap[val.userId];
+      const assigns = val.assigns;
+      val.assigns = [];
+      _.each(assigns, id => val.assigns.push(usermap[id]));
+    });
+
+    return { issues, total };
+  };
+
+  model.getIssueAssigns = async function(assigns) {
+    const ids = assigns.split('|').filter(o => o);
+    const userIds = [];
+    _.each(ids, id => {
+      id = id ? _.toNumber(id) : NaN;
+      if (_.isNaN(id)) return;
+      if (_.indexOf(userIds, id) < 0) userIds.push(id);
+    });
+
+    const attributes = [[ 'id', 'userId' ], 'username', 'nickname', 'portrait', 'description' ];
+    const users = await app.model.users.findAll({
+      attributes,
+      where: { id: { [app.Sequelize.Op.in]: userIds } },
+    });
+
+    _.each(users, (val, index) => {
+      users[index] = val.get ? val.get({ plain: true }) : val;
+    });
+    return users;
+  };
+
+  app.model.issues = model;
+  return model;
 };
