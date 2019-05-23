@@ -90,7 +90,7 @@ module.exports = {
       ],
     });
 
-    return queryInterface.addIndex(tableName, [ 'projectId' ]);
+    return queryInterface.addIndex(tableName, [ 'projectId' ], { unique: true });
   },
 
   down: queryInterface => {

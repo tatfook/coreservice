@@ -56,7 +56,11 @@ module.exports = {
       ],
     });
 
-    return queryInterface.addIndex(tableName, [ 'userId', 'year' ]);
+    return queryInterface.addIndex(
+      tableName,
+      [ 'userId', 'year' ],
+      { unique: true }
+    );
   },
 
   down: queryInterface => {
