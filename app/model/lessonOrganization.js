@@ -1,120 +1,130 @@
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    STRING,
+    TEXT,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizations", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		name: {                        // 名称
-			type:STRING,
-			defaultValue:"",
-			unique: true,
-		},
+  const model = app.model.define('lessonOrganizations', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		logo: {
-			type: TEXT('long'),
-		},
+    name: { // 名称
+      type: STRING,
+      defaultValue: '',
+      unique: true,
+    },
 
-		email: {
-			type: STRING,
-		},
+    logo: {
+      type: TEXT('long'),
+    },
 
-		cellphone: {
-			type: STRING,
-		},
+    email: {
+      type: STRING,
+    },
 
-		loginUrl: {
-			type: STRING,
-			unique: true,
-		},
+    cellphone: {
+      type: STRING,
+    },
 
-		userId: {                     // 组织拥有者
-			type: BIGINT,
-			defaultValue:0
-		},
+    loginUrl: {
+      type: STRING,
+      unique: true,
+    },
 
-		startDate: {
-			type: DATE,
-		},
+    userId: { // 组织拥有者
+      type: BIGINT,
+      defaultValue: 0,
+    },
 
-		endDate: {
-			type: DATE,
-		},
+    startDate: {
+      type: DATE,
+    },
 
-		state: {                      // 0 - 开启  1 - 停用
-			type: INTEGER,
-		},
+    endDate: {
+      type: DATE,
+    },
 
-		count: {                      // 用户数量
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    state: { // 0 - 开启  1 - 停用
+      type: INTEGER,
+    },
 
-		privilege: {                 // 权限  1 -- 允许教师添加学生  2 -- 允许教师移除学生
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    count: { // 用户数量
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		location: {                  // xxx xxx xxx
-			type: STRING,
-			defaultValue:"",
-		},
+    privilege: { // 权限  1 -- 允许教师添加学生  2 -- 允许教师移除学生
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		visibility: {                // 0 - 公开  1 - 不公开
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    location: { // xxx xxx xxx
+      type: STRING,
+      defaultValue: '',
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+    visibility: { // 0 - 公开  1 - 不公开
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	//model.sync({force:true});
-	
-	//获取机构已用人数
-	model.getUsedCount = async function(organizationId) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 1 and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
-		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
-		return list[0].count || 0;
-	}
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getStudentCount = async function(organizationId) {
-		return await this.getMemberCount(organizationId, 1);
-	}
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getMemberCount = async function(organizationId, roleId, classId) {
-		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId == undefined ? ">= 0" : ("= " + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
-		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
-		return list[0].count || 0;
-	}
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-	model.getMembers = async function(organizationId, roleId, classId) {
-		const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId == undefined ? ">= 0" : ("= " + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId`;
-		const list = await app.model.query(sql, {type:app.model.QueryTypes.SELECT});
-		return list;
-	}
+  // model.sync({force:true});
 
-	app.model.lessonOrganizations = model;
+  // 获取机构已用人数
+  model.getUsedCount = async function(organizationId) {
+    const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 1 and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
+    const list = await app.model.query(sql, { type: app.model.QueryTypes.SELECT });
+    return list[0].count || 0;
+  };
 
-	return model;
+  model.getStudentCount = async function(organizationId) {
+    return await this.getMemberCount(organizationId, 1);
+  };
+
+  model.getMemberCount = async function(organizationId, roleId, classId) {
+    const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId === undefined ? '>= 0' : ('= ' + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
+    const list = await app.model.query(sql, { type: app.model.QueryTypes.SELECT });
+    return list[0].count || 0;
+  };
+
+  model.getMembers = async function(organizationId, roleId, classId) {
+    const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & ${roleId} and classId ${classId === undefined ? '>= 0' : ('= ' + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId`;
+    const list = await app.model.query(sql, { type: app.model.QueryTypes.SELECT });
+    return list;
+  };
+
+  app.model.lessonOrganizations = model;
+
+  return model;
 };
 
