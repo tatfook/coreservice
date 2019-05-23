@@ -1,93 +1,98 @@
-
-const _ = require("lodash");
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		DATE,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    STRING,
+    DATE,
+    JSON,
+  } = app.Sequelize;
 
-	const attrs = {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                        // 用户id
-			type: BIGINT,
-			allowNull: false,
-		},
+  const attrs = {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		gameId: {                        // 比赛id
-			type: BIGINT,
-			allowNull: false,
-		},
+    userId: { // 用户id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		projectId: {                     // 项目id
-			type: BIGINT,
-			allowNull: false,
-		},
+    gameId: { // 比赛id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		worksName: {                     // 作品名称 
-			type: STRING,
-		},
+    projectId: { // 项目id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		worksSubject: {                  // 作品主题
-			type: STRING,
-		},
+    worksName: { // 作品名称
+      type: STRING,
+    },
 
-		worksLogo: {                     // 作品封面
-			type: STRING(512),
-		},
+    worksSubject: { // 作品主题
+      type: STRING,
+    },
 
-		worksDescription: {              // 作品简介
-			type: STRING(2048),
-		},
+    worksLogo: { // 作品封面
+      type: STRING(512),
+    },
 
-		worksRate: {                     // 作品评分
-			type: INTEGER,
-		},
+    worksDescription: { // 作品简介
+      type: STRING(2048),
+    },
 
-		worksRateCount: {                // 作品评分人数
-			type: INTEGER,
-		},
+    worksRate: { // 作品评分
+      type: INTEGER,
+    },
 
-		reward: {                        // 获奖情况
-			type: STRING,
-		},
+    worksRateCount: { // 作品评分人数
+      type: INTEGER,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	};
+    reward: { // 获奖情况
+      type: STRING,
+    },
 
-	const opts = {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["projectId"],
-		},
-		],
-	}
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	const model = app.model.define("gameWorks", attrs, opts);
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
+  };
 
-	//model.sync({force:true});
+  const opts = {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
 
-	app.model.gameWorks = model;
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'projectId' ],
+      },
+    ],
+  };
 
-	return model;
+  const model = app.model.define('gameWorks', attrs, opts);
+
+  // model.sync({force:true});
+
+  app.model.gameWorks = model;
+
+  return model;
 };
-
-

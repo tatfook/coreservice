@@ -9,6 +9,7 @@ module.exports = {
       INTEGER,
       STRING,
       DATE,
+      JSON,
     } = Sequelize;
 
     return queryInterface.createTable(tableName, {
