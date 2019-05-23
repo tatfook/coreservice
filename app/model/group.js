@@ -1,113 +1,85 @@
+'use strict';
 
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-} = require("../core/consts.js");
+  ENTITY_TYPE_GROUP,
+} = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    STRING,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("groups", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+  const model = app.model.define('groups', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		userId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    userId: {
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		groupname: {
-			type: STRING(48),
-			allowNull: false,
-		},
+    groupname: {
+      type: STRING(48),
+      allowNull: false,
+    },
 
-		description: {
-			type: STRING(128),
-		},
+    description: {
+      type: STRING(128),
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "groupname"],
-		},
-		],
-	});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getById = async function(id, userId) {
-		const where = {id};
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		if (userId) where.userId = userId;
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'userId', 'groupname' ],
+      },
+    ],
+  });
 
-		const data = await app.model.groups.findOne({where: where});
+  model.getById = async function(id, userId) {
+    const where = { id };
 
-		return data && data.get({plain:true});
-	}
+    if (userId) where.userId = userId;
 
-	model.deleteById = async function(id, userId) {
-		const group = await this.getById(id, userId);
-		if (!group) return;
+    const data = await app.model.groups.findOne({ where });
 
-		await app.model.groups.destroy({where:{id}});
-		await app.model.members.destroy({where:{objectId: id, objectType: ENTITY_TYPE_GROUP}});
-		await app.model.siteGroups.destroy({where:{groupId:id}});
+    return data && data.get({ plain: true });
+  };
 
-		return;
-	}
+  model.deleteById = async function(id, userId) {
+    const group = await this.getById(id, userId);
+    if (!group) return;
 
-	model.getGroupMembers = async function(userId, groupId) {
-		return await app.model.members.getObjectMembers(groupId, ENTITY_TYPE_GROUP)
-	}
+    await app.model.groups.destroy({ where: { id } });
+    await app.model.members.destroy({ where: { objectId: id, objectType: ENTITY_TYPE_GROUP } });
+    await app.model.siteGroups.destroy({ where: { groupId: id } });
 
-	app.model.groups = model;
-	return model;
+    return;
+  };
+
+  model.getGroupMembers = async function(userId, groupId) {
+    return await app.model.members.getObjectMembers(groupId, ENTITY_TYPE_GROUP);
+  };
+
+  app.model.groups = model;
+  return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
