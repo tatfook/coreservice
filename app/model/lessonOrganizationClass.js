@@ -1,67 +1,75 @@
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    STRING,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationClasses", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		organizationId: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+  const model = app.model.define('lessonOrganizationClasses', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		name: {
-			type: STRING,
-		},
+    organizationId: {
+      type: BIGINT,
+      defaultValue: 0,
+    },
 
-		begin: {
-			type: DATE, 
-			defaultValue: function() {
-				return new Date();
-			},
-		},
+    name: {
+      type: STRING,
+    },
 
-		end: {
-			type: DATE,
-			defaultValue: function() {
-				return new Date();
-			},
-		},
+    begin: {
+      type: DATE,
+      defaultValue() {
+        return new Date();
+      },
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+    end: {
+      type: DATE,
+      defaultValue() {
+        return new Date();
+      },
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["organizationId", "name"],
-		},
-		],
-	});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	//model.sync({force:true});
-	
-	app.model.lessonOrganizationClasses = model;
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	return model;
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'organizationId', 'name' ],
+      },
+    ],
+  });
+
+  // model.sync({force:true});
+
+  app.model.lessonOrganizationClasses = model;
+
+  return model;
 };
 
