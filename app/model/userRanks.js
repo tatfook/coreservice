@@ -1,81 +1,89 @@
+'use strict';
 
-const _ = require("lodash");
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("userRanks", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {
-			type: BIGINT,
-			unique: true,
-			allowNull: false,
-		},
+  const model = app.model.define('userRanks', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		project: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    userId: {
+      type: BIGINT,
+      unique: true,
+      allowNull: false,
+    },
 
-		site: {
-			type:INTEGER,
-			defaultValue: 0,
-		},
+    project: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		world: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    site: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		follow: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    world: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		fans: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    follow: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		active: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    fans: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+    active: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	//model.sync({force:true});
-	
-	model.getByUserId = async function(userId) {
-		let rank = await app.model.userRanks.findOne({where:{userId}});
-		if (!rank) rank = await app.model.userRanks.create({userId});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		return rank && rank.get({plain:true});
-	}
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	app.model.userRanks = model;
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-	return model;
+  // model.sync({force:true});
+
+  model.getByUserId = async function(userId) {
+    let rank = await app.model.userRanks.findOne({ where: { userId } });
+    if (!rank) rank = await app.model.userRanks.create({ userId });
+
+    return rank && rank.get({ plain: true });
+  };
+
+  app.model.userRanks = model;
+
+  return model;
 };
 
