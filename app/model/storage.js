@@ -1,103 +1,111 @@
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("storages", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {  // 文件所属者
-			type: BIGINT,
-			unique: true,
-			allowNull: false,
-		},
+  const model = app.model.define('storages', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		total: {
-			type: BIGINT,
-			defaultValue: 2 * 1024 * 1024 * 1024,
-		},
+    userId: { // 文件所属者
+      type: BIGINT,
+      unique: true,
+      allowNull: false,
+    },
 
-		used: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    total: {
+      type: BIGINT,
+      defaultValue: 2 * 1024 * 1024 * 1024,
+    },
 
-		fileCount: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    used: {
+      type: BIGINT,
+      defaultValue: 0,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    fileCount: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-	model.updateStatistics = async function(userId) {
-		const sql = "SELECT SUM(size) AS `used`, COUNT(*) as `fileCount` from `files` where `userId` = :userId and size > 0";
-		let result = await app.model.query(sql,  {
-			type: app.model.QueryTypes.SELECT, 
-			replacements: {
-				userId: userId,
-			}
-		});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		if (!result || !result[0]) return;
-		const data = result[0];
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		await app.model.storages.update({
-			userId,
-			used: data.used,
-			fileCount: data.fileCount,
-		}, {
-			where:{
-				userId,
-			},
-		});
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-		return;
-	}
+  model.updateStatistics = async function(userId) {
+    const sql = 'SELECT SUM(size) AS `used`, COUNT(*) as `fileCount` from `files` where `userId` = :userId and size > 0';
+    const result = await app.model.query(sql, {
+      type: app.model.QueryTypes.SELECT,
+      replacements: {
+        userId,
+      },
+    });
 
-	model.getStatistics = async function(userId) {
-		await this.updateStatistics(userId);
+    if (!result || !result[0]) return;
+    const data = result[0];
 
-		let data = await app.model.storages.findOne({where:{userId:userId}});
+    await app.model.storages.update({
+      userId,
+      used: data.used,
+      fileCount: data.fileCount,
+    }, {
+      where: {
+        userId,
+      },
+    });
 
-		if (!data) {
-			data = {
-				userId,
-				total: 2 * 1024 * 1024 * 1024,
-				used: 0,
-				fileCount: 0,
-			}
-			await app.model.storages.create(data);
-		} 
+    return;
+  };
 
-		return data;
+  model.getStatistics = async function(userId) {
+    await this.updateStatistics(userId);
 
-	}
+    let data = await app.model.storages.findOne({ where: { userId } });
 
-	model.isFull = async function(userId) {
-		let data = await this.getStatistics(userId);
+    if (!data) {
+      data = {
+        userId,
+        total: 2 * 1024 * 1024 * 1024,
+        used: 0,
+        fileCount: 0,
+      };
+      await app.model.storages.create(data);
+    }
 
-		if (data.used < data.total) {
-			return false;
-		}
+    return data;
 
-		return true;
-	}
+  };
 
-	app.model.storages = model;
-	return model;
+  model.isFull = async function(userId) {
+    const data = await this.getStatistics(userId);
+
+    if (data.used < data.total) {
+      return false;
+    }
+
+    return true;
+  };
+
+  app.model.storages = model;
+  return model;
 };
 
