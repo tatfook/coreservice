@@ -69,11 +69,11 @@ CREATE TABLE `userMessages` (
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `userId` (`userId`),
+  UNIQUE KEY `user_messages_user_id_message_id` (`userId`,`messageId`),
   KEY `messageId` (`messageId`),
   CONSTRAINT `userMessages_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `userMessages_ibfk_2` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- --------------------------------------------------------
 select * from `keepwork-rls`.users where username = "dsl4";
