@@ -1,75 +1,83 @@
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("siteGroups", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+  const model = app.model.define('siteGroups', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		userId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    userId: {
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		siteId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    siteId: {
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		groupId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    groupId: {
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		level: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    level: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["siteId", "groupId"],
-		},
-		],
-	});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getById = async function(id, userId) {
-		const where = {id};
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		if (userId) where.userId = userId;
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'siteId', 'groupId' ],
+      },
+    ],
+  });
 
-		const data = await app.model.siteGroups.findOne({where: where});
+  model.getById = async function(id, userId) {
+    const where = { id };
 
-		return data && data.get({plain:true});
-	}
+    if (userId) where.userId = userId;
 
-	model.getByUserId = async function(userId) {
-		const sql = "select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname from siteGroups, groups where siteGroups.groupId = groups.id and siteGroups.userId = :userId";
+    const data = await app.model.siteGroups.findOne({ where });
 
-		const list = await app.model.query(sql, {
-			replacements:{
-				userId:userId,
-			}
-		});
+    return data && data.get({ plain: true });
+  };
 
-		return list;
-	}
+  model.getByUserId = async function(userId) {
+    const sql = 'select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname from siteGroups, groups where siteGroups.groupId = groups.id and siteGroups.userId = :userId';
 
-	app.model.siteGroups = model;
-	return model;
+    const list = await app.model.query(sql, {
+      replacements: {
+        userId,
+      },
+    });
+
+    return list;
+  };
+
+  app.model.siteGroups = model;
+  return model;
 };
