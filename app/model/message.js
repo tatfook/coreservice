@@ -68,7 +68,7 @@ module.exports = app => {
 
 	// 主动合并消息
 	model.mergeMessage = async function(userId) {
-		const sql = `select id from messages where \`all\` = :all and id not in (select messageId from userMessages where userId = :userId)`;
+		const sql = `select id, createdAt from messages where \`all\` = :all and id not in (select messageId from userMessages where userId = :userId)`;
 		const list = await app.model.query(sql, {
 			type: app.model.QueryTypes.SELECT,
 			replacements: {
@@ -76,7 +76,7 @@ module.exports = app => {
 				userId,
 			}
 		});
-		const datas = _.map(list, o => ({userId, messageId:o.id, state:0}));
+		const datas = _.map(list, o => ({userId, messageId:o.id, state:0, createdAt: o.createdAt}));
 		await app.model.userMessages.bulkCreate(datas);
 		return;
 	}
