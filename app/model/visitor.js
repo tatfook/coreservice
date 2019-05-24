@@ -1,77 +1,87 @@
+'use strict';
 
-const _ = require("lodash");
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    STRING,
+    TEXT,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("visitors", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		url: {                      // url
-			type:STRING,
-			allowNull: false,
-		},
+  const model = app.model.define('visitors', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		date: {                     // 统计日期
-			type: STRING(24),
-			allowNull: false,
-			defaultValue:"",
-		},
+    url: { // url
+      type: STRING,
+      allowNull: false,
+    },
 
-		count: {
-			type: INTEGER,
-			defaultValue:0,
-		},
+    date: { // 统计日期
+      type: STRING(24),
+      allowNull: false,
+      defaultValue: '',
+    },
 
-		visitors: {                 // 访客的用户id列表  使用字符串而不用数组原因是字符串可模糊查找  数组则不可查询
-			type: TEXT,
-		},
+    count: {
+      type: INTEGER,
+      defaultValue: 0,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+    visitors: { // 访客的用户id列表  使用字符串而不用数组原因是字符串可模糊查找  数组则不可查询
+      type: TEXT,
+    },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["url", "date"],
-		},
-		],
-	});
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.addVisitor = async function(url, userId) {
-		const {year, month, day} = app.util.getDate();
-		const date = year + month + day;
-		let visitor = await app.model.visitors.findOne({where:{url, date}});
-		visitor = visitor ? visitor.get({plain:true}) : {url, count:0, visitors:"|", extra:{}, date};
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		visitor.count++;
-		if (userId) visitor.visitors = "|" + userId + visitor.visitors.replace("|" + userId + "|", "|");
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		await app.model.visitors.upsert(visitor);
-		return visitor;
-	} 
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'url', 'date' ],
+      },
+    ],
+  });
 
-	app.model.visitors = model;
-	return model;
+  // model.sync({force:true}).then(() => {
+  // console.log("create table successfully");
+  // });
+
+  model.addVisitor = async function(url, userId) {
+    const { year, month, day } = app.util.getDate();
+    const date = year + month + day;
+    let visitor = await app.model.visitors.findOne({ where: { url, date } });
+    visitor = visitor ? visitor.get({ plain: true }) : { url, count: 0, visitors: '|', extra: {}, date };
+
+    visitor.count++;
+    if (userId) visitor.visitors = '|' + userId + visitor.visitors.replace('|' + userId + '|', '|');
+
+    await app.model.visitors.upsert(visitor);
+    return visitor;
+  };
+
+  app.model.visitors = model;
+  return model;
 };
