@@ -1,96 +1,70 @@
-const _ = require("lodash");
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		DATE,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    STRING,
+    DATE,
+    JSON,
+  } = app.Sequelize;
 
-	const attrs = {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {
-			type: BIGINT,
-			unique: true,
-			allowNull: false,
-		},
+  const attrs = {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		name: {
-			type: STRING(48), // 用户姓名
-		},
+    userId: {
+      type: BIGINT,
+      unique: true,
+      allowNull: false,
+    },
 
-		qq: {
-			type: STRING(24), // qq号
-		},
+    name: {
+      type: STRING(48), // 用户姓名
+    },
 
-		birthdate: {          // 出生年月
-			type: DATE,
-		},
+    qq: {
+      type: STRING(24), // qq号
+    },
 
-		school: {             // 学校
-			type: STRING,
-		},
+    birthdate: { // 出生年月
+      type: DATE,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	};
+    school: { // 学校
+      type: STRING,
+    },
 
-	const opts = {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	}
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-	const model = app.model.define("userinfos", attrs, opts);
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	//model.sync({force:true});
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	app.model.userinfos = model;
+  };
 
-	return model;
+  const opts = {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  };
+
+  const model = app.model.define('userinfos', attrs, opts);
+
+  // model.sync({force:true});
+
+  app.model.userinfos = model;
+
+  return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
