@@ -1,119 +1,127 @@
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    STRING,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("worlds", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 用户id
-			type: BIGINT,
-			allowNull: false,
-		},
+  const model = app.model.define('worlds', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		worldName: {                 // 世界名
-			type: STRING(128),
-			allowNull: false,
-		},
+    userId: { // 用户id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		revision: {                  // 版本
-			type: STRING(32),	
-			allowNull: false,
-			defaultValue:0,
-		},
+    worldName: { // 世界名
+      type: STRING(128),
+      allowNull: false,
+    },
 
-		projectId: {                 // 项目id
-			type: BIGINT,
-			allowNull: false,
-		},
-		
-		commitId: {                  // 最后一次提价id
-			type: STRING(64),
-			defaultValue: "master",
-		},
+    revision: { // 版本
+      type: STRING(32),
+      allowNull: false,
+      defaultValue: 0,
+    },
 
-		archiveUrl: {                // git archive url
-			type: STRING(255),
-			defaultValue:"",
-		},
+    projectId: { // 项目id
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		fileSize: {                  // 文件大小
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    commitId: { // 最后一次提价id
+      type: STRING(64),
+      defaultValue: 'master',
+    },
 
-		giturl: {                    // git url
-			type: STRING(256),
-		},
+    archiveUrl: { // git archive url
+      type: STRING(255),
+      defaultValue: '',
+    },
 
-		download: {                  // 下载地址
-			type: STRING(256),
-		},
+    fileSize: { // 文件大小
+      type: BIGINT,
+      defaultValue: 0,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+    giturl: { // git url
+      type: STRING(256),
+    },
 
-		// 默认字段 updatedAt修改日期  createdAt创建日期
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "worldName"],
-		},
-		{
-			unique: true,
-			fields: ["projectId"],
-		},
-		],
-	});
+    download: { // 下载地址
+      type: STRING(256),
+    },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.__hook__ = async function(data, oper) {
-		//if (oper == "update") return;
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-		const {userId} = data;
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		const count = await app.model.worlds.count({where:{userId}});
-		await app.model.userRanks.update({world:count}, {where:{userId}});
-		//await app.model.userRanks.increment({project:1})
-	}
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getById = async function(id, userId) {
-		const where = {id};
+    // 默认字段 updatedAt修改日期  createdAt创建日期
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'userId', 'worldName' ],
+      },
+      {
+        unique: true,
+        fields: [ 'projectId' ],
+      },
+    ],
+  });
 
-		if (userId) where.userId = userId;
+  // model.sync({force:true}).then(() => {
+  // console.log("create table successfully");
+  // });
 
-		const data = await app.model.sites.findOne({where: where});
+  model.__hook__ = async function(data) {
+    // if (oper == "update") return;
 
-		return data && data.get({plain:true});
-	}
+    const { userId } = data;
 
-	model.getByProjectId = async function(projectId) {
-		const world = await app.model.worlds.findOne({where:{projectId}});
-		
-		return world && world.get({plain:true});
-	}
+    const count = await app.model.worlds.count({ where: { userId } });
+    await app.model.userRanks.update({ world: count }, { where: { userId } });
+    // await app.model.userRanks.increment({project:1})
+  };
 
-	app.model.worlds = model;
-	return model;
+  model.getById = async function(id, userId) {
+    const where = { id };
+
+    if (userId) where.userId = userId;
+
+    const data = await app.model.sites.findOne({ where });
+
+    return data && data.get({ plain: true });
+  };
+
+  model.getByProjectId = async function(projectId) {
+    const world = await app.model.worlds.findOne({ where: { projectId } });
+
+    return world && world.get({ plain: true });
+  };
+
+  app.model.worlds = model;
+  return model;
 };
 
