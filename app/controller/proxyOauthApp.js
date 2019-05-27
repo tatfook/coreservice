@@ -25,7 +25,6 @@ const ProxyOauthApp = class extends Controller {
 		if (!cache) return this.success({error:10001, message:"authorized code invalid"}, 503);
 		if (username && cache.username != username) this.success({error:10003, message:"username error"}, 503);
 
-
 		const user = await this.model.users.getById(cache.userId);
 		if (!user) return this.success({error:10002, message:"server inner errror"}, 503);
 
