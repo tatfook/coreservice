@@ -32,9 +32,9 @@ module.exports = (options, app) => {
 		try {
 			ctx.state.user = token ? app.util.jwt_decode(token, config.secret, false) : {};
 			//if (app.config.env !== "unittest") {
-				const isValid = await ctx.service.user.validateToken(ctx.state.user.userId, token);
+				//const isValid = await ctx.service.user.validateToken(ctx.state.user.userId, token);
 				//console.log(isValid, token);
-				if (!isValid) ctx.state.user = {};
+				//if (!isValid) ctx.state.user = {};
 			//}
 		} catch(e) {
 			ctx.state.user = {};
