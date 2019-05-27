@@ -37,6 +37,8 @@ const ProxyOauthApp = class extends Controller {
 			username: user.username,
 		}, config.secret, tokenExpire);
 
+		await this.ctx.service.user.setToken(user.id, token);
+
 		return this.success({token});
 	}
 }
