@@ -4,6 +4,17 @@ const _ = require('lodash');
 const Service = require('egg').Service;
 
 class User extends Service {
+
+	async token(payload, clear) {
+		const config = this.app.config.self;
+		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
+		const token = this.app.util.jwt_encode(payload, config.secret, tokenExpire);
+
+		await this.setToken(payload.userId, token, clear);
+
+		return token;
+	}
+
 	async setToken(userId, token, clear = false) {
 		const data = await this.app.model.userdatas.get(userId);
 		
