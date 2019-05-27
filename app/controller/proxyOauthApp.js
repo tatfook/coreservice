@@ -8,7 +8,7 @@ const ProxyOauthApp = class extends Controller {
 		const {userId, username} = this.authenticated();
 		const {client_id, state} = this.validate({client_id: "string"});
 
-		const code = _.random(1000000, 9999999);
+		const code = userId + "_" + _.random(1000000, 9999999);
 		await this.model.caches.set(`oauth_code_${client_id}_${code}`, {userId, username}, 1000 * 60 * 10);
 
 		return this.success({error:{id:0, message:"OK"}, data:{code, state}});
