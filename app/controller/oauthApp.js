@@ -64,7 +64,7 @@ const OauthApp = class extends Controller {
 			username: cache.username,
 		}, config.secret, tokenExpire);
 
-		await this.ctx.service.user.setToken(user.id, token);
+		await this.ctx.service.user.setToken(cache.userId, token);
 
 		return this.success({token});
 	}

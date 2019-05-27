@@ -28,9 +28,20 @@ const datas = {
 	},
 	],
 
+	caches:[],
 	favorites:[],
 	illegalUsers:[],
 	userinfos:[],
+
+	oauthApps:[
+	{
+		appName:"appname",
+		userId:1,
+		clientId: "123456",
+		clientSecret:"abcdef",
+		description:"oauth app test",
+	},
+	],
 
 	// 机构
 	lessonOrganizations: [
