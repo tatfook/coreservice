@@ -38,6 +38,7 @@
     "egg-mock": "^3.17.3",
     "eslint": "^4.11.0",
     "eslint-config-egg": "^6.0.0",
+    "factory-girl": "^5.0.4",
     "sequelize-cli": "^5.4.0"
   },
   "scripts": {
