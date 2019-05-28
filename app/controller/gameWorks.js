@@ -37,7 +37,7 @@ const GameWorks = class extends Controller {
 		}).then(x => {
 			x.rows = _.map(x.rows, o => {
 				o = o.toJSON();
-				o.projects = o.projects || o.extra.projects;
+				o.projects = o.projects || (o.extra || {}).projects;
 				if (!o.projects) return o;
 				o.projects.user = o.projects.users;
 				return o;
