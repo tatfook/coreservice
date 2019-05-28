@@ -100,6 +100,37 @@ module.exports = app => {
     return classes;
   };
 
+  model.associate = function() {
+    app.model.lessonOrganizationClassMembers.belongsTo(app.model.lessonOrganizations, {
+      as: 'lessonOrganizations',
+      foreignKey: 'organizationId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.lessonOrganizationClassMembers.belongsTo(app.model.lessonOrganizationClasses, {
+      as: 'lessonOrganizationClasses',
+      foreignKey: 'classId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.lessonOrganizationClassMembers.hasMany(app.model.lessonOrganizationPackages, {
+      as: 'lessonOrganizationPackages',
+      foreignKey: 'classId',
+      sourceKey: 'classId',
+      constraints: false,
+    });
+
+    app.model.lessonOrganizationClassMembers.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'memberId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+  };
+
   app.model.lessonOrganizationClassMembers = model;
 
   return model;

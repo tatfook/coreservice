@@ -249,6 +249,21 @@ module.exports = app => {
     return await app.model.sites.count({ where: { userId } });
   };
 
+  model.associate = function() {
+    app.model.sites.hasOne(app.model.illegals, {
+      as: 'illegals',
+      foreignKey: 'objectId',
+      constraints: false,
+    });
+
+
+    app.model.illegalSites.hasOne(app.model.illegals, {
+      as: 'illegals',
+      foreignKey: 'objectId',
+      constraints: false,
+    });
+  };
+
   app.model.sites = model;
   return model;
 };

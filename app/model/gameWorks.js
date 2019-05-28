@@ -92,6 +92,29 @@ module.exports = app => {
 
   // model.sync({force:true});
 
+  model.associate = function() {
+    app.model.gameWorks.belongsTo(app.model.games, {
+      as: 'games',
+      foreignKey: 'gameId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.gameWorks.belongsTo(app.model.projects, {
+      as: 'projects',
+      foreignKey: 'projectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.gameWorks.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.gameWorks = model;
 
   return model;

@@ -68,6 +68,29 @@ module.exports = app => {
 
   // model.sync({force:true});
 
+  model.associate = function() {
+    app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationClassMembers, {
+      as: 'lessonOrganizationClassMembers',
+      foreignKey: 'classId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationPackages, {
+      as: 'lessonOrganizationPackages',
+      foreignKey: 'classId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.lessonOrganizationClasses.hasMany(app.model.lessonOrganizationActivateCodes, {
+      as: 'lessonOrganizationActivateCodes',
+      foreignKey: 'classId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.lessonOrganizationClasses = model;
 
   return model;

@@ -81,6 +81,15 @@ module.exports = app => {
     return account;
   };
 
+  model.associate = function() {
+    app.model.accounts.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.accounts = model;
   return model;
 };

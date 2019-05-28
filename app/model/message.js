@@ -94,6 +94,15 @@ module.exports = app => {
     await this.mergeMessage();
   };
 
+  model.associate = function() {
+    app.model.messages.hasMany(app.model.userMessages, {
+      as: 'userMessages',
+      foreignKey: 'messageId',
+      sourceKey: 'id',
+      // constraints: false,
+    });
+  };
+
   app.model.messages = model;
 
   return model;

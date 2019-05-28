@@ -273,6 +273,42 @@ module.exports = app => {
   // return {paracraftCount, siteCount, recuritCount, userCount, projectCount}
   // }
 
+  model.associate = function() {
+    app.model.projects.hasOne(app.model.illegals, {
+      as: 'illegals',
+      foreignKey: 'objectId',
+      constraints: false,
+    });
+
+    app.model.illegalProjects.hasOne(app.model.illegals, {
+      as: 'illegals',
+      foreignKey: 'objectId',
+      constraints: false,
+    });
+
+    app.model.projects.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.projects.hasMany(app.model.favorites, {
+      as: 'favorites',
+      foreignKey: 'objectId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.projects.hasOne(app.model.gameWorks, {
+      as: 'gameWorks',
+      foreignKey: 'projectId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+  };
+
   app.model.projects = model;
   return model;
 };

@@ -155,6 +155,76 @@ module.exports = app => {
     return users;
   };
 
+  model.associate = function() {
+    app.model.users.hasMany(app.model.roles, {
+      as: 'roles',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasOne(app.model.userinfos, {
+      as: 'userinfos',
+      foreignKey: 'userId',
+      constraints: false,
+    });
+
+    app.model.users.hasOne(app.model.accounts, {
+      as: 'accounts',
+      foreignKey: 'userId',
+      constraints: false,
+    });
+
+    app.model.users.hasMany(app.model.issues, {
+      as: 'issues',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasOne(app.model.illegals, {
+      as: 'illegals',
+      foreignKey: 'objectId',
+      constraints: false,
+    });
+
+    app.model.users.hasMany(app.model.projects, {
+      as: 'projects',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasMany(app.model.gameWorks, {
+      as: 'gameWorks',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasMany(app.model.lessonOrganizations, {
+      as: 'lessonOrganizations',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasOne(app.model.lessonOrganizationClassMembers, {
+      as: 'lessonOrganizationClassMembers',
+      foreignKey: 'memberId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+
+    app.model.users.hasMany(app.model.userMessages, {
+      as: 'userMessages',
+      foreignKey: 'userId',
+      sourceKey: 'id',
+      // constraints: false,
+    });
+
+  };
+
   app.model.users = model;
   return model;
 };

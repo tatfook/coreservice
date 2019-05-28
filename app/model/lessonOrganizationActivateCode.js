@@ -75,6 +75,15 @@ module.exports = app => {
     collate: 'utf8mb4_bin',
   });
 
+  model.associate = function() {
+    app.model.lessonOrganizationActivateCodes.belongsTo(app.model.lessonOrganizationClasses, {
+      as: 'lessonOrganizationClasses',
+      foreignKey: 'classId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   // model.sync({force:true});
 
   app.model.lessonOrganizationActivateCodes = model;

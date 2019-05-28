@@ -53,6 +53,15 @@ module.exports = app => {
     ],
   });
 
+  model.associate = function() {
+    app.model.systemTags.hasMany(app.model.tags, {
+      as: 'tags',
+      foreignKey: 'tagId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+  };
+
   // model.sync({force:true}).then(() => {
   // console.log("create table successfully");
   // });

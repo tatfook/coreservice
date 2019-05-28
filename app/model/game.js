@@ -69,6 +69,15 @@ module.exports = app => {
 
   // model.sync({force:true});
 
+  model.associate = function() {
+    app.model.games.hasMany(app.model.gameWorks, {
+      as: 'gameWorks',
+      foreignKey: 'gameId',
+      sourceKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.games = model;
 
   return model;

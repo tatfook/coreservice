@@ -60,6 +60,15 @@ module.exports = app => {
   // console.log("create table successfully");
   // });
 
+  model.associate = function() {
+    app.model.tags.belongsTo(app.model.systemTags, {
+      as: 'systemTags',
+      foreignKey: 'tagId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.tags = model;
   return model;
 };

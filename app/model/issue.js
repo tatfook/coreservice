@@ -200,6 +200,15 @@ module.exports = app => {
     return users;
   };
 
+  model.associate = function() {
+    app.model.issues.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.issues = model;
   return model;
 };

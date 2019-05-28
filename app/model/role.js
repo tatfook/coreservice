@@ -113,6 +113,15 @@ module.exports = app => {
   // return this.isExceptionRole(roleId);
   // }
 
+  model.associate = function() {
+    app.model.roles.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.roles = model;
   return model;
 };

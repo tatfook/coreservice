@@ -64,6 +64,15 @@ module.exports = app => {
 
   // model.sync({force:true});
 
+  model.associate = function() {
+    app.model.userinfos.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.userinfos = model;
 
   return model;

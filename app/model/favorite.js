@@ -204,6 +204,15 @@ module.exports = app => {
     };
   };
 
+  model.associate = function() {
+    app.model.favorites.belongsTo(app.model.projects, {
+      as: 'projects',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.favorites = model;
   return model;
 };

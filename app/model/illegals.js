@@ -109,6 +109,50 @@ module.exports = app => {
     }
   };
 
+  model.associate = function() {
+    app.model.illegals.belongsTo(app.model.illegalUsers, {
+      as: 'illegalUsers',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.illegals.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.illegals.belongsTo(app.model.projects, {
+      as: 'projects',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.illegals.belongsTo(app.model.sites, {
+      as: 'sites',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.illegals.belongsTo(app.model.illegalProjects, {
+      as: 'illegalProjects',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+
+    app.model.illegals.belongsTo(app.model.illegalSites, {
+      as: 'illegalSites',
+      foreignKey: 'objectId',
+      targetKey: 'id',
+      constraints: false,
+    });
+  };
+
   app.model.illegals = model;
 
   return model;

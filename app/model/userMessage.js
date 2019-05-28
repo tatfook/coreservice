@@ -48,6 +48,22 @@ module.exports = app => {
   // console.log("create table successfully");
   // });
 
+  model.associate = function() {
+    app.model.userMessages.belongsTo(app.model.users, {
+      as: 'users',
+      foreignKey: 'userId',
+      targetKey: 'id',
+      // constraints: false,
+    });
+
+    app.model.userMessages.belongsTo(app.model.messages, {
+      as: 'messages',
+      foreignKey: 'messageId',
+      targetKey: 'id',
+      // constraints: false,
+    });
+  };
+
   app.model.userMessages = model;
 
   return model;

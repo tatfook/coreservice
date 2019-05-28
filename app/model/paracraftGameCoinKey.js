@@ -100,6 +100,15 @@ module.exports = app => {
   // console.log("create table successfully");
   // });
 
+  model.associate = function() {
+    app.model.paracraftGameCoinKeys.belongsTo(app.model.paracraftDevices, {
+      as: 'paracraftDevices',
+      foreignKey: 'deviceId',
+      targetKey: 'deviceId',
+      constraints: false,
+    });
+  };
+
   app.model.paracraftGameCoinKeys = model;
   return model;
 };
