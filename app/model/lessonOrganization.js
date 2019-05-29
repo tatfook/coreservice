@@ -90,6 +90,14 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
+	model.getValidOrganizationById = async function(organizationId) {
+		const curdate = new Date();
+		return await app.model.lessonOrganizations.findOne({where: {
+			id: organizationId,
+			endDate: {$gte: new Date()},
+		}}).then(o => o && o.toJSON());
+	}
+
 	//获取机构已用人数
 	model.getUsedCount = async function(organizationId) {
 		const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 1 and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;

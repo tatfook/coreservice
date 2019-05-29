@@ -48,12 +48,20 @@ const datas = {
 	{
 		name:"org1",
 		state:0,
+		startDate: new Date(),
+		endDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 30),
+		count: 100,
 	},
 	{
 		name:"org2",
 		state:0,
+		startDate: new Date(),
+		endDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 30),
+		count: 100,
 	},
 	],
+
+	lessonOrganizationActivateCodes:[],
 
 	// 机构班级
 	lessonOrganizationClasses: [
