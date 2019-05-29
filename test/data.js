@@ -1,6 +1,9 @@
+const _ = require("lodash");
 const md5 = require("blueimp-md5");
 
 const datas = {
+	sensitiveWords:[],
+
 	// 用户
 	users: [
 	{
@@ -32,6 +35,8 @@ const datas = {
 	favorites:[],
 	illegalUsers:[],
 	userinfos:[],
+	messages:[],
+	userMessages:[],
 
 	oauthApps:[
 	{
@@ -239,6 +244,25 @@ const datas = {
 }
 
 module.exports = async (app) => {
+	const tables = _.keys(datas);
+	const keepworktables = tables.filter(key => app.model[key]).reverse();
+	for (let i = 0; i < keepworktables.length; i++) {
+		const table = keepworktables[i];
+		try {
+			await app.model.query(`drop table ${table}`);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+	const lessontables = tables.filter(key => app.lessonModel[key]).reverse();
+	for (let i = 0; i < lessontables.length; i++) {
+		const table = lessontables[i];
+		try {
+			await app.lessonModel.query(`drop table ${table}`);
+		} catch(e) {
+			console.log(e);
+		}
+	}
 	for (let key in datas) {
 		if (app.model[key]){
 			await app.model[key].sync({force:true});

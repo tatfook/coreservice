@@ -9,6 +9,7 @@ describe("/users", () => {
 	});
 
 	it("修改密码 token失效测试", async () => {
+		app.config.self.env = "local";
 		const apiUrlPrefix = "/api/v0/";
 		// 构建用户
 		const user = await app.model.users.create({username:"user0000", password: md5("123456")}).then(o => o.toJSON());
@@ -27,5 +28,6 @@ describe("/users", () => {
 
 		// 废弃token验证
 		await app.httpRequest().get(`${apiUrlPrefix}users/profile`).set("Authorization", `Bearer ${token1}`).expect(res => assert(res.statusCode == 401));
+		app.config.self.env = "unittest";
 	});
 });

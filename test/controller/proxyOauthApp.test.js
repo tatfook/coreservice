@@ -10,7 +10,7 @@ describe("旧第三方程序登录", () => {
 		//await initData(app);
 	});
 
-	it("OAUTH LOGIN", async () => {
+	it.skip("OAUTH LOGIN", async () => {
 		const apiUrlPrefix = "https://keepwork.com/api/wiki/models/";
 		
 		// 登录
