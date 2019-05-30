@@ -15,7 +15,6 @@ const User = class extends Controller {
 
 	tokeninfo() {
 		try {
-			console.log(this.ctx.state.token);
 			const user = this.app.util.jwt_decode(this.ctx.state.token, this.app.config.self.secret, true);
 			return this.success(user);
 		} catch(e) {

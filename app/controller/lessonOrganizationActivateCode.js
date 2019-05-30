@@ -20,6 +20,9 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const {count = 1, classId} = this.validate({count:"number", classId:"number"});
 
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
+
+		const organ = await this.model.lessonOrganizations.getValidOrganizationById(organizationId);
+		if (!organ) this.throw(400, "无效机构");
 		
 		const datas = [];
 		for (let i = 0; i < count; i++) {
@@ -73,8 +76,8 @@ const LessonOrganizationActivateCode = class extends Controller {
 		if (curtime > end) return this.fail({code:3, message:"班级结束"});
 		//if (curtime < begin) return this.fail({code:4, message:"班级未开始"});
 
-		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId}}).then(o => o && o.toJSON());
-		if (!organ) return this.fail({code:2, message:"无效激活码"});
+		const organ = await this.model.lessonOrganizations.findOne({where:{id: data.organizationId, endDate:{$gt: new Date()}}}).then(o => o && o.toJSON());
+		if (!organ) return this.fail({code:2, message:"无效机构"});
 	
 		const ms = await this.model.lessonOrganizationClassMembers.findAll({where:{organizationId: data.organizationId, memberId: userId}}).then(list => list.map(o => o.toJSON()));
 		const isClassStudent = _.find(ms, o => o.classId == data.classId && o.roleId & CLASS_MEMBER_ROLE_STUDENT);

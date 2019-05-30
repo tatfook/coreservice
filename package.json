@@ -41,7 +41,8 @@
     "dev": "egg-bin dev",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
     "start": "egg-scripts start",
-    "test": "egg-bin test "
+    "test": "egg-bin test ",
+	"cov": "egg-bin cov"
   },
   "repository": {
     "type": "git",

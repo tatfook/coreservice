@@ -64,4 +64,33 @@ describe("lesson organization class", () => {
 		let teachers = await app.httpRequest().get("/api/v0/lessonOrganizationClassMembers/teacher").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(teachers.length == 1);
 	});
+
+	it("aaaa机构过期测试", async() => {
+		// 获取机构
+		const organ = await app.model.lessonOrganizations.findOne({where:{id:1}}).then(o => o && o.toJSON());		
+		// 验证机构的存在
+		assert(organ);
+
+		// 过期机构
+		await app.model.lessonOrganizations.update({endDate:"2019-01-01"}, {where:{id:1}});
+
+		const token = app.util.jwt_encode({userId:1, username:"user001", roleId:64, organizationId:1}, app.config.self.secret);
+		assert(token);
+
+		// 生成激活码
+		await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(400).then(res => res.body);
+		//const list = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(200).then(res => res.body);
+
+		// 不过期机构
+		await app.model.lessonOrganizations.update({endDate:"2119-01-01"}, {where:{id:1}});
+		const list = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(200).then(res => res.body);
+		assert(list.length == 2);
+		console.log(list);
+
+		const usertoken = app.util.jwt_encode({userId:4, username:"user004"}, app.config.self.secret);
+		const key = list[0].key;
+		// 激活激活码
+		const ok = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes/activate").set("Authorization", `Bearer ${usertoken}`).send({key, organizationId:1}).expect(200).then(res => res.body).catch(e => console.log(e));
+		assert(ok);
+	});
 });

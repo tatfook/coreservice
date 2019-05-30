@@ -81,6 +81,11 @@ module.exports = app => {
 	router.post(`${prefix}oauth_users/xinlang`, oauthUser.xinlang);
 	router.resources(`${prefix}oauth_users`, oauthUser);
 
+	const oauthApp = controller.oauthApp;
+	router.get(`${prefix}oauth_apps/oauth_code`, oauthApp.oauthCode);
+	router.post(`${prefix}oauth_apps/oauth_token`, oauthApp.oauthToken);
+	router.post(`${prefix}oauth_apps/login`, oauthApp.login);
+
 	const comment = controller.comment;
 	router.resources(`${prefix}comments`, comment);
 
