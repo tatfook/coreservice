@@ -193,6 +193,10 @@ const User = class extends Controller {
 			});
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
+			
+			// 用户注册
+			await this.ctx.service.user.register(user);
+
 			// 创建lesson用户
 			await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
@@ -306,6 +310,9 @@ const User = class extends Controller {
 		if (!user) return this.fail(0);
 		user = user.get({plain:true});
 		
+		// 用户注册
+		await this.ctx.service.user.register(user);
+
 		// 创建lesson用户
 		await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
