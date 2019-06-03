@@ -196,6 +196,13 @@ const LessonOrganization = class extends Controller {
 			await this.fixedClassPackage(id, params.packages);
 		}
 
+		if (params.endDate) {
+			await this.model.lessonOrganizationClasses.update({end: params.endDate}, {where: {
+				organizationId:id,
+				end: {$gt: params.endDate},
+			}});
+		}
+
 		if (params.usernames) {
 			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: id}});
 			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
