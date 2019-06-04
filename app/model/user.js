@@ -163,7 +163,7 @@ module.exports = app => {
       constraints: false,
     });
 
-    app.model.users.hasOne(app.model.userinfos, {
+    model.hasOne(app.model.Userinfo, {
       as: 'userinfos',
       foreignKey: 'userId',
       constraints: false,
