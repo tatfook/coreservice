@@ -12,7 +12,7 @@ const git = require('./app/core/git.js');
 const gitGateway = require('./app/core/gitGateway.js');
 const model = require('./app/core/model.js');
 const ahocorasick = require('./app/core/ahocorasick.js');
-const association = require("./app/core/association.js");
+// const association = require("./app/core/association.js");
 const log = require("./app/core/log.js");
 
 module.exports = app => {
@@ -34,7 +34,7 @@ module.exports = app => {
   model(app);
   ahocorasick(app);
   log(app);
-  association(app);   // 定义模型关系
+  // association(app);   // 定义模型关系
 
   app.keepworkModel = app.model;
 
