@@ -34,6 +34,7 @@
     "wurl": "^2.5.3"
   },
   "devDependencies": {
+    "axios-mock-adapter": "^1.16.0",
     "egg-bin": "^4.8.1",
     "egg-mock": "^3.17.3",
     "eslint": "^4.11.0",
