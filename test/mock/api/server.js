@@ -4,7 +4,7 @@ const { app } = require('egg-mock/bootstrap');
 const router = require('./router');
 const Koa = require('koa');
 
-const mockApi = new Koa;
+const mockApi = new Koa();
 mockApi.use(router.routes());
 mockApi.use(router.allowedMethods());
 
