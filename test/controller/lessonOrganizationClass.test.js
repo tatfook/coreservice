@@ -80,13 +80,11 @@ describe("lesson organization class", () => {
 
 		// 生成激活码
 		await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(400).then(res => res.body);
-		//const list = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(200).then(res => res.body);
 
 		// 不过期机构
 		await app.model.lessonOrganizations.update({endDate:"2119-01-01"}, {where:{id:1}});
 		const list = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").set("Authorization", `Bearer ${token}`).send({classId:1, count:2}).expect(200).then(res => res.body);
 		assert(list.length == 2);
-		console.log(list);
 
 		const usertoken = app.util.jwt_encode({userId:4, username:"user004"}, app.config.self.secret);
 		const key = list[0].key;
