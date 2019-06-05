@@ -3,6 +3,12 @@ const md5 = require("blueimp-md5");
 
 const datas = {
 	sensitiveWords:[],
+	admins:[
+	{
+		username:"admin001",
+		password:md5("123456"),
+	},
+	],
 
 	// 用户
 	users: [
@@ -20,6 +26,14 @@ const datas = {
 	},
 	{
 		username:"user004",
+		password:md5("123456"),
+	},
+	{
+		username:"user005",
+		password:md5("123456"),
+	},
+	{
+		username:"user006",
 		password:md5("123456"),
 	},
 	],
@@ -50,6 +64,10 @@ const datas = {
 	messages:[],
 	userMessages:[],
 	applies:[],
+	comments:[],
+	tags:[],
+	issues:[],
+	feedbacks:[],
 
 	oauthApps:[
 	{

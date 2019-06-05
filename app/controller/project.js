@@ -1,6 +1,5 @@
 const joi = require("joi");
 const _ = require("lodash");
-const worlds = require("./worlds.js");
 
 const { ENTITY_TYPE_USER,
 	ENTITY_TYPE_SITE,
@@ -292,6 +291,7 @@ const Project = class extends Controller {
 	}
 
 	async importProject() {
+		const worlds= [];
 		for (let i = 0; i < worlds.length; i++) {
 			const world = worlds[i];
 			const {userid, worldsName, _id} = world;
