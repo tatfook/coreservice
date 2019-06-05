@@ -8,7 +8,7 @@ describe("lesson organization class", () => {
 		await initData(app);
 	});
 
-	it("modify lesson organization classes", async() => {
+	it("001 班级结业与恢复", async() => {
 		// 创建机构
 		const organ = await app.model.lessonOrganizations.create({name:"org0000", count:1}).then(o => o.toJSON());
 
@@ -37,11 +37,12 @@ describe("lesson organization class", () => {
 	});
 
 
-	it("获取机构学生", async() => {
+	it("002 获取机构学生", async() => {
 		const user = await app.model.users.create({username:"userxiaoyao", password: md5("123456")}).then(o => o.toJSON());
 		const organ = await app.model.lessonOrganizations.create({name:"org1111", count:100}).then(o => o.toJSON());
-		// 创建班级
+		// 创建班级 student=3 teacher=2
 		const cls1 = await app.model.lessonOrganizationClasses.create({name:"clss000", organizationId: organ.id, begin: new Date(), end: new Date().getTime() + 1000 * 60 * 60 * 24}).then(o => o.toJSON());
+		// 班级2过期  student=2 teacher=1
 		const cls2 = await app.model.lessonOrganizationClasses.create({name:"clss001", organizationId: organ.id, begin: new Date(), end: new Date().getTime() - 1000 * 60 * 60 * 24}).then(o => o.toJSON());
 		const cls3 = await app.model.lessonOrganizationClasses.create({name:"clss002", organizationId: organ.id, begin: new Date(), end: new Date().getTime() + 1000 * 60 * 60 * 24}).then(o => o.toJSON());
 
@@ -62,10 +63,10 @@ describe("lesson organization class", () => {
 		assert(students.count == 1);
 
 		let teachers = await app.httpRequest().get("/api/v0/lessonOrganizationClassMembers/teacher").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert(teachers.length == 1);
+		assert(teachers.length == 2);
 	});
 
-	it("aaaa机构过期测试", async() => {
+	it("003 机构过期测试", async() => {
 		// 获取机构
 		const organ = await app.model.lessonOrganizations.findOne({where:{id:1}}).then(o => o && o.toJSON());		
 		// 验证机构的存在

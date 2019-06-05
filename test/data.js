@@ -31,12 +31,25 @@ const datas = {
 	},
 	],
 
+	contributions:[],
+	userRanks:[],
+	sites:[],
+	siteFiles:[],
+	projects:[],
+	worlds:[],
+	groups:[],
+	members:[],
+	siteGroups:[],
+	oauthUsers:[],
+	accounts:{},
+	projects:[],
 	caches:[],
 	favorites:[],
 	illegalUsers:[],
 	userinfos:[],
 	messages:[],
 	userMessages:[],
+	applies:[],
 
 	oauthApps:[
 	{
