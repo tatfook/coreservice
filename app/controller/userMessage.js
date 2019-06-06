@@ -43,7 +43,7 @@ const Message = class extends Controller {
 
 	async setState() {
 		const {userId} = this.authenticated();
-		const {ids=[], state} = this.validate({state:"number"});
+		const {ids=[], state=1} = this.validate();
 		if (ids.length == 0) return this.success();
 		
 		await this.model.userMessages.update({

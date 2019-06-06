@@ -8,10 +8,12 @@ describe("关注收藏", () => {
 	});
 
 	it("001 用户关注 是否关注 获取收藏列表 获取收藏用户 取消收藏", async()=> {
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
+		const user = await app.httpRequest().post("/api/v0/users/login").send({
 			username:"user001",
 			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		const token = user.token;
+		const userId = user.id;
 
 		// 用户
 		let objectType = 0;
@@ -28,7 +30,7 @@ describe("关注收藏", () => {
 		assert.ok(data);
 
 		// 获取关注列表
-		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}&userId=${userId}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.length, 1);
 		assert.equal(data[0].id, objectId);
 
@@ -44,7 +46,7 @@ describe("关注收藏", () => {
 		// 取消关注
 		data = await app.httpRequest().delete(`/api/v0/favorites?objectId=${objectId}&objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 
-		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}&userId=${userId}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.length, 0);
 		
 		// 站点
@@ -52,7 +54,7 @@ describe("关注收藏", () => {
 		objectType = 1;
 		objectId = site.id;
 		// 关注用户
-		let data = await app.httpRequest().post("/api/v0/favorites").send({
+		data = await app.httpRequest().post("/api/v0/favorites").send({
 			objectType,
 			objectId,
 		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
@@ -63,7 +65,7 @@ describe("关注收藏", () => {
 		assert.ok(data);
 
 		// 获取关注列表
-		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}&userId=${userId}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.length, 1);
 		assert.equal(data[0].id, objectId);
 
@@ -79,7 +81,7 @@ describe("关注收藏", () => {
 		// 取消关注
 		data = await app.httpRequest().delete(`/api/v0/favorites?objectId=${objectId}&objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 
-		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		data = await app.httpRequest().get(`/api/v0/favorites?objectType=${objectType}&userId=${userId}`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.length, 0);
 	});
 });

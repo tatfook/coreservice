@@ -283,5 +283,6 @@ module.exports = app => {
 	// Message
 	const userMessage = controller.userMessage;
 	router.post(`${prefix}userMessages/state`, userMessage.setState);
+	router.post(`${prefix}userMessages/allstate`, userMessage.allstate);
 	router.resources(`${prefix}userMessages`, userMessage);
 }

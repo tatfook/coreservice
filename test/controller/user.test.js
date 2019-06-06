@@ -135,7 +135,7 @@ describe("/users", () => {
 		assert(list.count == users.length);
 
 		list = await app.httpRequest().get("/api/v0/users/rank").expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert(list.length == 0);
+		assert(list.length == await app.model.userRanks.count());
 	});
 
 	//it("0005 register with cellphone oauthToken", async ()=> {
