@@ -45,6 +45,9 @@ const datas = {
 	},
 	],
 
+	projectRates:[],
+	games:[],
+	gameWorks:[],
 	systemTags:[],
 	orders:[],
 	contributions:[],
