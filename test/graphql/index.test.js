@@ -47,7 +47,7 @@ describe("graphql", () => {
 		assert(data.organization.studentCount == 3);
 		assert(data.organization.teacherCount == 2);
 		assert(data.organization.students.length == 3);
-		assert(data.organization.teachers.length == 3);
+		assert(data.organization.teachers.length == 4);
 	});
 
 	// 机构用户

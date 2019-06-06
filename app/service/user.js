@@ -33,6 +33,27 @@ class User extends Service {
 		//console.log(userId, data, token);
 		return _.find(tokens, o => o == token) ? true : false;
 	}
+
+	async createRegisterMsg(user) {
+		const msg = await this.app.model.messages.create({
+			sender:0,
+			type: 0,
+			all: 0,
+			msg: {
+				type: 1, 
+				user: {
+					...user,
+					password: undefined,
+				},
+			},
+			extra:{},
+		}).then(o => o && o.toJSON());
+		return await this.app.model.userMessages.create({userId: user.id, messageId:msg.id, state:0}).then(o => o && o.toJSON());
+	}
+
+	async register(user) {
+		await this.createRegisterMsg(user);
+	}
 }
 
 module.exports = User;

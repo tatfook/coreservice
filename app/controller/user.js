@@ -100,7 +100,7 @@ const User = class extends Controller {
 		delete params.id;
 		params.userId = userId;
 
-		await this.model.userinfos.upsert({...info, userId});
+		await this.model.userinfos.upsert({...params, userId});
 		
 		return this.success(true);
 	}
@@ -193,6 +193,10 @@ const User = class extends Controller {
 			});
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
+			
+			// 用户注册
+			await this.ctx.service.user.register(user);
+
 			// 创建lesson用户
 			await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
@@ -286,13 +290,15 @@ const User = class extends Controller {
 		}
 
 		// 同步用户到wikicraft
-		const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
-			console.log("创建wikicraft用户失败", e);
-		});
-		if (!data || data.error.id != 0) {
-			console.log("创建wikicraft用户失败", data);
-			return this.fail(-1, 400, data);
-		} 
+		if (this.app.config.env != "unittest") {
+			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
+				console.log("创建wikicraft用户失败", e);
+			});
+			if (!data || data.error.id != 0) {
+				console.log("创建wikicraft用户失败", data);
+				return this.fail(-1, 400, data);
+			} 
+		}
 
 		user = await model.users.create({
 			cellphone: params.cellphone,
@@ -306,26 +312,31 @@ const User = class extends Controller {
 		if (!user) return this.fail(0);
 		user = user.get({plain:true});
 		
+		// 用户注册
+		await this.ctx.service.user.register(user);
+
 		// 创建lesson用户
 		await this.app.lessonModel.users.create({id: user.id, username: user.username});
 
 		// 创建用户账号记录
 		await this.model.accounts.upsert({userId: user.id});
 
-		const ok = await this.app.api.createGitUser({
-			id: user.id,
-			username: user.username,
-			password: params.password,
-		});
-		if (!ok) {
-			await this.model.users.destroy({where:{id:user.id}});
-			return this.fail(6);
+		if (this.app.config.env != "unittest") {
+			const ok = await this.app.api.createGitUser({
+				id: user.id,
+				username: user.username,
+				password: params.password,
+			});
+			if (!ok) {
+				await this.model.users.destroy({where:{id:user.id}});
+				return this.fail(6);
+			}
+			await this.app.api.createGitProject({
+				username: user.username,
+				sitename: '__keepwork__',
+				visibility: 'public',
+			});
 		}
-		await this.app.api.createGitProject({
-			username: user.username,
-			sitename: '__keepwork__',
-			visibility: 'public',
-		});
 
 		if (params.oauthToken) {
 			await model.oauthUsers.update({userId:user.id}, {where:{token:params.oauthToken}});
@@ -399,11 +410,14 @@ const User = class extends Controller {
 		const env = this.app.config.self.env;
 		if ((env == "release" || env == "stage") && (cellphone == "13632519862" || cellphone == "15219498528")) captcha = "0000";
 
-		const ok = await app.sendSms(cellphone, [captcha, "3分钟"]);
 		
+		if (!this.app.unittest) {
+			const ok = await app.sendSms(cellphone, [captcha, "3分钟"]);
+			if (!ok) return this.throw(500, "请求次数过多");
+		}
+
 		await app.model.caches.put(cellphone, {captcha}, 1000 * 60 * 3); // 10分钟有效期
 
-		if (!ok) return this.throw(500, "请求次数过多");
 		//console.log(captcha);
 		return this.success();
 	}
@@ -446,7 +460,6 @@ const User = class extends Controller {
 
 	async captchaVerify(key, captcha) {
 		const cache = await this.model.caches.get(key);
-		console.log(cache, captcha, key);
 		if (!captcha || !cache || cache.captcha != captcha) return false;
 
 		return true;
@@ -477,8 +490,9 @@ const User = class extends Controller {
 		const captcha = _.times(4, () =>  _.random(0,9,false)).join("");
 
 		const body = `<h3>尊敬的KEEPWORK用户:</h3><p>您好: 您的邮箱验证码为${captcha}, 请在10分钟内完成邮箱验证。谢谢</p>`;
-		const ok = await app.sendEmail(email, "KEEPWORK 邮箱绑定验证", body);
-		//console.log(captcha);
+		if (!this.app.unittest) {
+			const ok = await app.sendEmail(email, "KEEPWORK 邮箱绑定验证", body);
+		}
 		await app.model.caches.put(email, {captcha}, 1000 * 60 * 10); // 10分钟有效期
 
 		return this.success();

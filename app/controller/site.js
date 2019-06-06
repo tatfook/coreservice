@@ -69,8 +69,10 @@ const Site = class extends Controller {
 		if (!data) return ctx.throw(500);
 		data = data.get({plain:true});
 
-		const ok = await this.app.api.createGitProject({username:username, sitename:params.sitename, visibility:data.visibility == 0 ? "public" : "private", site_id: data.id});
-		if (!ok) this.throw(500, "创建git仓库失败");
+		if (!this.app.unittest) {
+			const ok = await this.app.api.createGitProject({username:username, sitename:params.sitename, visibility:data.visibility == 0 ? "public" : "private", site_id: data.id});
+			if (!ok) this.throw(500, "创建git仓库失败");
+		}
 		//this.addNotification(userId, data.id, "create");
 
 		return this.success(data);
@@ -108,7 +110,9 @@ const Site = class extends Controller {
 		const user = await model.users.getById(userId);
 		if (!user || !site) this.throw(400);
 
-		this.app.api.deleteGitProject({username:user.username, sitename:site.sitename});
+		if (!this.app.unittest) {
+			this.app.api.deleteGitProject({username:user.username, sitename:site.sitename});
+		}
 
 		await this.model.siteGroups.destroy({where:{userId, siteId:id}});
 		await this.model.siteFiles.destroy({where:{userId, siteId:id}});

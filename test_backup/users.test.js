@@ -82,46 +82,4 @@ describe("/users", () => {
 		//done();
 	});
 
-	it ("cellphone verfiy", async () => {
-		const cellphone="cellphone";
-		let data = await app.httpRequest().get("/users/cellphone_captcha?cellphone=" + cellphone).expect(200);
-
-		const cache = app.cache.get(cellphone) || {};
-		assert.ok(cache.captcha);
-
-		await app.httpRequest().post("/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:true}).expect(200);
-
-		data = await app.httpRequest().get("/users/1").expect(200).then(res => res.body);
-
-		assert.equal(data.cellphone, cellphone);
-
-		// 解绑
-		await app.httpRequest().post("/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:false}).expect(200);
-
-		data = await app.httpRequest().get("/users/1").expect(200).then(res => res.body);
-
-		assert.equal(data.cellphone, "");
-	});
-
-	it ("email verfiy", async () => {
-		const email="email";
-		//const email="765485868@qq.com";
-		let data = await app.httpRequest().get("/users/email_captcha?email=" + email).expect(200);
-
-		const cache = app.cache.get(email) || {};
-		assert.ok(cache.captcha);
-
-		await app.httpRequest().post("/users/email_captcha").send({email, captcha:cache.captcha, isBind:true}).expect(200);
-
-		data = await app.httpRequest().get("/users/1").expect(200).then(res => res.body);
-
-		assert.equal(data.email, email);
-
-		// 解绑
-		await app.httpRequest().post("/users/email_captcha").send({email, captcha:cache.captcha, isBind:false}).expect(200);
-
-		data = await app.httpRequest().get("/users/1").expect(200).then(res => res.body);
-
-		assert.equal(data.email, "");
-	});
 });
