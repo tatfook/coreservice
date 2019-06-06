@@ -15,7 +15,7 @@ const ProjectRates = class extends Controller {
 		const {projectId, rate} = this.validate({projectId:"int", rate:"int"});
 
 		const data = await this.model.projectRates.create({userId, projectId, rate});
-		await this.ctx.service.project.projectRate(projectId, rate);
+		await this.ctx.service.project.rate(projectId, rate);
 		await this.ctx.service.project.worksRate(projectId, rate);
 
 		return this.success(data);

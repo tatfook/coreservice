@@ -30,6 +30,7 @@ const User = class extends Controller {
 		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
 		const token = this.app.util.jwt_encode({
 			userId: user.userId, 
+			username: user.username,
 			appId: appId,
 		}, config.secret, tokenExpire);
 

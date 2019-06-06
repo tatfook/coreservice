@@ -91,6 +91,21 @@ module.exports = app => {
 		return classes;
 	}
 
+	model.getAllClassIds = async function({memberId, roleId, organizationId}) {
+		const sql = `select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId`;	
+		const list = await app.model.query(sql, {
+			type: app.model.QueryTypes.SELECT,
+			replacements: {
+				organizationId,
+				memberId,
+				roleId,
+			}
+		});
+		const classIds = _.uniq(_.map(list, o => o.classId));
+
+		return classIds;
+	}
+
 	app.model.lessonOrganizationClassMembers = model;
 
 	return model;
