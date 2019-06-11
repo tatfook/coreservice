@@ -6,4 +6,4 @@ class MockUserService {
   }
 }
 
-module.exports = MockUserService;
+module.exports = () => MockUserService;

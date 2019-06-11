@@ -9,5 +9,12 @@ before(async () => {
 });
 
 after(async () => {
-  await app.factory.cleanUp();
+  const opts = { restartIdentity: true };
+  await Promise.all([
+    app.model.User.truncate(opts),
+    app.model.Userinfo.truncate(opts),
+    app.model.World.truncate(opts),
+    app.model.Project.truncate(opts),
+    app.model.Member.truncate(opts),
+  ]);
 });
