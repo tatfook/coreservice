@@ -2,7 +2,7 @@
 
 const { app } = require('egg-mock/bootstrap');
 
-module.exports = user => {
+const getMockToken = user => {
   const { secret, tokenExpire } = app.config.self;
   return 'Bearer ' + app.util.jwt_encode({
     userId: user.id,
@@ -10,3 +10,5 @@ module.exports = user => {
     username: user.username,
   }, secret, tokenExpire);
 };
+
+module.exports = () => getMockToken;
