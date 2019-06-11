@@ -51,5 +51,10 @@ describe("NPL 大赛", () => {
 		// 获取作品
 		works = await app.httpRequest().get("/api/v0/gameWorks/" + works.id).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(works.worksName == "test1");
+
+		// 参赛作品统计
+		const statistics = await app.httpRequest().get("/api/v0/gameWorks/statistics").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(statistics);
+		//console.log(statistics);
 	});
 });
