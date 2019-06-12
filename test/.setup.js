@@ -3,8 +3,7 @@
 const { app } = require('egg-mock/bootstrap');
 const loadMockTools = require('./setup/loader')
 
-before(async () => {
-  await app.ready();
+before(() => {
   loadMockTools(app);
 });
 

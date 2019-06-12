@@ -2,12 +2,12 @@
 
 const path = require('path');
 
-const loadMockUtils = app => {
+const loadMockService = app => {
   const defaultConfig = {
     baseDir: path.join('mock', 'service'),
     enabled: true,
   };
-  const config = Object.assign({}, defaultConfig, app.config.mockUtils);
+  const config = Object.assign({}, defaultConfig, app.config.mockService);
   const { enabled, baseDir } = config;
   if (enabled === false) return;
 
@@ -17,4 +17,4 @@ const loadMockUtils = app => {
   app.mock.service = app[_mockService];
 };
 
-module.exports = loadMockUtils;
+module.exports = loadMockService;
