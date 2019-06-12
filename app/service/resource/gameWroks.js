@@ -36,6 +36,8 @@ class GameWorks extends Model {
 			data.userId = project.userId;
 		}
 
+		if (data.reward != undefined) data.win = data.reward ? 1 : 0;
+
 		return data;
 	}
 }
