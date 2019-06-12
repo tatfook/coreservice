@@ -6,10 +6,10 @@ const Admin = class extends Controller {
 	parseParams() {
 		const params = this.validate();
 		const resourceName = params["resources"] || "";
-
 		delete params.resources;
 
 		this.resource = this.ctx.model[resourceName];
+		this.resourceName = resourceName;
 
 		if (!this.resource) this.ctx.throw(400, "args error");
 
@@ -180,6 +180,8 @@ const Admin = class extends Controller {
 		this.adminAuthenticated();
 
 		const params = this.parseParams();
+		const resource = this.ctx.service.resource.getResourceByName(this.resourceName);
+		if (resource) await resource.build(params); 
 
 		const data = await this.resource.create(params);
 
