@@ -6,28 +6,17 @@ const Model = require("./model.js");
 class GameWorks extends Model {
 	constructor(app) {
 		super(app);
-
-		this.associates = [
-		{
-		
-		}
-		]
-
 	}
 
-	set projectId(projectId) {
-		this.__projectId__ = projectId;
-		
-		const promise = new Promise(async (resolve, reject) => {
-			const project = await this.projectLoader.load(projectId);
-			this.userId = this.userId || project.userId;
+	async buildList(list) {
+		const promises = [];
+		_.each(list, o => {
+			promises.push(this.projectLoader.load(o.projectId).then(project => o.project = project));
+			promises.push(this.userLoader.load(o.userId).then(user => o.user = user));
+			promises.push(this.userinfoLoader.load(o.userId).then(userinfo => o.userinfo = userinfo));
 		});
 
-		this.promises.push(promise);
-	}
-
-	get projectId() {
-		return this.__projectId__;
+		return await Promise.all(promises);
 	}
 
 	async build(data) {
@@ -39,6 +28,18 @@ class GameWorks extends Model {
 		if (data.reward != undefined) data.win = data.reward ? 1 : 0;
 
 		return data;
+	}
+
+	async afterCreate() {
+
+	}
+
+	async afterUpdate() {
+
+	}
+
+	async afterDelete() {
+
 	}
 }
 

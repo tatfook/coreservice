@@ -120,7 +120,9 @@ const Admin = class extends Controller {
 
 		this.formatQuery(query);
 
-		const list = await this.resource.findAll({...this.queryOptions, where:query});
+		const list = await this.resource.findAll({...this.queryOptions, where:query}).then(list => list.map(o => o.toJSON()));
+		const resource = this.ctx.service.resource.getResourceByName(this.resourceName);
+		if (resource && resource.buildList) await resource.buildList(list);
 
 		this.success(list);
 	}
