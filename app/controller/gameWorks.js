@@ -26,6 +26,7 @@ const GameWorks = class extends Controller {
 		const attributes = ["id", "username", "nickname", "portrait"];
 
 		const list = await this.model.gameWorks.findAndCount({
+			...this.queryOptions,
 			include: [
 			{
 				as: "projects",
