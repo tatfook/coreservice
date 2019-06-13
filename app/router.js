@@ -82,6 +82,11 @@ module.exports = app => {
   router.post(`${prefix}oauth_users/xinlang`, oauthUser.xinlang);
   router.resources(`${prefix}oauth_users`, oauthUser);
 
+  const oauthApp = controller.oauthApp;
+  router.get(`${prefix}oauth_apps/oauth_code`, oauthApp.oauthCode);
+  router.post(`${prefix}oauth_apps/oauth_token`, oauthApp.oauthToken);
+  router.post(`${prefix}oauth_apps/login`, oauthApp.login);
+
   const comment = controller.comment;
   router.resources(`${prefix}comments`, comment);
 
@@ -236,6 +241,7 @@ module.exports = app => {
 
   // NPL 大赛 作品
   const gameWorks = controller.gameWorks;
+  router.get(`${prefix}gameWorks/statistics`, gameWorks.statistics);
   router.post(`${prefix}gameWorks/search`, gameWorks.search);
   router.post(`${prefix}gameWorks/snapshoot`, gameWorks.snapshoot);
   router.resources(`${prefix}gameWorks`, gameWorks);
@@ -278,5 +284,6 @@ module.exports = app => {
   // Message
   const userMessage = controller.userMessage;
   router.post(`${prefix}userMessages/state`, userMessage.setState);
+  router.post(`${prefix}userMessages/allstate`, userMessage.allstate);
   router.resources(`${prefix}userMessages`, userMessage);
 };

@@ -23,7 +23,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const {classId} = this.validate({classId:"number_optional"});
 		//const organizationId = 25;
 
-		const members = await this.model.lessonOrganizations.getMembers(organizationId, 2, classId);
+		const members = await this.model.lessonOrganizations.getTeachers(organizationId, classId);
 		const memberIds = members.map(o => o.memberId);
 		if (memberIds.length == 0) return this.success([]);
 
@@ -39,7 +39,6 @@ const LessonOrganizationClassMember = class extends Controller {
 				as: "lessonOrganizationClasses",
 				model: this.model.lessonOrganizationClasses,
 				where: {
-					//begin: {$lte: curtime},
 					end: {$gte: curtime},
 				},
 				required: false,
@@ -83,14 +82,14 @@ const LessonOrganizationClassMember = class extends Controller {
 				attributes: ["id", "username", "nickname", "portrait"],
 				model: this.model.users,
 			},
-			{ as: "lessonOrganizationClasses",
+			{ 
+				as: "lessonOrganizationClasses",
 				model: this.model.lessonOrganizationClasses,
 				where: {
-					//begin: {$lte: curtime},
 					end: {$gte: curtime},
 				},
 				required: false,
-			}
+			},
 			],
 			where: {
 				organizationId,

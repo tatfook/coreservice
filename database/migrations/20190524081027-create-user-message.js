@@ -3,14 +3,14 @@
 const tableName = 'userMessages';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  up: async (queryInterface, Sequelize) => {
     const {
       BIGINT,
       INTEGER,
       DATE,
     } = Sequelize;
 
-    return queryInterface.createTable(tableName, {
+    await queryInterface.createTable(tableName, {
       id: {
         type: BIGINT,
         autoIncrement: true,
@@ -45,6 +45,12 @@ module.exports = {
       charset: 'utf8mb4',
       collate: 'utf8mb4_bin',
     });
+
+    return queryInterface.addIndex(
+      tableName,
+      [ 'userId', 'messageId' ],
+      { unique: true }
+    );
   },
 
   down: queryInterface => {
