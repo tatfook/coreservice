@@ -42,27 +42,18 @@ module.exports = app => {
     underscored: false,
     charset: 'utf8mb4',
     collate: 'utf8mb4_bin',
+
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'userId', 'messageId' ],
+      },
+    ],
   });
 
   // model.sync({force:true}).then(() => {
   // console.log("create table successfully");
   // });
-
-  model.associate = function() {
-    app.model.userMessages.belongsTo(app.model.users, {
-      as: 'users',
-      foreignKey: 'userId',
-      targetKey: 'id',
-      // constraints: false,
-    });
-
-    app.model.userMessages.belongsTo(app.model.messages, {
-      as: 'messages',
-      foreignKey: 'messageId',
-      targetKey: 'id',
-      // constraints: false,
-    });
-  };
 
   app.model.userMessages = model;
 

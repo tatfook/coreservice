@@ -100,6 +100,13 @@ module.exports = app => {
 
   // model.sync({force:true});
 
+  model.getValidOrganizationById = async function(organizationId) {
+    return await app.model.lessonOrganizations.findOne({ where: {
+      id: organizationId,
+      endDate: { $gte: new Date() },
+    } }).then(o => o && o.toJSON());
+  };
+
   // 获取机构已用人数
   model.getUsedCount = async function(organizationId) {
     const sql = `select count(*) as count from (select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 1 and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId and end > current_timestamp())) group by memberId) as t`;
@@ -123,27 +130,10 @@ module.exports = app => {
     return list;
   };
 
-  model.associate = function() {
-    app.model.lessonOrganizations.belongsTo(app.model.users, {
-      as: 'users',
-      foreignKey: 'userId',
-      targetKey: 'id',
-      constraints: false,
-    });
-
-    app.model.lessonOrganizations.hasMany(app.model.lessonOrganizationPackages, {
-      as: 'lessonOrganizationPackages',
-      foreignKey: 'organizationId',
-      sourceKey: 'id',
-      constraints: false,
-    });
-
-    app.model.lessonOrganizations.hasMany(app.model.lessonOrganizationClassMembers, {
-      as: 'lessonOrganizationClassMembers',
-      foreignKey: 'organizationId',
-      sourceKey: 'id',
-      constraints: false,
-    });
+  model.getTeachers = async function(organizationId, classId) {
+    const sql = `select * from lessonOrganizationClassMembers as locm where locm.organizationId = ${organizationId} and roleId & 2 and classId ${classId === undefined ? '>= 0' : ('= ' + classId)}  and (classId = 0 or exists (select * from lessonOrganizationClasses where id = classId)) group by memberId`;
+    const list = await app.model.query(sql, { type: app.model.QueryTypes.SELECT });
+    return list;
   };
 
   app.model.lessonOrganizations = model;

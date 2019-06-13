@@ -3,29 +3,48 @@
 module.exports = app => {
   const {
     BIGINT,
-    FLOAT,
+    STRING,
+    TEXT,
+    JSON,
     DATE,
   } = app.Sequelize;
 
-  const model = app.model.define('locations', {
+  const model = app.model.define('oauthApps', {
     id: {
       type: BIGINT,
       autoIncrement: true,
       primaryKey: true,
     },
 
-    userId: {
+    userId: { // 文件所属者
       type: BIGINT,
-      unique: true,
+      defaultValue: 0,
+    },
+
+    appName: {
+      type: STRING,
+      defaultValue: '',
       allowNull: false,
     },
 
-    longitude: { // 经度
-      type: FLOAT(10, 6),
+    clientId: {
+      type: STRING,
+      unique: true,
+      defaultValue: '',
     },
 
-    latitude: { // 维度
-      type: FLOAT(10, 6),
+    clientSecret: {
+      type: STRING,
+      defaultValue: '',
+    },
+
+    description: {
+      type: TEXT,
+    },
+
+    extra: {
+      type: JSON,
+      defaultValue: {},
     },
 
     createdAt: {
@@ -42,12 +61,20 @@ module.exports = app => {
     underscored: false,
     charset: 'utf8mb4',
     collate: 'utf8mb4_bin',
+    indexes: [
+      {
+        unique: true,
+        fields: [ 'userId', 'appName' ],
+      },
+    ],
   });
 
   // model.sync({force:true}).then(() => {
   // console.log("create table successfully");
   // });
 
-  app.model.locations = model;
+  app.model.oauthApps = model;
+
   return model;
 };
+

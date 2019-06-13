@@ -5,6 +5,21 @@ use `lesson-dev`;
 use `lesson-rls`;
 use `keepwork`;
 
+CREATE TABLE `oauthApps` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `userId` bigint(20) DEFAULT '0',
+  `appName` varchar(255) COLLATE utf8mb4_bin NOT NULL DEFAULT '',
+  `clientId` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `clientSecret` varchar(255) COLLATE utf8mb4_bin DEFAULT '',
+  `description` text COLLATE utf8mb4_bin,
+  `extra` json DEFAULT NULL,
+  `createdAt` datetime NOT NULL,
+  `updatedAt` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `clientId` (`clientId`),
+  UNIQUE KEY `oauth_apps_user_id_app_name` (`userId`,`appName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+
 CREATE TABLE `userdatas` (
   `userId` bigint(20) NOT NULL,
   `data` json DEFAULT NULL,
@@ -69,11 +84,11 @@ CREATE TABLE `userMessages` (
   `createdAt` datetime NOT NULL,
   `updatedAt` datetime NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `userId` (`userId`),
+  UNIQUE KEY `user_messages_user_id_message_id` (`userId`,`messageId`),
   KEY `messageId` (`messageId`),
   CONSTRAINT `userMessages_ibfk_1` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `userMessages_ibfk_2` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 -- --------------------------------------------------------
 select * from `keepwork-rls`.users where username = "dsl4";

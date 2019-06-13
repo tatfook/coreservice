@@ -196,6 +196,13 @@ const LessonOrganization = class extends Controller {
 			await this.fixedClassPackage(id, params.packages);
 		}
 
+		if (params.endDate) {
+			await this.model.lessonOrganizationClasses.update({end: params.endDate}, {where: {
+				organizationId:id,
+				end: {$gt: params.endDate},
+			}});
+		}
+
 		if (params.usernames) {
 			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: id}});
 			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
@@ -309,12 +316,12 @@ const LessonOrganization = class extends Controller {
 		if (classId !== undefined) {
 			list = await this.model.lessonOrganizationPackages.findAll({where: {organizationId, packageId, classId}}).then(list => _.map(list, o => o.toJSON()));
 		} else {
-			const classes = await this.model.lessonOrganizationClassMembers.getClasses({memberId: userId, roleId, organizationId});
+			const classIds = await this.model.lessonOrganizationClassMembers.getAllClassIds({memberId: userId, roleId, organizationId});
 			list = await this.model.lessonOrganizationPackages.findAll({
 				where: {
 					organizationId,
 					packageId,
-					classId:{$in: _.map(classes, o => o.id)},
+					classId:{$in: classIds},
 				}
 			}).then(list => _.map(list, o => o.toJSON()));
 		}

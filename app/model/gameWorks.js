@@ -55,6 +55,11 @@ module.exports = app => {
       type: INTEGER,
     },
 
+    win: { // 是否获奖
+      type: INTEGER,
+      defaultValue: 0,
+    },
+
     reward: { // 获奖情况
       type: STRING,
     },
@@ -73,6 +78,7 @@ module.exports = app => {
       type: DATE,
       allowNull: false,
     },
+
   };
 
   const opts = {
@@ -91,29 +97,6 @@ module.exports = app => {
   const model = app.model.define('gameWorks', attrs, opts);
 
   // model.sync({force:true});
-
-  model.associate = function() {
-    app.model.gameWorks.belongsTo(app.model.games, {
-      as: 'games',
-      foreignKey: 'gameId',
-      targetKey: 'id',
-      constraints: false,
-    });
-
-    app.model.gameWorks.belongsTo(app.model.projects, {
-      as: 'projects',
-      foreignKey: 'projectId',
-      targetKey: 'id',
-      constraints: false,
-    });
-
-    app.model.gameWorks.belongsTo(app.model.users, {
-      as: 'users',
-      foreignKey: 'userId',
-      targetKey: 'id',
-      constraints: false,
-    });
-  };
 
   app.model.gameWorks = model;
 

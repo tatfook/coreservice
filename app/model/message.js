@@ -77,12 +77,15 @@ module.exports = app => {
 
   // 主动合并消息
   model.mergeMessage = async function(userId) {
-    const sql = 'select id, createdAt from messages where `all` = :all and id not in (select messageId from userMessages where userId = :userId)';
+    const user = await app.model.users.findOne({ where: { id: userId } }).then(o => o && o.toJSON());
+    if (!user) return;
+    const sql = 'select id, createdAt from messages where `all` = :all and createdAt > :createdAt and id not in (select messageId from userMessages where userId = :userId)';
     const list = await app.model.query(sql, {
       type: app.model.QueryTypes.SELECT,
       replacements: {
         all: 1,
         userId,
+        createdAt: user.createdAt,
       },
     });
     const datas = _.map(list, o => ({ userId, messageId: o.id, state: 0, createdAt: o.createdAt }));
@@ -92,15 +95,6 @@ module.exports = app => {
 
   model.getCountByUserId = async function() {
     await this.mergeMessage();
-  };
-
-  model.associate = function() {
-    app.model.messages.hasMany(app.model.userMessages, {
-      as: 'userMessages',
-      foreignKey: 'messageId',
-      sourceKey: 'id',
-      // constraints: false,
-    });
   };
 
   app.model.messages = model;

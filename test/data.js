@@ -1,6 +1,15 @@
+const _ = require("lodash");
 const md5 = require("blueimp-md5");
 
 const datas = {
+	sensitiveWords:[],
+	admins:[
+	{
+		username:"admin001",
+		password:md5("123456"),
+	},
+	],
+
 	// 用户
 	users: [
 	{
@@ -19,6 +28,14 @@ const datas = {
 		username:"user004",
 		password:md5("123456"),
 	},
+	{
+		username:"user005",
+		password:md5("123456"),
+	},
+	{
+		username:"user006",
+		password:md5("123456"),
+	},
 	],
 
 	userdatas: [
@@ -28,21 +45,64 @@ const datas = {
 	},
 	],
 
+	projectRates:[],
+	games:[],
+	gameWorks:[],
+	systemTags:[],
+	orders:[],
+	contributions:[],
+	userRanks:[],
+	sites:[],
+	siteFiles:[],
+	projects:[],
+	worlds:[],
+	groups:[],
+	members:[],
+	siteGroups:[],
+	oauthUsers:[],
+	accounts:{},
+	projects:[],
+	caches:[],
 	favorites:[],
 	illegalUsers:[],
 	userinfos:[],
+	messages:[],
+	userMessages:[],
+	applies:[],
+	comments:[],
+	tags:[],
+	issues:[],
+	feedbacks:[],
+
+	oauthApps:[
+	{
+		appName:"appname",
+		userId:1,
+		clientId: "123456",
+		clientSecret:"abcdef",
+		description:"oauth app test",
+	},
+	],
 
 	// 机构
 	lessonOrganizations: [
 	{
 		name:"org1",
 		state:0,
+		startDate: new Date(),
+		endDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 30),
+		count: 100,
 	},
 	{
 		name:"org2",
 		state:0,
+		startDate: new Date(),
+		endDate: new Date(new Date().getTime() + 1000 * 60 * 60 * 30),
+		count: 100,
 	},
 	],
+
+	lessonOrganizationActivateCodes:[],
 
 	// 机构班级
 	lessonOrganizationClasses: [
@@ -220,6 +280,25 @@ const datas = {
 }
 
 module.exports = async (app) => {
+	const tables = _.keys(datas);
+	const keepworktables = tables.filter(key => app.model[key]).reverse();
+	for (let i = 0; i < keepworktables.length; i++) {
+		const table = keepworktables[i];
+		try {
+			await app.model.query(`drop table ${table}`);
+		} catch(e) {
+			console.log(e);
+		}
+	}
+	const lessontables = tables.filter(key => app.lessonModel[key]).reverse();
+	for (let i = 0; i < lessontables.length; i++) {
+		const table = lessontables[i];
+		try {
+			await app.lessonModel.query(`drop table ${table}`);
+		} catch(e) {
+			console.log(e);
+		}
+	}
 	for (let key in datas) {
 		if (app.model[key]){
 			await app.model[key].sync({force:true});

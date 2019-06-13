@@ -9,11 +9,29 @@ const GameWorks = class extends Controller {
 		return "gameWorks";
 	}
 
+	async statistics() {
+		// 全部作品统计
+		let sql = `select name, count(*) count from games, gameWorks where games.id = gameWorks.gameId group by name`;
+		let list = await this.model.query(sql, {type: this.model.QueryTypes.SELECT});
+	
+		// 获奖作品统计
+		sql = `select name, count(*) count from games, gameWorks where games.id = gameWorks.gameId and win > 0 group by name`;
+		let winlist = await this.model.query(sql, {type: this.model.QueryTypes.SELECT});
+
+		return this.success({list, winlist});
+	}
+
 	async search() {
 		const query = this.validate();
 		const attributes = ["id", "username", "nickname", "portrait"];
+		const gameWhere = {};
+		if (query.gameName) {
+			gameWhere.name = query.gameName;
+			delete query.gameName;
+		}
 
 		const list = await this.model.gameWorks.findAndCount({
+			...this.queryOptions,
 			include: [
 			{
 				as: "projects",
@@ -32,12 +50,17 @@ const GameWorks = class extends Controller {
 					},
 				]
 			}, 
+			{
+				as: "games",
+				model: this.model.games,
+				where: gameWhere,
+			}
 			],
 			where: query,
 		}).then(x => {
 			x.rows = _.map(x.rows, o => {
 				o = o.toJSON();
-				o.projects = o.projects || o.extra.projects;
+				o.projects = o.projects || (o.extra || {}).projects;
 				if (!o.projects) return o;
 				o.projects.user = o.projects.users;
 				return o;

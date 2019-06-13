@@ -262,6 +262,8 @@ const OauthUsers = class extends Controller {
 			domain: "." + config.domain,
 		});
 
+		await this.ctx.service.user.setToken(user.id, token);
+
 		return this.success(user);
 	}
 }

@@ -53,6 +53,9 @@ const ProxyUser = class extends Controller {
 		//this.formatUserInfo(data.data.userinfo, user);
 
 		data.data = {userinfo: data.data, token};
+		
+		await this.ctx.service.user.setToken(user.id, token);
+
 		return this.success(data);
 	}
 
@@ -91,6 +94,12 @@ const ProxyUser = class extends Controller {
 		});
 
 		this.formatUserInfo(data.data.userinfo, user);
+		const token = data.data.token;
+
+		// 用户注册
+		await this.ctx.service.user.register(user);
+		await this.ctx.service.user.setToken(user.id, token);
+
 		return this.success(data);
 	}
 

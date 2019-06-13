@@ -58,6 +58,11 @@ module.exports = {
         type: INTEGER,
       },
 
+      win: { // 是否获奖
+        type: INTEGER,
+        defaultValue: 0,
+      },
+
       reward: { // 获奖情况
         type: STRING,
       },

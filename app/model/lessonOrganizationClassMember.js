@@ -100,35 +100,19 @@ module.exports = app => {
     return classes;
   };
 
-  model.associate = function() {
-    app.model.lessonOrganizationClassMembers.belongsTo(app.model.lessonOrganizations, {
-      as: 'lessonOrganizations',
-      foreignKey: 'organizationId',
-      targetKey: 'id',
-      constraints: false,
+  model.getAllClassIds = async function({ memberId, roleId, organizationId }) {
+    const sql = 'select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId';
+    const list = await app.model.query(sql, {
+      type: app.model.QueryTypes.SELECT,
+      replacements: {
+        organizationId,
+        memberId,
+        roleId,
+      },
     });
+    const classIds = _.uniq(_.map(list, o => o.classId));
 
-    app.model.lessonOrganizationClassMembers.belongsTo(app.model.lessonOrganizationClasses, {
-      as: 'lessonOrganizationClasses',
-      foreignKey: 'classId',
-      targetKey: 'id',
-      constraints: false,
-    });
-
-    app.model.lessonOrganizationClassMembers.hasMany(app.model.lessonOrganizationPackages, {
-      as: 'lessonOrganizationPackages',
-      foreignKey: 'classId',
-      sourceKey: 'classId',
-      constraints: false,
-    });
-
-    app.model.lessonOrganizationClassMembers.belongsTo(app.model.users, {
-      as: 'users',
-      foreignKey: 'memberId',
-      targetKey: 'id',
-      constraints: false,
-    });
-
+    return classIds;
   };
 
   app.model.lessonOrganizationClassMembers = model;
