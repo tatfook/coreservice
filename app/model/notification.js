@@ -1,140 +1,149 @@
+'use strict';
 
-const _ = require("lodash");
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
+  ENTITY_TYPE_USER,
+  ENTITY_TYPE_SITE,
+  ENTITY_TYPE_PAGE,
 
-	NOTIFICATION_STATE_UNREAD,
-	NOTIFICATION_STATE_READ,
-} = require("../core/consts.js");
+  NOTIFICATION_STATE_UNREAD,
+} = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+  const {
+    BIGINT,
+    INTEGER,
+    TEXT,
+    JSON,
+    DATE,
+  } = app.Sequelize;
 
-	const model = app.model.define("notifications", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {             // 通知所属者
-			type: BIGINT,
-			allowNull:  false,
-		},
+  const model = app.model.define('notifications', {
+    id: {
+      type: BIGINT,
+      autoIncrement: true,
+      primaryKey: true,
+    },
 
-		type: {               // 通知类型
-			type: INTEGER,
-		},
+    userId: { // 通知所属者
+      type: BIGINT,
+      allowNull: false,
+    },
 
-		state: {              // 是否已读  0 -- 未读  1 -- 已读
-			type: INTEGER,
-		},
+    type: { // 通知类型
+      type: INTEGER,
+    },
 
-		description: {        // 通知内容
-			type: TEXT,
-		},
+    state: { // 是否已读  0 -- 未读  1 -- 已读
+      type: INTEGER,
+    },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    description: { // 通知内容
+      type: TEXT,
+    },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.addNotification = async function(userId, description) {
-		if (!userId) return;
+    extra: {
+      type: JSON,
+      defaultValue: {},
+    },
 
-		const data = await app.model.notifications.create({
-			userId,
-			description,
-			state: NOTIFICATION_STATE_UNREAD,
-		});
+    createdAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-		return data && data.get({plain:true});
-	}
+    updatedAt: {
+      type: DATE,
+      allowNull: false,
+    },
 
-	model.getUnreadByUserId = async function(userId) {
-		let data = await this.model.findAndCount({
-			where: {
-				userId,
-				state: NOTIFICATION_STATE_UNREAD,
-			}
-		});
+  }, {
+    underscored: false,
+    charset: 'utf8mb4',
+    collate: 'utf8mb4_bin',
+  });
 
-		return data;
-	}
-	
-	model.favoriteNotification = async function(userId, objectId, objectType, oper = "favorite") {
-		if (objectType == ENTITY_TYPE_USER) await this.favoriteUser(userId, objectId, oper);
-		else if (objectType == ENTITY_TYPE_SITE) await this.favoriteSite(userId, objectId, oper);
-		else if (objectType == ENTITY_TYPE_PAGE) await this.favoritePage(userId, pageId, oper);
+  // model.sync({force:true}).then(() => {
+  // console.log("create table successfully");
+  // });
 
-		return;
-	}
+  model.addNotification = async function(userId, description) {
+    if (!userId) return;
 
-	model.favoriteUser = async function(userId, followingId, oper="favorite") {
-		const usersModel = app.model["users"];
+    const data = await app.model.notifications.create({
+      userId,
+      description,
+      state: NOTIFICATION_STATE_UNREAD,
+    });
 
-		let user = await usersModel.getById(userId);
-		let followingUser = await usersModel.getById(followingId);
+    return data && data.get({ plain: true });
+  };
 
-		if (oper == "favorite") oper = "关注";
-		if (oper == "unfavorite") oper = "取消关注";
-		let description = `${user.nickname || user.username} ${oper} ${followingUser.nickname || followingUser.username}`;
+  model.getUnreadByUserId = async function(userId) {
+    const data = await this.model.findAndCount({
+      where: {
+        userId,
+        state: NOTIFICATION_STATE_UNREAD,
+      },
+    });
 
-		await this.addNotification(userId, description);
-		await this.addNotification(followingId, description);
-	}
+    return data;
+  };
 
-	model.favoriteSite = async function(userId, siteId, oper="favorite") {
-		const usersModel = app.model["users"];
-		const sitesModel = app.model["sites"];
+  model.favoriteNotification = async function(userId, objectId, objectType, oper = 'favorite', pageId) {
+    if (objectType === ENTITY_TYPE_USER) await this.favoriteUser(userId, objectId, oper);
+    else if (objectType === ENTITY_TYPE_SITE) await this.favoriteSite(userId, objectId, oper);
+    else if (objectType === ENTITY_TYPE_PAGE) await this.favoritePage(userId, pageId, oper);
 
-		let user = await usersModel.getById(userId);
-		let site = await sitesModel.getById(siteId);
+    return;
+  };
 
-		if (oper == "favorite") oper = "收藏";
-		if (oper == "unfavorite") oper = "取消收藏";
+  model.favoriteUser = async function(userId, followingId, oper = 'favorite') {
+    const usersModel = app.model.users;
 
-		let description = `${user.nickname || user.username} ${oper} ${site.sitename}站点`;
+    const user = await usersModel.getById(userId);
+    const followingUser = await usersModel.getById(followingId);
 
-		await this.addNotification(userId, description);
-		await this.addNotification(site.userId, description);
-	}
+    if (oper === 'favorite') oper = '关注';
+    if (oper === 'unfavorite') oper = '取消关注';
+    const description = `${user.nickname || user.username} ${oper} ${followingUser.nickname || followingUser.username}`;
 
-	model.favoritePage = async function(userId, pageId, oper="favorite") {
-		const usersModel = app.model["users"];
-		const pagesModel = app.model["pages"];
+    await this.addNotification(userId, description);
+    await this.addNotification(followingId, description);
+  };
 
-		let user = await usersModel.getById(userId);
-		let page = await pagesModel.getById(pageId);
+  model.favoriteSite = async function(userId, siteId, oper = 'favorite') {
+    const usersModel = app.model.users;
+    const sitesModel = app.model.sites;
 
-		if (oper == "favorite") oper = "收藏";
-		if (oper == "unfavorite") oper = "取消收藏";
+    const user = await usersModel.getById(userId);
+    const site = await sitesModel.getById(siteId);
 
-		let description = `${user.nickname || user.username} ${oper} ${page.url}页面`;
+    if (oper === 'favorite') oper = '收藏';
+    if (oper === 'unfavorite') oper = '取消收藏';
 
-		await this.addNotification(userId, description);
-		await this.addNotification(page.userId, description);
-	}
+    const description = `${user.nickname || user.username} ${oper} ${site.sitename}站点`;
 
-	app.model.notifications = model;
+    await this.addNotification(userId, description);
+    await this.addNotification(site.userId, description);
+  };
 
-	return model;
+  model.favoritePage = async function(userId, pageId, oper = 'favorite') {
+    const usersModel = app.model.users;
+    const pagesModel = app.model.pages;
+
+    const user = await usersModel.getById(userId);
+    const page = await pagesModel.getById(pageId);
+
+    if (oper === 'favorite') oper = '收藏';
+    if (oper === 'unfavorite') oper = '取消收藏';
+
+    const description = `${user.nickname || user.username} ${oper} ${page.url}页面`;
+
+    await this.addNotification(userId, description);
+    await this.addNotification(page.userId, description);
+  };
+
+  app.model.notifications = model;
+
+  return model;
 };
