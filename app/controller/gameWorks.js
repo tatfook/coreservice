@@ -24,6 +24,11 @@ const GameWorks = class extends Controller {
 	async search() {
 		const query = this.validate();
 		const attributes = ["id", "username", "nickname", "portrait"];
+		const gameWhere = {};
+		if (query.gameName) {
+			gameWhere.name = query.gameName;
+			delete query.gameName;
+		}
 
 		const list = await this.model.gameWorks.findAndCount({
 			...this.queryOptions,
@@ -45,6 +50,11 @@ const GameWorks = class extends Controller {
 					},
 				]
 			}, 
+			{
+				as: "games",
+				model: this.model.games,
+				where: gameWhere,
+			}
 			],
 			where: query,
 		}).then(x => {
