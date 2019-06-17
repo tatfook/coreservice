@@ -18,6 +18,16 @@ const Admin = class extends Controller {
 		return params;
 	}
 	
+	async action() {
+		const userId = this.ctx.state.admin.userId;
+		const url = this.ctx.url;
+		const data = this.validate();
+
+		await this.model.adminActions.create({userId, url, data});
+
+		return ;
+	}
+
 	async login() {
 		const config = this.app.config.self;
 		const util = this.app.util;
@@ -46,6 +56,8 @@ const Admin = class extends Controller {
 
 		user.token = token;
 
+		//this.action();
+
 		return this.success(user);
 	}
 
@@ -60,6 +72,8 @@ const Admin = class extends Controller {
 			userId: user.id, 
 			username: user.username
 		}, config.secret, tokenExpire);
+
+		//this.action();
 
 		return this.success(token);
 	}
@@ -86,6 +100,8 @@ const Admin = class extends Controller {
 			replacements: data,
 		});
 
+		//this.action();
+
 		return this.success(list);
 	}
 
@@ -98,7 +114,9 @@ const Admin = class extends Controller {
 
 		const list = await this.resource.findAndCount(query);
 
-		this.success(list);
+		//this.action();
+
+		return this.success(list);
 	}
 
 	async search() {
@@ -110,7 +128,9 @@ const Admin = class extends Controller {
 
 		const list = await this.resource.findAndCountAll({...this.queryOptions, where:query});
 
-		this.success(list);
+		//this.action();
+
+		return this.success(list);
 	}
 
 	async index() {
@@ -124,7 +144,9 @@ const Admin = class extends Controller {
 		const resource = this.ctx.service.resource.getResourceByName(this.resourceName);
 		if (resource && resource.buildList) await resource.buildList(list);
 
-		this.success(list);
+		//this.action();
+
+		return this.success(list);
 	}
 
 	async show() {
@@ -137,6 +159,8 @@ const Admin = class extends Controller {
 
 		const data = await this.resource.findOne({where:{id}});
 
+		//this.action();
+
 		return this.success(data);
 	}
 
@@ -146,6 +170,8 @@ const Admin = class extends Controller {
 		const {datas} = this.parseParams();
 
 		const data = await this.resource.bulkCreate(datas); 
+
+		this.action();
 
 		return this.success(data);
 	}
@@ -161,6 +187,8 @@ const Admin = class extends Controller {
 			await this.resource.update(datas[i], {where:{id:datas[i].id}});
 		}
 
+		this.action();
+
 		return this.success(data);
 	}
 
@@ -175,6 +203,8 @@ const Admin = class extends Controller {
 			await this.resource.destroy({where:{id:datas[i].id}});
 		}
 
+		this.action();
+
 		return this.success(data);
 	}
 
@@ -186,6 +216,8 @@ const Admin = class extends Controller {
 		if (resource) await resource.build(params); 
 
 		const data = await this.resource.create(params);
+
+		this.action();
 
 		return this.success(data);
 	}
@@ -201,6 +233,8 @@ const Admin = class extends Controller {
 		delete params.id;
 		const data = await this.resource.update(params, {where:{id}, silent: true});
 
+		this.action();
+
 		return this.success(data);
 	}
 
@@ -213,6 +247,8 @@ const Admin = class extends Controller {
 		if (!id) this.throw(400, "args error");
 
 		const data = await this.resource.destroy({where:{id}});
+
+		this.action();
 
 		return this.success(data);
 	}
