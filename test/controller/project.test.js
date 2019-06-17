@@ -73,7 +73,7 @@ describe("项目", () => {
 
 		// 创建项目
 		let project = await app.httpRequest().post("/api/v0/projects").send({
-			name:"projectname1",
+			name:"projectnamexxx",
 			type:0,
 		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(project.id);

@@ -9,7 +9,7 @@ describe("/users", () => {
 	});
 
 	it("0001 修改密码 token失效测试", async () => {
-		app.config.self.env = "local";
+		app.config.self.env = "production";
 		const apiUrlPrefix = "/api/v0/";
 		// 构建用户
 		const user = await app.model.users.create({username:"user0000", password: md5("123456")}).then(o => o.toJSON());
