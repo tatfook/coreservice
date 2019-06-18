@@ -62,7 +62,6 @@ const datas = {
 	siteGroups:[],
 	oauthUsers:[],
 	accounts:{},
-	projects:[],
 	caches:[],
 	favorites:[],
 	illegalUsers:[],
