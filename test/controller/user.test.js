@@ -6,6 +6,11 @@ const initData = require("../data.js");
 describe("/users", () => {
 	before(async () => {
 		await initData(app);
+		//await app.model.users.truncate();
+	});
+
+	after(async () => {
+		//await app.model.users.truncate();
 	});
 
 	it("0001 修改密码 token失效测试", async () => {
@@ -80,8 +85,9 @@ describe("/users", () => {
 	});
 
 	it ("0003 手机验证", async () => {
-		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user001", password: "123456"}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
-		console.log(token);
+		// 构建用户
+		await app.model.users.create({username:"user0001", password: md5("123456")}).then(o => o.toJSON());
+		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user0001", password: "123456"}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
 		assert(token);
 		const cellphone="18702759796";
 		let data = await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
@@ -104,7 +110,8 @@ describe("/users", () => {
 	});
 
 	it ("0004 邮箱验证", async () => {
-		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user001", password: "123456"}).then(res => res.body.token);
+		await app.model.users.create({username:"user0002", password: md5("123456")}).then(o => o.toJSON());
+		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user0002", password: "123456"}).then(res => res.body.token);
 		const email="765485868@qq.com";
 		let data = await app.httpRequest().get("/api/v0/users/email_captcha?email=" + email).expect(res => assert(res.statusCode == 200));
 
@@ -126,7 +133,8 @@ describe("/users", () => {
 	});
 
 	it("0005 用户列表 用户搜索 用户排行榜", async () => {
-		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user001", password: "123456"}).then(res => res.body.token);
+		await app.model.users.create({username:"user0003", password: md5("123456")}).then(o => o.toJSON());
+		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user0003", password: "123456"}).then(res => res.body.token);
 		const users = await app.model.users.findAll();
 		let list = await app.httpRequest().get("/api/v0/users").expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(list.length == users.length);

@@ -9,6 +9,10 @@ module.exports = app => {
 	router.all(`${prefix}indexs/test`, index.test);
 	router.resources(`${prefix}indexs`, index);
 
+	const migration = controller.migration;
+	router.get(`${prefix}migrations/generate`, migration.generate);
+	router.get(`${prefix}migrations/generateAll`, migration.generateAll);
+
 	const keepwork = controller.keepwork;
 	router.post(`${prefix}keepworks/email`, keepwork.email);
 	router.get(`${prefix}keepworks/test`, keepwork.test);
