@@ -1,48 +1,12 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("/api/v0/sites", () => {
 	before(async () => {
-		await initData(app);
-
-		let data = await app.httpRequest().post("/api/v0/users/register").send({
-			username:"xiaoyao",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.ok(data.token);
-		const token = data.token;
-
-		data = await app.httpRequest().post("/api/v0/users/register").send({
-			username:"wxatest",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.ok(data.token);
-
-		data = await app.httpRequest().post("/api/v0/users/register").send({
-			username:"wxaxiaoyao",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.ok(data.token);
-
-		data = await app.httpRequest().post("/api/v0/groups").send({
-			groupname:"group1",
-			description:"test",
-		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.equal(data.id,1);
-		
-		data = await app.httpRequest().post("/api/v0/groups").send({
-			groupname:"group2",
-			description:"test",
-		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.equal(data.id,2);
 	});
 
 	it("001 网站增删查改 通过用户名站点名获取信息", async()=> {
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"xiaoyao",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		const token = await app.login({username:"xiaoyao"}).then(o => o.token);
 		assert.ok(token);
 
 		// 创建网站
@@ -80,11 +44,12 @@ describe("/api/v0/sites", () => {
 	});
 
 	it("002 POST|PUT|DELETE|GET /site/:id/groups", async()=>{
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"xiaoyao",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		const user = await app.login();
+		const token = user.token;
+		const userId = user.id;
 		assert.ok(token);
+		const group1 = await app.model.groups.create({userId, groupname:"group1"});
+		const group2 = await app.model.groups.create({userId, groupname:"group2"});
 		// 创建网站
 		const site = await app.httpRequest().post("/api/v0/sites").send({
 			sitename:"site",
@@ -93,13 +58,13 @@ describe("/api/v0/sites", () => {
 		assert(site);
 		const url = `/api/v0/sites/${site.id}/groups`;
 		let data = await app.httpRequest().post(url).send({
-			groupId:1,
+			groupId:group1.id,
 			level: 32,
 		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.id, 1);
 		
 		data = await app.httpRequest().post(url).send({
-			groupId:2,
+			groupId:group2.id,
 			level: 64,
 		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert.equal(data.id, 2);
@@ -119,13 +84,9 @@ describe("/api/v0/sites", () => {
 	});
 
 	it("003 GET /sites 获取参与站点", async()=> {
-		const user = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"xiaoyao",
-			password:"wuxiangan",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert.ok(user);
+		const user = await app.login();
 		const token = user.token;
-		const userId = 1;
+		const userId = await app.factory.create("users").then(o => o.toJSON()).then(o => o.id);
 		const site = await app.model.sites.create({
 			userId,
 			sitename:"site2",

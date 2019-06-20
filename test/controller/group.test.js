@@ -1,16 +1,11 @@
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("组", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 组的增删查改", async ()=> {
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"user001",
-			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		const token = await app.login().then(o => o.token);
 		assert.ok(token);
 		const group1 = await app.httpRequest().post("/api/v0/groups").send({
 			groupname:"group1",
@@ -39,10 +34,9 @@ describe("组", () => {
 	});
 
 	it("002 组成员增删改查", async()=>{
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"user001",
-			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		await app.factory.create("users", {username:"user002"});
+		await app.factory.create("users", {username:"user003"});
+		const token = await app.login().then(o => o.token);
 		assert.ok(token);
 		const group = await app.httpRequest().post("/api/v0/groups").send({
 			groupname:"group3",

@@ -1,26 +1,26 @@
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("NPL 大赛", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 大赛列表", async () => {
-		const userId = 1;
-		const token = app.util.jwt_encode({userId, username:"user001"}, app.config.self.secret);
+		await app.factory.createMany("users", 10);
+		const user = await app.login();
+		const userId = user.id;
+		const token = user.token;
 
 		const game = await app.model.games.create({gameNo:1, name:"game", stateDate: new Date().getTime() - 1000 * 60 * 60 * 24, endDate: new Date().getTime() + 1000 * 60 * 60 * 24});
 
-		const p1 = await app.model.projects.create({userId:1, name:"project1"});
+		const p1 = await app.model.projects.create({userId, name:"project1"});
 		const p2 = await app.model.projects.create({userId:2, name:"project2"});
 		const p3 = await app.model.projects.create({userId:3, name:"project3"});
 		const p4 = await app.model.projects.create({userId:4, name:"project4"});
 		const p5 = await app.model.projects.create({userId:5, name:"project5"});
 		const p6 = await app.model.projects.create({userId:6, name:"project6"});
-		const p7 = await app.model.projects.create({userId:1, name:"project7"});
+		const p7 = await app.model.projects.create({userId, name:"project7"});
 
-		await app.model.gameWorks.create({gameId: game.id, projectId: p1.id, userId:1,});
+		await app.model.gameWorks.create({gameId: game.id, projectId: p1.id, userId,});
 		await app.model.gameWorks.create({gameId: game.id, projectId: p2.id, userId:2,});
 		await app.model.gameWorks.create({gameId: game.id, projectId: p3.id, userId:3,});
 		await app.model.gameWorks.create({gameId: game.id, projectId: p4.id, userId:4,});

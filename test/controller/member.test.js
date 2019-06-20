@@ -1,17 +1,13 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("成员", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 成员增删改查 批量创建成员 成员是否存在", async()=> {
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"user001",
-			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		await app.factory.createMany("users", 10);
+		const token = await app.login().then(o => o.token);
 
 		const group = await app.httpRequest().post("/api/v0/groups").send({
 			groupname:"group",

@@ -1,10 +1,8 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("充值订单", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 订单创建", async()=> {

@@ -1,23 +1,19 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("关注收藏", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 用户关注 是否关注 获取收藏列表 获取收藏用户 取消收藏", async()=> {
-		const user = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"user001",
-			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		const user2 = await app.factory.create("users", {username:"user002"}).then(o => o.toJSON());
+		const user = await app.login({username:"user001"});
 		const token = user.token;
 		const userId = user.id;
 
 		// 用户
 		let objectType = 0;
-		let objectId = 2;
+		let objectId = user2.id;
 		// 关注用户
 		let data = await app.httpRequest().post("/api/v0/favorites").send({
 			objectType,

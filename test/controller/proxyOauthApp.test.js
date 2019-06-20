@@ -3,11 +3,9 @@ const axios = require("axios");
 const md5 = require("blueimp-md5");
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-//const initData = require("../data.js");
 
 describe("旧第三方程序登录", () => {
 	before(async () => {
-		//await initData(app);
 	});
 
 	it.skip("OAUTH LOGIN", async () => {

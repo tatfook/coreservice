@@ -1,14 +1,15 @@
 
+const md5 = require("blueimp-md5");
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
-
 
 describe("管理员接口", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 管理员接口", async()=> {
+		await app.factory.createMany("users", 10);
+		await app.model.admins.create({username:"admin001", password: md5("123456")}).then(o => o.toJSON());
+
 		// 登录
 		let user = await app.httpRequest().post("/api/v0/admins/login").send({username:"admin001", password:"123456"}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(user.token);

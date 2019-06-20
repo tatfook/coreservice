@@ -1,17 +1,12 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("评论", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("001 评论的增删查改", async()=> {
-		const token = await app.httpRequest().post("/api/v0/users/login").send({
-			username:"user001",
-			password:"123456",
-		}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
+		const token = await app.login().then(o => o.token);
 		assert.ok(token);
 
 		const objectType = 2;

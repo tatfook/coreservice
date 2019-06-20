@@ -35,14 +35,15 @@
   },
   "devDependencies": {
     "egg-bin": "^4.8.1",
-    "egg-mock": "^3.17.3"
+    "egg-mock": "^3.17.3",
+    "factory-girl": "^5.0.4"
   },
   "scripts": {
     "dev": "egg-bin dev",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
     "start": "egg-scripts start",
     "test": "egg-bin test ",
-	"cov": "egg-bin cov"
+    "cov": "egg-bin cov"
   },
   "repository": {
     "type": "git",

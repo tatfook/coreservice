@@ -1,14 +1,13 @@
 const { app, mock, assert  } = require('egg-mock/bootstrap');
-const initData = require("../data.js");
 
 describe("/users", () => {
 	before(async () => {
-		await initData(app);
 	});
 
 	it("拉取用户消息", async () => {
-		const userId = 1;
-		const token = app.util.jwt_encode({userId, username:"user001"}, app.config.self.secret);
+		const user = await app.login();
+		const userId = user.id;
+		const token = user.token;
 
 		await app.model.messages.create({all:1});
 		await app.model.messages.create({all:1});
