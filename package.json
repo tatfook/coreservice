@@ -34,6 +34,7 @@
     "wurl": "^2.5.3"
   },
   "devDependencies": {
+    "chance": "^1.0.18",
     "egg-bin": "^4.8.1",
     "egg-mock": "^3.17.3",
     "factory-girl": "^5.0.4"

@@ -1,0 +1,55 @@
+
+module.exports = app => {
+	const {
+		BIGINT,
+		INTEGER,
+		STRING,
+		TEXT,
+		BOOLEAN,
+		JSON,
+		DATE,
+	} = app.Sequelize;
+
+	const model = app.model.define("pBlockClassies", {
+		id: {
+			type: BIGINT,
+			autoIncrement: true,
+			primaryKey: true,
+		},
+
+		blockId: {
+			type: BIGINT,
+			defaultValue:0,
+		},
+
+		classifyId: {
+			type: BIGINT,
+			defaultValue:0,
+		},
+
+		extra: {
+			type: JSON,
+		}
+
+	}, {
+		underscored: false,
+		charset: "utf8mb4",
+		collate: 'utf8mb4_bin',
+
+		indexes: [
+		{
+			unique: true,
+			fields: ["blockId", "classifyId"],
+		},
+		]
+
+	});
+
+	//model.sync({force:true}).then(() => {
+		//console.log("create table successfully");
+	//});
+	
+	app.model.pBlockClassies = model;
+	return model;
+};
+

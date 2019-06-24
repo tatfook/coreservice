@@ -1,10 +1,13 @@
 
 const { app, mock, assert  } = require('egg-mock/bootstrap');
 const _ = require("lodash");
+const Chance = require("chance");
 const loader = require("./setup/loader.js");
+
 
 before(() => {
 	loader(app);
+	app.chance = new Chance();
 });
 
 afterEach(async () => {

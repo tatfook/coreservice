@@ -290,4 +290,10 @@ module.exports = app => {
 	router.post(`${prefix}userMessages/state`, userMessage.setState);
 	router.post(`${prefix}userMessages/allstate`, userMessage.allstate);
 	router.resources(`${prefix}userMessages`, userMessage);
+
+	// paracraft
+	const pBlock = controller.pBlock;
+	router.post(`${prefix}pBlocks/:id/use`, pBlock.use);
+	router.resources(`${prefix}pBlocks`, pBlock);
+
 }
