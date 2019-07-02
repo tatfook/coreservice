@@ -27,7 +27,12 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
-		url: {                        // 下载路径
+		previewUrl: {                 // 预览地址
+			type: STRING(1024),
+			defaultValue:"",
+		},
+
+		fileUrl: {                    // 下载路径
 			type: STRING(1024),
 			defaultValue:"",
 		},

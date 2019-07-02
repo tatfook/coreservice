@@ -95,6 +95,8 @@ module.exports = app => {
 
 	const qiniu = controller.qiniu;
 	router.get(`${prefix}qinius/test`, qiniu.test);
+	router.get(`${prefix}qinius/uploadToken`, qiniu.uploadToken);
+	router.post(`${prefix}qinius/uploadCallback`, qiniu.uploadCallback);
 	router.post(`${prefix}qinius/fop`, qiniu.fop);
 	router.post(`${prefix}qinius/fopCallback`, qiniu.fopCallback);
 	router.get(`${prefix}qinius/token`, qiniu.token);

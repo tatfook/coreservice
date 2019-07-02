@@ -6,8 +6,7 @@ const _ = require("lodash");
 module.exports = {
 	Query: {
 		test(root, arg, ctx) {
-			console.log(arg);
-			return arg || {key:1};
+			return {id:1};
 		},
 
 		profile(root, {}, ctx) {

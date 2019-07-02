@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const qiniu = require("qiniu");
+const uuidv1 = require('uuid/v1');
 
 const Controller = require("../core/controller.js");
 
@@ -18,6 +19,32 @@ const Qiniu = class extends Controller {
 		const token = putPolicy.uploadToken(mac);
 
 		return this.success(token);
+	}
+
+	async uploadToken() {
+		const {userId} = this.authenticated();
+		const config = this.config.self;
+		const apiUrlPrefix = config.origin + config.baseUrl;
+		const key = userId + "-" + uuidv1();
+		const options = {
+			scope: config.qiniuPublic.bucketName + ":" + key,
+			expires: 3600 * 24, // 一天
+			callbackUrl: apiUrlPrefix + "qiniu/callback",
+			callbackBody:'{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)"}',
+			callbackBodyType:"application/json",
+		}
+		const mac = new qiniu.auth.digest.Mac(config.qiniuPublic.accessKey, config.qiniuPublic.secretKey);
+		const putPolicy = new qiniu.rs.PutPolicy(options);
+		const token = putPolicy.uploadToken(mac);
+
+		return this.success(token);
+	}
+
+	async uploadCallback() {
+		const config = this.config.self;
+		const params = this.validate();
+		const url = config.qiniuPublic.bucketDomain + "/" + params.key;
+		return this.success({key: params.key, url});
 	}
 
 	async fop() {

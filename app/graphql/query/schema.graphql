@@ -1,6 +1,6 @@
 
 type Query {
-	test(arg: Json): Json
+	test: User
 	profile: User
 	user(id: Int, name: String): User
 	projects(userId: Int): [Project]
