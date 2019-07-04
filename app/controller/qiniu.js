@@ -22,10 +22,11 @@ const Qiniu = class extends Controller {
 	}
 
 	async uploadToken() {
-		const {userId} = this.authenticated();
+		const userId = this.ctx.state.user.userId || this.ctx.state.admin.userId;
+		if (!userId) return this.fail(403);
 		const config = this.config.self;
 		const apiUrlPrefix = config.origin + config.baseUrl;
-		const key = userId + "-" + uuidv1();
+		const key = (this.ctx.state.user.userId ? "user" : "admin") + userId + "-" + uuidv1();
 		const options = {
 			scope: config.qiniuPublic.bucketName + ":" + key,
 			expires: 3600 * 24, // 一天
