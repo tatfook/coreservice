@@ -59,26 +59,26 @@ const ProxyUser = class extends Controller {
 				token,
 			}
 		});
-		const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
-			"Content-Type":"application/json",
-			"Authorization":"Bearer " + token,
-		}}).then(res => res.data).catch(e => {
-			console.log("获取wikicraft用户失败", e);
-		});
-		if (!data || data.error.id != 0) return this.success(data ||{error:{id:-1, message:"内部错误"}});
-		this.formatUserInfo(data.data, user);
-		
-		//const data = await axios.get(config.keepworkBaseURL + `user/login?username=${username}&password=${password}`).then(res => res.data).catch(e => {
-			//console.log("登录wikicraft失败", e);
+		//const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
+			//"Content-Type":"application/json",
+			//"Authorization":"Bearer " + token,
+		//}}).then(res => res.data).catch(e => {
+			//console.log("获取wikicraft用户失败", e);
 		//});
-		//if (!data || data.error.id != 0) return this.success(data);
-		//this.formatUserInfo(data.data.userinfo, user);
-
-		data.data = {userinfo: data.data, token};
+		//if (!data || data.error.id != 0) return this.success(data ||{error:{id:-1, message:"内部错误"}});
+		//this.formatUserInfo(data.data, user);
 		
-		await this.ctx.service.user.setToken(user.id, token);
+		////const data = await axios.get(config.keepworkBaseURL + `user/login?username=${username}&password=${password}`).then(res => res.data).catch(e => {
+			////console.log("登录wikicraft失败", e);
+		////});
+		////if (!data || data.error.id != 0) return this.success(data);
+		////this.formatUserInfo(data.data.userinfo, user);
 
-		return this.success(data);
+		//data.data = {userinfo: data.data, token};
+		
+		//await this.ctx.service.user.setToken(user.id, token);
+
+		//return this.success(data);
 	}
 
 	// 注册
