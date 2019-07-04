@@ -37,6 +37,28 @@ const ProxyUser = class extends Controller {
 			roleId: user.roleId,
 		}, config.secret, tokenExpire);
 
+		await this.ctx.service.user.setToken(user.id, token);
+
+		return this.success({
+			error: {
+				message:"success",
+				id:0,
+			},
+			data: {
+				userinfo: {
+					...user,
+					_id. user.id,
+					joindate: user.createdAt,
+					displayName: user.nickname,,
+					realNameInfo: {
+						cellphone: user.realname,
+						verified: user.realname ? true : false,
+
+					}
+				},
+				token,
+			}
+		});
 		const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
 			"Content-Type":"application/json",
 			"Authorization":"Bearer " + token,
@@ -112,17 +134,34 @@ const ProxyUser = class extends Controller {
 
 		if (!user) return this.success({error:{id:-1, message:"用户不存在"}});
 
-		const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
-			"Content-Type":"application/json",
-			"Authorization":"Bearer " + this.ctx.state.token,
-		}}).then(res => res.data).catch(e => {
-			console.log("获取wikicraft用户失败", e);
+		return this.success({
+			error: {
+				message:"success",
+				id:0,
+			},
+			data: {
+				...user,
+				_id. user.id,
+				joindate: user.createdAt,
+				displayName: user.nickname,,
+				realNameInfo: {
+					cellphone: user.realname,
+					verified: user.realname ? true : false,
+
+				}
+			}
 		});
-		if (!data || data.error.id != 0) return this.success(data ||{error:{id:-1, message:"内部错误"}});
+		//const data = await axios.get(config.keepworkBaseURL + "user/getProfile", {headers:{
+			//"Content-Type":"application/json",
+			//"Authorization":"Bearer " + this.ctx.state.token,
+		//}}).then(res => res.data).catch(e => {
+			//console.log("获取wikicraft用户失败", e);
+		//});
+		//if (!data || data.error.id != 0) return this.success(data ||{error:{id:-1, message:"内部错误"}});
 
-		this.formatUserInfo(data.data, user);
+		//this.formatUserInfo(data.data, user);
 
-		return this.success(data);
+		//return this.success(data);
 	}
 
 	async changepw() {
@@ -216,7 +255,7 @@ const ProxyUser = class extends Controller {
 		if (!user) return this.success({error:{id:-1, message:"用户不存在"}});
 		user.displayName = user.nickname;
 		user._id = user.id;
-		user.defaultDataSource = {username:user.username};
+		user.defaultDataSource = {};
 
 		return this.success({error:{id:0, message:"OK"}, data:user});
 	}
