@@ -95,17 +95,24 @@ const ProxyUser = class extends Controller {
 		let user = await this.model.users.getByName(username);
 		if (user) return this.success({error:{id:-1, message:"用户已存在"}});
 
-		const data = await axios.post(config.keepworkBaseURL + `user/register`, {username, password}, {headers:{
-			"Content-Type":"application/json",
-		}}).then(res => res.data).catch(e => {
-			console.log("创建wikicraft用户失败", e);
-		});
-		if (!data || data.error.id != 0) return this.success(data || {error:-1, message:"wikicraft用户创建失败"});
+		//const data = await axios.post(config.keepworkBaseURL + `user/register`, {username, password}, {headers:{
+			//"Content-Type":"application/json",
+		//}}).then(res => res.data).catch(e => {
+			//console.log("创建wikicraft用户失败", e);
+		//});
+		//if (!data || data.error.id != 0) return this.success(data || {error:-1, message:"wikicraft用户创建失败"});
 		
 		user = await this.model.users.create({
 			username: username.toLowerCase(),
-		   	password:this.app.util.md5(password)});
+		   	password:this.app.util.md5(password)}).then(o => o && o.toJSON());
 		if (!user) return this.success({error:{id:-1, message:"服务器内部错误"}});
+
+		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
+		const token = this.app.util.jwt_encode({
+			userId: user.id, 
+			username: user.username,
+			roleId: user.roleId,
+		}, config.secret, tokenExpire);
 
 		const ok = await this.app.api.createGitUser(user);
 		if (!ok) console.log("创建git用户失败");
@@ -115,14 +122,35 @@ const ProxyUser = class extends Controller {
 			visibility: 'public',
 		});
 
-		this.formatUserInfo(data.data.userinfo, user);
-		const token = data.data.token;
+		//this.formatUserInfo(data.data.userinfo, user);
+		//const token = data.data.token;
 
 		// 用户注册
 		await this.ctx.service.user.register(user);
 		await this.ctx.service.user.setToken(user.id, token);
 
-		return this.success(data);
+		return this.success({
+			error: {
+				message:"success",
+				id:0,
+			},
+			data: {
+				userinfo: {
+					...user,
+					_id: user.id,
+					joindate: user.createdAt,
+					displayName: user.nickname,
+					realNameInfo: {
+						cellphone: user.realname,
+						verified: user.realname ? true : false,
+
+					}
+				},
+				token,
+			}
+		});
+
+		//return this.success(data);
 	}
 
 	// profile
@@ -130,7 +158,7 @@ const ProxyUser = class extends Controller {
 		const {userId} = this.authenticated();	
 		const config = this.app.config.self;
 
-		const user = await this.model.users.findOne({where:{id: userId}});
+		const user = await this.model.users.findOne({where:{id: userId}}).then(o => o && o.toJSON());
 
 		if (!user) return this.success({error:{id:-1, message:"用户不存在"}});
 
