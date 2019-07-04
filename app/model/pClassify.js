@@ -10,7 +10,7 @@ module.exports = app => {
 		DATE,
 	} = app.Sequelize;
 
-	const model = app.model.define("pClassies", {
+	const model = app.model.define("pClassifies", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -41,7 +41,7 @@ module.exports = app => {
 		//console.log("create table successfully");
 	//});
 	
-	app.model.pClassies = model;
+	app.model.pClassifies = model;
 	return model;
 };
 

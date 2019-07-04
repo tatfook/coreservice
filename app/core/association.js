@@ -396,5 +396,33 @@ module.exports = app => {
 		targetKey: "id",
 		constraints: false,
 	});
+
+	app.model.pBlocks.hasMany(app.model.pBlockClassifies, {
+		as: "pBlockClassifies",
+		foreignKey: "blockId",
+		sourceKey: "id",
+		constraints: false,
+	});
+	
+	app.model.pBlockClassifies.belongsTo(app.model.pBlocks, {
+		as: "pBlocks",
+		foreignKey: "blockId",
+		sourceKey: "id",
+		constraints: false,
+	});
+
+	app.model.pClassifies.hasMany(app.model.pBlockClassifies, {
+		as: "pBlockClassifies",
+		foreignKey: "classifyId",
+		sourceKey: "id",
+		constraints: false,
+	});
+	
+	app.model.pBlockClassifies.belongsTo(app.model.pClassifies, {
+		as: "pClassifies",
+		foreignKey: "classifyId",
+		sourceKey: "id",
+		constraints: false,
+	});
 }
 
