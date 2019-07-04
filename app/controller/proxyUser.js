@@ -47,9 +47,9 @@ const ProxyUser = class extends Controller {
 			data: {
 				userinfo: {
 					...user,
-					_id. user.id,
+					_id: user.id,
 					joindate: user.createdAt,
-					displayName: user.nickname,,
+					displayName: user.nickname,
 					realNameInfo: {
 						cellphone: user.realname,
 						verified: user.realname ? true : false,
@@ -141,9 +141,9 @@ const ProxyUser = class extends Controller {
 			},
 			data: {
 				...user,
-				_id. user.id,
+				_id: user.id,
 				joindate: user.createdAt,
-				displayName: user.nickname,,
+				displayName: user.nickname,
 				realNameInfo: {
 					cellphone: user.realname,
 					verified: user.realname ? true : false,
