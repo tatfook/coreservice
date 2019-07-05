@@ -22,6 +22,19 @@ const PBlock = class extends Controller {
 		return this.success(list);
 	}
 
+	async systemClassifies() {
+		const list = await this.model.pClassifies.findAll({
+			include: [
+			{
+				as: "pBlockClassifies",
+				model: this.model.pBlockClassifies,
+			}
+			]
+		});
+
+		return this.success(list);
+	}
+
 	async use() {
 		const {id} = this.validate({id:"number"});
 		

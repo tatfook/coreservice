@@ -295,6 +295,7 @@ module.exports = app => {
 
 	// paracraft
 	const pBlock = controller.pBlock;
+	router.get(`${prefix}pBlocks/systemClassifies`, pBlock.systemClassifies);
 	router.get(`${prefix}pBlocks/system`, pBlock.system);
 	router.post(`${prefix}pBlocks/:id/use`, pBlock.use);
 	router.resources(`${prefix}pBlocks`, pBlock);

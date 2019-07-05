@@ -37,7 +37,12 @@ describe("paracraft 元件", () => {
 		block = await app.httpRequest().get("/api/v0/pBlocks/" + blockId).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(block.useCount == 1);
 
+	});
+
+	it("002 元件分类", async () => {
 		// 测试系统元件获取
 		await app.httpRequest().get("/api/v0/pBlocks/system").expect(res => assert(res.statusCode == 200)).then(res => res.body);
+
+		await app.httpRequest().get("/api/v0/pBlocks/systemClassifies").expect(res => assert(res.statusCode == 200)).then(res => res.body);
 	});
 });
