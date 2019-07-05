@@ -213,9 +213,11 @@ const Admin = class extends Controller {
 
 		const params = this.parseParams();
 		const resource = this.ctx.service.resource.getResourceByName(this.resourceName);
-		if (resource) await resource.build(params); 
+		if (resource && resource.build) await resource.build(params); 
 
 		const data = await this.resource.create(params);
+
+		if (resource && resource.afterCreate) await resource.afterCreate({...params, id: data.id});
 
 		this.action();
 
@@ -227,11 +229,14 @@ const Admin = class extends Controller {
 
 		const params = this.parseParams();
 		const id = _.toNumber(params.id);
+		const resource = this.ctx.service.resource.getResourceByName(this.resourceName);
 
 		if (!id) this.throw(400, "args error");
 
 		delete params.id;
 		const data = await this.resource.update(params, {where:{id}, silent: true});
+
+		if (resource && resource.afterUpdate) await resource.afterUpdate(params);
 
 		this.action();
 

@@ -16,5 +16,13 @@ module.exports = app => {
 		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 	}
 
+	app.adminLogin = async() => {
+		await app.model.admins.create({username:"user001", password:md5("123456")});
+		return await app.httpRequest().post(`/api/v0/admins/login`).send({
+			username: "user001", 
+			password: "123456",
+		}).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+	}
+
 	loadFactory(app);
 }
