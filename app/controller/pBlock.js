@@ -8,6 +8,20 @@ const PBlock = class extends Controller {
 		return "pBlocks";
 	}
 
+	async index() {
+		const userId = this.ctx.state.user.userId || 0;
+
+		const list = await this.model.pBlocks.findAll({where:{userId}});
+
+		return this.success(list);
+	}
+
+	async system() {
+		const list = await this.model.pBlocks.findAll({where:{userId:0}});
+
+		return this.success(list);
+	}
+
 	async use() {
 		const {id} = this.validate({id:"number"});
 		

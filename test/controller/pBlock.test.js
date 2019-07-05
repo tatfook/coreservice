@@ -20,11 +20,11 @@ describe("paracraft 元件", () => {
 
 		// 更新
 		const blockId = block1.id;
-		await app.httpRequest().put("/api/v0/pBlocks/" + blockId).send({url:"/test"}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		await app.httpRequest().put("/api/v0/pBlocks/" + blockId).send({fileUrl:"/test"}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 
 		// 获取
 		let block = await app.httpRequest().get("/api/v0/pBlocks/" + blockId).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-		assert(block.url == "/test");
+		assert(block.fileUrl == "/test");
 
 		// 删除
 		await app.httpRequest().delete("/api/v0/pBlocks/" + block2.id).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
@@ -36,5 +36,8 @@ describe("paracraft 元件", () => {
 		await app.httpRequest().post("/api/v0/pBlocks/" + blockId + "/use").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		block = await app.httpRequest().get("/api/v0/pBlocks/" + blockId).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(block.useCount == 1);
+
+		// 测试系统元件获取
+		await app.httpRequest().get("/api/v0/pBlocks/system").expect(res => assert(res.statusCode == 200)).then(res => res.body);
 	});
 });
