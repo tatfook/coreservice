@@ -86,10 +86,14 @@ const User = class extends Controller {
 		delete params.roleId;
 
 		const info = params.info;
+		info.email = info.email || params.email;
+
 		if (info) {
 			delete info.id;
 			await this.model.userinfos.upsert({...info, userId});
 		}
+
+		delete params.email;
 		const ok = await ctx.model.users.update(params, {where:{id:userId}});
 
 		return this.success(ok && ok[0] == 1);
