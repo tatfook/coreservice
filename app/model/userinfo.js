@@ -28,6 +28,10 @@ module.exports = app => {
 			type: STRING(48), // 用户姓名
 		},
 
+		email: {
+			type: STRING(64),
+		},
+
 		qq: {
 			type: STRING(24), // qq号
 		},
