@@ -233,7 +233,7 @@ const Admin = class extends Controller {
 
 		if (!id) this.throw(400, "args error");
 
-		delete params.id;
+		params.id = id;
 		const data = await this.resource.update(params, {where:{id}, silent: true});
 
 		if (resource && resource.afterUpdate) await resource.afterUpdate(params);
