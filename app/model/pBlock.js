@@ -27,12 +27,17 @@ module.exports = app => {
 			defaultValue:"",
 		},
 
-		previewUrl: {                 // 预览地址
+		previewUrl: {                 // 图片地址
 			type: STRING(1024),
 			defaultValue:"",
 		},
 
-		fileUrl: {                    // 下载路径
+		gifUrl: {                     // 动图地址
+			type: STRING(1024),
+			defaultValue:"",
+		},
+
+		fileUrl: {                    // 文件地址
 			type: STRING(1024),
 			defaultValue:"",
 		},
