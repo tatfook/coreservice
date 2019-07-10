@@ -30,7 +30,7 @@ const Qiniu = class extends Controller {
 		const options = {
 			scope: config.qiniuPublic.bucketName + ":" + key,
 			expires: 3600 * 24, // 一天
-			callbackUrl: apiUrlPrefix + "qiniu/callback",
+			callbackUrl: apiUrlPrefix + "qinius/uploadCallback",
 			callbackBody:'{"key":"$(key)","hash":"$(etag)","size":$(fsize),"bucket":"$(bucket)","mimeType":"$(mimeType)"}',
 			callbackBodyType:"application/json",
 		}
