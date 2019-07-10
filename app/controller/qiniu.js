@@ -38,7 +38,7 @@ const Qiniu = class extends Controller {
 		const putPolicy = new qiniu.rs.PutPolicy(options);
 		const token = putPolicy.uploadToken(mac);
 
-		return this.success(token);
+		return this.success({token, key});
 	}
 
 	async uploadCallback() {
