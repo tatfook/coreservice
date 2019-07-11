@@ -17,7 +17,9 @@ const PBlock = class extends Controller {
 	}
 
 	async system() {
-		const list = await this.model.pBlocks.findAll({where:{userId:0}});
+		const query = this.validate();
+		query.userId = 0;
+		const list = await this.model.pBlocks.findAll({where:query});
 
 		return this.success(list);
 	}
