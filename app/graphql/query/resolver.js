@@ -81,11 +81,20 @@ module.exports = {
 			if (userId) {
 				user = await ctx.connector.user.fetchById(userId);	
 			} else {
-				user = await ctx.connector.user.fetchByName(username);	
+				user = await ctx.model.users.findOne({
+					where: {
+						"$or": [
+						{username: username},
+						{cellphone: username},
+						{email: username},
+						],
+					}
+				}).then(o => o && o.toJSON());
+				//user = await ctx.connector.user.fetchByName(username);	
 			}
 			if (!user) return ctx.throw(400);
 
-			return {organizationId, userId: user.id};
+			return {organizationId, userId: user.id, user: {...user, password: undefined}};
 		},
 
 		async package(root, {id}, ctx) {

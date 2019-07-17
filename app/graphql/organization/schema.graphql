@@ -29,7 +29,7 @@ type OrganizationUser {
 	organizationClasses: [OrganizationClass]       # 用户班级
 	organizationClassMembers: [OrganizationClassMember]      # 用户班级成员信息
 
-	#user: User                                     # 用户信息
+	user: Json                                     # 用户信息
 }
 
 type OrganizationClass {
