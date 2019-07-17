@@ -283,7 +283,8 @@ describe("graphql", () => {
 					organizationClassMembers {
 						classId,
 						roleId,
-					}
+					},
+					user
 				}
 			}`,
 			variables: {
