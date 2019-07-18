@@ -16,8 +16,15 @@ const LessonOrganizationActivateCode = class extends Controller {
 	}
 
 	async create() {
-		const {userId, organizationId, roleId} = this.authenticated();
-		const {count = 1, classId} = this.validate({count:"number", classId:"number"});
+		let {userId, organizationId, roleId} = this.authenticated();
+		const params = this.validate({count:"number", classId:"number"});
+
+		if (params.organizationId && params.organizationId != organizationId) {
+			organizationId = params.organizationId;
+			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
+		}
+
+		const {count = 1, classId} = params;
 
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
 
@@ -37,10 +44,15 @@ const LessonOrganizationActivateCode = class extends Controller {
 	}
 
 	async index() {
-		const {userId, organizationId, roleId} = this.authenticated();
+		let {organizationId, roleId, userId} = this.authenticated();
+		const where = this.validate();
+
+		if (where.organizationId && where.organizationId != organizationId) {
+			organizationId = where.organizationId;
+			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
+		}
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(400, "无权限");
 
-		const where = this.validate();
 		this.formatQuery(where);
 
 		where.organizationId = organizationId;

@@ -2,11 +2,11 @@
 const md5 = require("blueimp-md5");
 const { app, mock, assert  } = require('egg-mock/bootstrap');
 
-describe("机构", () => {
+describe("机构学生", () => {
 	before(async () => {
 	});
 
-	it("001 机构", async() => {
+	it("001 机构学生添加接口测试", async() => {
 		const user = await app.login();
 		const token = user.token;
 
