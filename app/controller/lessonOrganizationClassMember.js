@@ -141,8 +141,14 @@ const LessonOrganizationClassMember = class extends Controller {
 	}
 
 	async create() {
-		const {organizationId, roleId} = this.authenticated();
+		let {organizationId, roleId, userId} = this.authenticated();
 		const params = this.validate();
+
+		if (params.organizationId && params.organizationId != organizationId) {
+			organizationId = params.organizationId;
+			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
+		}
+
 		params.organizationId = organizationId;
 		params.roleId = params.roleId || CLASS_MEMBER_ROLE_STUDENT;
 		const classIds = _.uniq(params.classIds || []);

@@ -5,6 +5,10 @@ const Service = require('egg').Service;
 
 class User extends Service {
 
+	async getUserByUserId(userId) {
+		return await this.app.model.users.findOne({where:{id:userId}}).then(o => o && o.toJSON());
+	}
+
 	async token(payload, clear) {
 		const config = this.app.config.self;
 		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
