@@ -9,10 +9,10 @@
 	},
 	"test": {
 		"username": "root",
-		"password": "root",
+		"password": "tf.123456",
 		"database": "lesson-wxa-test",
-		"host": "10.28.18.4",
-		"port": "32000",
+		"host": "10.28.18.62",
+		"port": "3306",
 		"dialect": "mysql",
 	    "operatorsAliases": false
 	},

@@ -30,7 +30,7 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		organId: {                     // 机构ID
+		organizationId: {                     // 机构ID
 			type: BIGINT,
 			defaultValue: 0,
 		},

@@ -1,7 +1,7 @@
 
 #!/bin/bash
 
-mysql -h 10.28.18.4 -P 32000 -u root -proot -e '
+mysql -h 10.28.18.62 -P 3306 -u root -ptf.123456 -e '
 drop database if exists `keepwork-wxa-test`;
 create database `keepwork-wxa-test`;
 drop database if exists `lesson-wxa-test`;

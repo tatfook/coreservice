@@ -287,6 +287,11 @@ module.exports = app => {
 	router.post(`${prefix}lessonOrganizationActivateCodes/search`, lessonOrganizationActivateCode.index);
 	router.resources(`${prefix}lessonOrganizationActivateCodes`, lessonOrganizationActivateCode);
 
+	// organization user 
+	const lessonOrganizationUser = controller.lessonOrganizationUser;
+	router.post(`${prefix}lessonOrganizationUsers/batch`, lessonOrganizationUser.batchCreateUser);
+	router.post(`${prefix}lessonOrganizationUsers/unbind`, lessonOrganizationUser.unbind);
+
 	// Message
 	const userMessage = controller.userMessage;
 	router.post(`${prefix}userMessages/state`, userMessage.setState);

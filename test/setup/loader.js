@@ -8,6 +8,7 @@ module.exports = app => {
 	app.mock = app.mock || {};
 
 	app.login = async (user = {}) => {
+		user.username = user.username || "user0001";
 		user.password = md5("123456");
 		user = await app.factory.create("users", user).then(o => o.toJSON());
 		return await app.httpRequest().post(`/api/v0/users/login`).send({
