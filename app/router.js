@@ -291,6 +291,7 @@ module.exports = app => {
 	const lessonOrganizationUser = controller.lessonOrganizationUser;
 	router.post(`${prefix}lessonOrganizationUsers/batch`, lessonOrganizationUser.batchCreateUser);
 	router.post(`${prefix}lessonOrganizationUsers/unbind`, lessonOrganizationUser.unbind);
+	router.post(`${prefix}lessonOrganizationUsers/setpwd`, lessonOrganizationUser.setpwd);
 
 	// Message
 	const userMessage = controller.userMessage;

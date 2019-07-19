@@ -26,8 +26,15 @@ describe("机构用户", () => {
 			organizationId: organ.id,
 			count: 3,
 		}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
-
 		assert(users.length == 2);
+
+		// 修改绑定用户密码
+		await app.httpRequest().post("/api/v0/lessonOrganizationUsers/setpwd").send({
+			classId:cls.id,
+			organizationId: organ.id,
+			memberId: users[0].id,
+			password: "xiaoyao",
+		}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 
 		// 解绑用户
 		await app.httpRequest().post("/api/v0/lessonOrganizationUsers/unbind").send({
