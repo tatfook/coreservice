@@ -36,6 +36,8 @@ const LessonOrganizationUser = class extends Controller {
 		const userPrefix = await this.model.userPrefixs.findOne({where:{prefix}}).then(o => o && o.toJSON());
 		const no = userPrefix ? userPrefix.no : 0;
 		const userdatas = [];
+
+		count = count > 100 ? 100 : count;
 		for (let i = 1; i <= count; i++) {
 			const username = prefix + _.padStart(no + i, 4, "0");
 			userdatas.push({
