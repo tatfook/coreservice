@@ -67,10 +67,10 @@ const User = class extends Controller {
 		const {ctx, model} = this;
 		const {id} = this.validate();
 
-		const userId = _.toNumber(id);
-		const user = userId ?  await model.users.getById(userId) :	await model.users.getByName(id);
-
+		const user = await this.ctx.service.user.getUser({userId: id, username:id});
 		if (!user) return this.throw(404);
+
+		user.info = await this.ctx.service.user.getUserinfoByUserId(user.id);
 
 		return this.success(user);
 	}

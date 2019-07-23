@@ -24,6 +24,14 @@ module.exports = app => {
 			allowNull: false,
 		},
 
+		kid: {
+			type: BIGINT,
+		},
+
+		isIdRegister: {
+			type: INTEGER(2),
+		},
+
 		name: {
 			type: STRING(48), // 用户姓名
 		},

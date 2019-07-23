@@ -18,52 +18,40 @@ const LessonOrganizationUser = class extends Controller {
 	
 	async batchCreateUser() {
 		let {userId, organizationId, roleId} = this.authenticated();
-		const params = this.validate({classId: "number", count:"number", prefix:"string"});
+		const params = this.validate({classId: "number", count:"number"});
 		if (params.organizationId && params.organizationId != organizationId) {
 			organizationId = params.organizationId;
 			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
 		}
 		if (roleId < CLASS_MEMBER_ROLE_TEACHER) return this.throw(400, "无权限操作");
 
-		let {classId, handlerId, count, prefix, password} = params;;
+		let {classId, handlerId, count, password} = params;;
 		handlerId = handlerId || userId;
 		
 		const handler = await this.ctx.service.user.getUserByUserId(handlerId);
 		if (!handler) return this.throw(400, "负责人不存在");
 		const cellphone = handler.realname;
 		if (!cellphone) return this.throw(400, "负责人未实名");
-
-		const userPrefix = await this.model.userPrefixs.findOne({where:{prefix}}).then(o => o && o.toJSON());
-		const no = userPrefix ? userPrefix.no : 0;
+		
 		const userdatas = [];
-
 		count = count > 100 ? 100 : count;
 		for (let i = 1; i <= count; i++) {
-			const username = prefix + _.padStart(no + i, 4, "0");
 			userdatas.push({
-				username: username,
-				nickname: username,
 				password: this.app.util.md5(password || "123456"),
 				realname: cellphone,
 			});
 		}
-	
-		if (userPrefix) {
-			await this.model.userPrefixs.increment({no:count}, {where:{id: userPrefix.id}});
-		} else {
-			await this.model.userPrefixs.create({prefix, no: count, organizationId});
-		}
 
 		// 批量创建返回结果有 BUG
-		let users = await this.model.users.bulkCreate(userdatas, {ignoreDuplicates: true}).then(list => list.map(o => o.toJSON()));
+		const users = await this.model.users.bulkCreate(userdatas).then(list => list.map(o => o.toJSON()));
 		const ids = users.filter(o => o.id).map(o => o.id);
-		users = await this.model.users.findAll({
-			attributes:["id","username"],
-			where:{id:{"$in":ids}},
-		}).then(list => list.map(o => o.toJSON()));
+		//users = await this.model.users.findAll({
+			//attributes:["id","username"],
+			//where:{id:{"$in":ids}},
+		//}).then(list => list.map(o => o.toJSON()));
 
-		const members = ids.map(id => ({
-			memberId: id,
+		const members = users.map(u => ({
+			memberId: u.id,
 			classId,
 			organizationId,
 			roleId: CLASS_MEMBER_ROLE_STUDENT,
@@ -71,6 +59,9 @@ const LessonOrganizationUser = class extends Controller {
 		}));
 		await this.model.lessonOrganizationClassMembers.bulkCreate(members);
 
+		const userinfos = users.map(u => ({userId: u.id, isIdRegister: 1}));
+		await this.model.userinfos.bulkCreate(userinfos);
+	
 		////const organizationUserdatas = users.map(o => ({
 			////userId: o.id,
 			////state:1,

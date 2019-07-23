@@ -5,8 +5,28 @@ const Service = require('egg').Service;
 
 class User extends Service {
 
+	async getUser({userId, kid, username, cellphone, email}) {
+		return await this.app.model.users.findOne({
+			where: {
+				"$or" : [
+				{userId: _.toNumber(userId) || 0},
+				{userId: (_.toNumber(kid) || 0) - 10000},
+				{username: username},
+				{cellphone: cellphone},
+				{email: email},
+				]
+			}
+		}).then(o => o && o.toJSON());
+	}
+
 	async getUserByUserId(userId) {
 		return await this.app.model.users.findOne({where:{id:userId}}).then(o => o && o.toJSON());
+	}
+
+	async getUserinfoByUserId(userId) {
+		const userinfo = await this.app.model.userinfos.findOne({where:{userId}}).then(o => o && o.toJSON());
+		if (!userinfo) await this.app.userinfos.upsert({userId});
+		return userinfo;
 	}
 
 	async token(payload, clear) {
