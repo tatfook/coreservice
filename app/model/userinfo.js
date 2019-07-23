@@ -28,8 +28,8 @@ module.exports = app => {
 			type: BIGINT,
 		},
 
-		isIdRegister: {
-			type: INTEGER(2),
+		registerUsername: {     // 注册用户名
+			type: STRING(48),
 		},
 
 		name: {

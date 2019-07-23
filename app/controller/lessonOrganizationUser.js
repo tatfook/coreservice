@@ -59,7 +59,7 @@ const LessonOrganizationUser = class extends Controller {
 		}));
 		await this.model.lessonOrganizationClassMembers.bulkCreate(members);
 
-		const userinfos = users.map(u => ({userId: u.id, isIdRegister: 1}));
+		const userinfos = users.map(u => ({userId: u.id, registerUsername: _.toString(u.id + 10000)}));
 		await this.model.userinfos.bulkCreate(userinfos);
 	
 		////const organizationUserdatas = users.map(o => ({
