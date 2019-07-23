@@ -50,6 +50,7 @@ module.exports = app => {
 		if (!modelName) return;
 		
 		inst = inst.get({plain:true});
+
 		const model = app.model[modelName];
 
 		hook(tableName, inst, model, "create");
@@ -57,6 +58,10 @@ module.exports = app => {
 		const apiName = tableName + "Upsert";
 		if (!app.api[apiName]) return ;
 		await app.api[apiName](inst);
+	}
+
+	async function afterBulkCreate(inst) {
+		_.each(inst, o => afterCreate(o));
 	}
 
 	async function afterBulkUpdate(options) {
@@ -113,6 +118,8 @@ module.exports = app => {
 			}
 		}
 	}
+
+	app.model.afterBulkCreate((inst) => afterBulkCreate(inst));
 
 	app.model.afterCreate((inst) =>  afterCreate(inst));
 

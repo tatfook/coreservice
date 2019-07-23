@@ -112,7 +112,7 @@ class Api  {
 		return this.curl('post', `/users/${inst.id}/upsert`, {
 		//return await this.curl('post', `/users/${inst.id}/upsert`, {
 			id: inst.id,
-			username: inst.username,
+			username: inst.username || (inst.id + 10000),
 			portrait: inst.portrait,
 			description: inst.description,
 			total_fans: inst.fansCount,
