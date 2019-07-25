@@ -1,5 +1,5 @@
 
-/* 机构用户名关联表, 用于记录机构批量生成用户 */
+/* 机构表单 */
 
 const _ = require("lodash");
 
@@ -13,7 +13,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationUsers", {
+	const model = app.model.define("lessonOrganizationForms", {
 		id: {
 			type: BIGINT,
 			autoIncrement: true,
@@ -25,30 +25,37 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		state: {                       // 关联状态 0 - 未关联  1 - 已关联
+		organizationId: {
+			type: BIGINT,
+			defaultValue: 0,
+		},
+
+		state: {                       // 关联状态 0 - 未发布  1 - 进行中  2 - 已停止
 			type: INTEGER,
 			defaultValue: 0,
 		},
 
-		organizationId: {              // 机构ID
-			type: BIGINT,
+		type: {
+			type: INTEGER,
 			defaultValue: 0,
 		},
 
-		classId: {
-			type: BIGINT,              // 班级ID
-			defaultValue: 0,
+		title: {
+			type: STRING,
+			defaultValue:"",
 		},
 
-		handlerId: {                   // 操作人用户ID
-			type: BIGINT,
-			defaultValue: 0,
+		description: {
+			type: STRING(1024),
+			defaultValue:"",
 		},
 
-		cellphone: {                   // 关联的手机号
-			type: STRING(24),
-			defaultValue: "",
-			allowNull: false,
+		text: {
+			type: TEXT,
+		},
+
+		quizzes: {
+			type: JSON,
 		},
 
 		extra: {                       // 附加数据
@@ -64,7 +71,7 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
-	app.model.lessonOrganizationUsers = model;
+	app.model.lessonOrganizationForms = model;
 
 	return model;
 };
