@@ -40,6 +40,11 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		name: {
+			type: STRING,
+			defaultValue:"",
+		},
+
 		title: {
 			type: STRING,
 			defaultValue:"",

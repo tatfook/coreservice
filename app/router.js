@@ -298,7 +298,7 @@ module.exports = app => {
 	const lessonOrganizationForm = controller.lessonOrganizationForm;
 	router.get(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.getSubmit);
 	router.post(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.postSubmit);
-	router.post(`${prefix}lessonOrganizationForms/:id/submit/:submitId`, lessonOrganizationForm.updateSubmit);
+	router.put(`${prefix}lessonOrganizationForms/:id/submit/:submitId`, lessonOrganizationForm.updateSubmit);
 	router.post(`${prefix}lessonOrganizationForms/search`, lessonOrganizationForm.search);
 	router.resources(`${prefix}lessonOrganizationForms`, lessonOrganizationForm);
 
