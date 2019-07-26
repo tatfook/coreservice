@@ -1,6 +1,9 @@
 
 const fs = require("fs");
 const _ = require("lodash");
+const uuidv1 = require('uuid/v1');
+const svgCaptcha = require('svg-captcha');
+
 const Controller = require("../core/controller.js");
 
 const {
@@ -29,6 +32,35 @@ class Keepwork extends Controller {
 		return this.success(ok);
 	}
 
+	// 获取 svg 验证码
+	async getSvgCaptcha() {
+		const captcha = svgCaptcha.createMathExpr({
+			mathMin: 1,
+			mathMax: 9,
+			mathOperator: "+",
+		});
+		//const captcha = svgCaptcha.create({});
+
+		const key = "svg-captcha-" + uuidv1();
+
+		await this.model.caches.set(key, captcha.text, 1000 * 60 * 10); // 有效期十分钟
+
+		//console.log(captcha);
+
+		return this.success({key, captcha: captcha.data});
+	}
+
+	// 验证 svg 验证码
+	async postSvgCaptcha() {
+		const {key, captcha} = this.validate({key:"string", captcha:"string"});
+
+		const value = await this.model.caches.get(key);
+
+		if (value && captcha && value == captcha) return this.success(true);
+
+		return this.success(false);
+	}
+
 	async statistics() {
 		const {app} = this;
 
@@ -49,28 +81,6 @@ class Keepwork extends Controller {
 		const data = {paracraftCount, siteCount, recuritCount, userCount, projectCount}
 
 		return this.success(data);
-	}
-
-	async test() {
-		const cache = this.app.cache.get("test");
-
-		if (!cache) this.app.cache.put("test", "hello world", 1000 * 60 * 10);
-
-		const caches = this.model.caches;
-
-		await caches.destroy({where:{key:"key"}});
-		await caches.destroy({where:{key:"key1"}});
-		console.log("---------------create cache-------------");
-		await caches.create({key:"key", value:"value"});
-		console.log("---------------update cache-------------");
-		await caches.update({key:"key", value:{key:1}}, {where:{key:"key"}});
-		console.log("--------------upsert caceh----------------");
-		await caches.upsert({key:"key", value:"value"});
-		await caches.upsert({key:"key1", value:"value1"});
-		console.log("--------------destroy cache---------------");
-		await caches.destroy({where:{key:"key"}});
-		await caches.destroy({where:{key:"key1"}});
-		return this.success(cache);
 	}
 
 	async words() {

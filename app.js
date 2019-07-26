@@ -16,7 +16,7 @@ const association = require("./app/core/association.js");
 const log = require("./app/core/log.js");
 
 module.exports = app => {
-  app.cache = cache;
+  app.cache = cache;  // 产品部署时采用了负载均衡 内存缓存失效 禁用此功能
   app.consts = consts;
   app.util = util;
   app.unittest = app.config.env == 'unittest';

@@ -30,12 +30,12 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
-		state: {                       // 关联状态 0 - 未发布  1 - 进行中  2 - 已停止
+		state: {                       // 发布状态 0 - 未发布  1 - 进行中  2 - 已停止
 			type: INTEGER,
 			defaultValue: 0,
 		},
 
-		type: {
+		type: {                        // 0 - 空白模板 1 - 招生通知 2 - 入学作品提交通知 3 - 报名表  4 - 入选学员通知
 			type: INTEGER,
 			defaultValue: 0,
 		},

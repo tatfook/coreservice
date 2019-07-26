@@ -15,7 +15,8 @@ module.exports = app => {
 
 	const keepwork = controller.keepwork;
 	router.post(`${prefix}keepworks/email`, keepwork.email);
-	router.get(`${prefix}keepworks/test`, keepwork.test);
+	router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
+	router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);
 	router.get(`${prefix}keepworks/words`, keepwork.words);
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
 
@@ -292,6 +293,14 @@ module.exports = app => {
 	router.post(`${prefix}lessonOrganizationUsers/batch`, lessonOrganizationUser.batchCreateUser);
 	router.post(`${prefix}lessonOrganizationUsers/unbind`, lessonOrganizationUser.unbind);
 	router.post(`${prefix}lessonOrganizationUsers/setpwd`, lessonOrganizationUser.setpwd);
+
+	// organization form
+	const lessonOrganizationForm = controller.lessonOrganizationForm;
+	router.get(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.getSubmit);
+	router.post(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.postSubmit);
+	router.post(`${prefix}lessonOrganizationForms/:id/submit/:submitId`, lessonOrganizationForm.updateSubmit);
+	router.post(`${prefix}lessonOrganizationForms/search`, lessonOrganizationForm.search);
+	router.resources(`${prefix}lessonOrganizationForms`, lessonOrganizationForm);
 
 	// Message
 	const userMessage = controller.userMessage;

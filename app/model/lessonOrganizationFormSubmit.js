@@ -13,7 +13,7 @@ module.exports = app => {
 		JSON,
 	} = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationFormApplys", {
+	const model = app.model.define("lessonOrganizationFormSubmits", {
 		id: { 
 			type: BIGINT,
 			autoIncrement: true,
@@ -44,6 +44,11 @@ module.exports = app => {
 			type: JSON,
 		},
 
+		comment: {                     // 备注
+			type: STRING(1024),
+			defaultValue:"",
+		},
+
 		extra: {                       // 附加数据
 			type: JSON,
 			defaultValue:{},
@@ -57,7 +62,7 @@ module.exports = app => {
 
 	//model.sync({force:true});
 	
-	app.model.lessonOrganizationFormApplys = model;
+	app.model.lessonOrganizationFormSubmits = model;
 
 	return model;
 };
