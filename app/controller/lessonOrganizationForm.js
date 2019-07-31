@@ -22,7 +22,8 @@ const LessonOrganizationForm = class extends Controller {
 			{
 				as: "lessonOrganizationFormSubmits",
 				model: this.model.lessonOrganizationFormSubmits,
-				attributes: ["id"],
+				//attributes: {exclude:["userId", "organizationId", "quizzes", "state", "comment", "extra", "createdAt", "updatedAt"]},
+				attributes: ["formId"],
 				limit: 100000,
 			}
 			],
