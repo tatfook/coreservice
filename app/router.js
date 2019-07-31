@@ -19,6 +19,7 @@ module.exports = app => {
 	router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);
 	router.get(`${prefix}keepworks/words`, keepwork.words);
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
+	router.get(`${prefix}keepworks/ip`, keepwork.ip);
 
 	const user = controller.user;
 	router.get(`${prefix}users/rank`, user.rank);

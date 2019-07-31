@@ -10,7 +10,7 @@ class Classroom extends Subscription {
 			cron:"0 0 2 */1 * *",
 			type:"worker",
 			//disable:true,
-			immediate: true,
+			//immediate: true,
 		}
 	}
 

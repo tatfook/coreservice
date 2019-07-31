@@ -40,6 +40,8 @@ class User extends Service {
 	}
 
 	async setToken(userId, token, clear = false) {
+		this.ctx.state.user = {userId};
+
 		const data = await this.app.model.userdatas.get(userId);
 		
 		data.tokens = data.tokens || [];

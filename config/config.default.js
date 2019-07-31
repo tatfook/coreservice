@@ -5,7 +5,7 @@ exports.cors = {
 	origin: "*",
 }
 
-exports.middleware = ['authenticated', 'pagination', 'graphql'];
+exports.middleware = ['authenticated', 'pagination', 'graphql', 'activity'];
 
 exports.security = {
 	xframe: {

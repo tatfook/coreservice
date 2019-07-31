@@ -17,7 +17,22 @@ const LessonOrganizationForm = class extends Controller {
 	async search() {
 		const query = this.validate({organizationId:"number"});
 		
-		const list = await this.model.lessonOrganizationForms.findAll({where: query}).then(list => list.map(o => o.toJSON()));
+		const list = await this.model.lessonOrganizationForms.findAll({
+			include: [
+			{
+				as: "lessonOrganizationFormSubmits",
+				model: this.model.lessonOrganizationFormSubmits,
+				attributes: ["id"],
+				limit: 100000,
+			}
+			],
+			where: query,
+		}).then(list => list.map(o => o.toJSON()));
+
+		_.each(list, o => {
+			o.submitCount = o.lessonOrganizationFormSubmits.length;
+			o.lessonOrganizationFormSubmits = undefined;
+		});
 
 		return this.success(list);
 	}

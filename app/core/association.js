@@ -421,7 +421,21 @@ module.exports = app => {
 	app.model.pBlockClassifies.belongsTo(app.model.pClassifies, {
 		as: "pClassifies",
 		foreignKey: "classifyId",
-		sourceKey: "id",
+		targetKey: "id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationForms.hasMany(app.model.lessonOrganizationFormSubmits, {
+		as: "lessonOrganizationFormSubmits",
+		foreignKey: "formId",
+		sourceKey:"id",
+		constraints: false,
+	});
+
+	app.model.lessonOrganizationFormSubmits.belongsTo(app.model.lessonOrganizationForms, {
+		as: "lessonOrganizationForms",
+		foreignKey:"formId",
+		targetKey:"id",
 		constraints: false,
 	});
 }

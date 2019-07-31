@@ -5,6 +5,8 @@ use `lesson-dev`;
 use `lesson-rls`;
 use `keepwork`;
 
+create 
+
 CREATE TABLE `oauthApps` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `userId` bigint(20) DEFAULT '0',
