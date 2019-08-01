@@ -85,10 +85,10 @@ describe("/users", () => {
 		//await app.model.users.create({username:"user0001", password: md5("123456")}).then(o => o.toJSON());
 		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user0001", password: "123456"}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
 		assert(token);
-		const cellphone="18702759796";
+		let cellphone="18702759796";
 		let data = await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
 
-		const cache = await app.model.caches.get(cellphone) || {};
+		let cache = await app.model.caches.get(cellphone) || {};
 		assert.ok(cache.captcha);
 
 		await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:true}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200));
@@ -97,33 +97,57 @@ describe("/users", () => {
 
 		assert.equal(data.cellphone, cellphone);
 
+		// 使用它人手机号解绑
+		cellphone = "18702759795"
+		await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
+		cache = await app.model.caches.get(cellphone) || {};
+		let ok = await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(!ok);
+		
 		// 解绑
-		await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200));
+		cellphone = "18702759796"
+		await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
+		cache = await app.model.caches.get(cellphone) || {};
+		ok = await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(ok);
 
 		data = await app.httpRequest().get("/api/v0/users/profile").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-
 		assert.ok(!data.cellphone);
 	});
 
 	it ("0004 邮箱验证", async () => {
 		const token = await app.login().then(user => user.token);
-		const email="765485868@qq.com";
-		let data = await app.httpRequest().get("/api/v0/users/email_captcha?email=" + email).expect(res => assert(res.statusCode == 200));
+		let email="765485868@qq.com";
 
-		const cache = await app.model.caches.get(email) || {};
+		// 邮箱绑定
+		await app.httpRequest().get("/api/v0/users/email_captcha?email=" + email).expect(res => assert(res.statusCode == 200));
+		let cache = await app.model.caches.get(email) || {};
 		assert.ok(cache.captcha);
+		let ok = await app.httpRequest().post("/api/v0/users/email_captcha").send({email, captcha:cache.captcha, isBind:true}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(ok);
 
-		await app.httpRequest().post("/api/v0/users/email_captcha").send({email, captcha:cache.captcha, isBind:true}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200));
-
+		// 用户信息验证
 		data = await app.httpRequest().get("/api/v0/users/profile").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-
 		assert.equal(data.email, email);
 
-		// 解绑
-		await app.httpRequest().post("/api/v0/users/email_captcha").send({email, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200));
+		// 错误邮箱解绑
+		email="765485867@qq.com";
+		await app.httpRequest().get("/api/v0/users/email_captcha?email=" + email).expect(res => assert(res.statusCode == 200));
+		cache = await app.model.caches.get(email) || {};
+		assert.ok(cache.captcha);
+		ok = await app.httpRequest().post("/api/v0/users/email_captcha").send({email, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(!ok);
 
+		// 正确邮箱解绑
+		email="765485868@qq.com";
+		await app.httpRequest().get("/api/v0/users/email_captcha?email=" + email).expect(res => assert(res.statusCode == 200));
+		cache = await app.model.caches.get(email) || {};
+		assert(cache.captcha);
+		ok = await app.httpRequest().post("/api/v0/users/email_captcha").send({email, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		assert(ok);
+
+		// 用户信息验证
 		data = await app.httpRequest().get("/api/v0/users/profile").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-
 		assert.ok(!data.email);
 	});
 
