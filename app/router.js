@@ -20,6 +20,8 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/words`, keepwork.words);
 	router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
 	router.get(`${prefix}keepworks/ip`, keepwork.ip);
+	router.post(`${prefix}keepworks/page_visit`, keepwork.postPageVisit);
+	router.get(`${prefix}keepworks/page_visit`, keepwork.getPageVisit);
 
 	const user = controller.user;
 	router.get(`${prefix}users/rank`, user.rank);

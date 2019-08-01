@@ -457,9 +457,12 @@ const User = class extends Controller {
 			return this.success("OK");
 		}
 
-		if (!params.isBind) cellphone = null;
+		if (params.isBind) {
+			await this.model.users.update({cellphone}, {where:{id:userId}});
+		} else {
+			await this.model.users.update({cellphone:null}, {where:{id:userId, cellphone}});
+		}
 
-		await this.model.users.update({cellphone}, {where:{id:userId}});
 		return this.success("OK");
 	}
 
@@ -533,11 +536,13 @@ const User = class extends Controller {
 			if (!captcha || cache.captcha != captcha) return ctx.throw(400, "验证码错误");
 		}
 		
-		if (!params.isBind) email = null;
+		if (!params.isBind) {
+			await model.users.update({email:null}, {where:{id:userId, email}});
+		} else {
+			await model.users.update({email}, {where:{id:userId}});
+		};
 
-		const result = await model.users.update({email}, {where:{id:userId}});
-
-		return this.success(result && result[0] == 1);
+		return this.success(true);
 	}
 
 	async profile() {

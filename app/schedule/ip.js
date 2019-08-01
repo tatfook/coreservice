@@ -7,7 +7,7 @@ class Test extends Subscription {
 		return {
 			cron: "0 0 1 1 * *", // 每个月1号凌晨1点更新IP数据
 			type:"worker",
-			immediate: true,
+			//immediate: true,
 		}
 	}
 

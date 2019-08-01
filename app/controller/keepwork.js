@@ -1,6 +1,7 @@
 
 const fs = require("fs");
 const _ = require("lodash");
+const moment = require("moment");
 const axios = require("axios");
 const uuidv1 = require('uuid/v1');
 const svgCaptcha = require('svg-captcha');
@@ -60,6 +61,26 @@ class Keepwork extends Controller {
 		if (value && captcha && value == captcha) return this.success(true);
 
 		return this.success(false);
+	}
+
+	// 增加页面访问量
+	async postPageVisit() {
+		const ip = this.ctx.ip;
+		const {url} = this.validate({url:"string"});
+		const ipsetkey = `${url}-page-visit-ip-sets`;
+		const ret = await this.app.redis.sadd(ipsetkey, ip);
+
+		const timestamp = moment(moment(new Date()).format("YYYY-MM-DD")).add(1, "days").unix();
+		await this.app.redis.expireat(ipsetkey, timestamp);
+
+		this.success(await this.app.redis.scard(ipsetkey));
+	}
+
+	// 或取页面访问量
+	async getPageVisit() {
+		const {url} = this.validate({url:"string"});
+		const ipsetkey = `${url}-page-visit-ip-sets`;
+		this.success(await this.app.redis.scard(ipsetkey));
 	}
 
 	async statistics() {

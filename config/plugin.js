@@ -19,7 +19,7 @@ exports.graphql = {
 	package: 'egg-graphql',
 }
 
-//exports.redis = {
-	//enable: true,
-    //package: 'egg-redis',
-//};
+exports.redis = {
+	enable: true,
+	package: 'egg-redis',
+};
