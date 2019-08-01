@@ -457,13 +457,14 @@ const User = class extends Controller {
 			return this.success("OK");
 		}
 
+		let result = [0];
 		if (params.isBind) {
-			await this.model.users.update({cellphone}, {where:{id:userId}});
+			result = await this.model.users.update({cellphone}, {where:{id:userId}});
 		} else {
-			await this.model.users.update({cellphone:null}, {where:{id:userId, cellphone}});
+			result = await this.model.users.update({cellphone:null}, {where:{id:userId, cellphone}});
 		}
 
-		return this.success("OK");
+		return this.success(result && result[0] == 1);
 	}
 
 	async captchaVerify(key, captcha) {
@@ -536,13 +537,14 @@ const User = class extends Controller {
 			if (!captcha || cache.captcha != captcha) return ctx.throw(400, "验证码错误");
 		}
 		
+		let result = [0];
 		if (!params.isBind) {
-			await model.users.update({email:null}, {where:{id:userId, email}});
+			result = await model.users.update({email:null}, {where:{id:userId, email}});
 		} else {
-			await model.users.update({email}, {where:{id:userId}});
+			result = await model.users.update({email}, {where:{id:userId}});
 		};
 
-		return this.success(true);
+		return this.success(result && result[0] == 1);
 	}
 
 	async profile() {
