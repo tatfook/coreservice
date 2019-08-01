@@ -86,25 +86,24 @@ describe("/users", () => {
 		const token = await app.httpRequest().post(`/api/v0/users/login`).send({username:"user0001", password: "123456"}).expect(res => assert(res.statusCode == 200)).then(res => res.body.token);
 		assert(token);
 		let cellphone="18702759796";
+		// 绑定
 		let data = await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
-
 		let cache = await app.model.caches.get(cellphone) || {};
 		assert.ok(cache.captcha);
-
 		await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:true}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200));
 
+		// 用户信息验证
 		data = await app.httpRequest().get("/api/v0/users/profile").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
-
 		assert.equal(data.cellphone, cellphone);
 
-		// 使用它人手机号解绑
+		// 错误手机号解绑
 		cellphone = "18702759795"
 		await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
 		cache = await app.model.caches.get(cellphone) || {};
 		let ok = await app.httpRequest().post("/api/v0/users/cellphone_captcha").send({cellphone, captcha:cache.captcha, isBind:false}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(!ok);
 		
-		// 解绑
+		// 正确手机号解绑
 		cellphone = "18702759796"
 		await app.httpRequest().get("/api/v0/users/cellphone_captcha?cellphone=" + cellphone).expect(res => assert(res.statusCode == 200));
 		cache = await app.model.caches.get(cellphone) || {};
