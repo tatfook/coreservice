@@ -76,6 +76,8 @@ const User = class extends Controller {
 		user.email = undefined;
 		user.password = undefined;
 		user.realname = undefined;
+		user.roleId = undefined;
+		user.sex = undefined;
 
 		return this.success(user);
 	}
@@ -597,6 +599,8 @@ const User = class extends Controller {
 		user.email = undefined;
 		user.password = undefined;
 		user.realname = undefined;
+		user.roleId = undefined;
+		user.sex = undefined;
 
 		const userId = user.id;
 		const rank = await this.model.userRanks.getByUserId(userId);
