@@ -74,6 +74,8 @@ const User = class extends Controller {
 
 		user.cellphone = undefined;
 		user.email = undefined;
+		user.password = undefined;
+		user.realname = undefined;
 
 		return this.success(user);
 	}
@@ -594,6 +596,7 @@ const User = class extends Controller {
 		user.cellphone = undefined;
 		user.email = undefined;
 		user.password = undefined;
+		user.realname = undefined;
 
 		const userId = user.id;
 		const rank = await this.model.userRanks.getByUserId(userId);
@@ -601,6 +604,7 @@ const User = class extends Controller {
 
 		user.rank = rank;
 		user.contributions = contributions;
+
 
 		return this.success(user);
 	}
