@@ -587,11 +587,13 @@ const User = class extends Controller {
 		//const {id} = this.validate({id:'int'});
 		//const user = await this.model.users.getById(id);
 		const {id, username} = this.validate();
-		const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
+		//const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
+		const user = await this.model.users.getByName(username);
 		if (!user) this.throw(400);
 
 		user.cellphone = undefined;
 		user.email = undefined;
+		user.password = undefined;
 
 		const userId = user.id;
 		const rank = await this.model.userRanks.getByUserId(userId);
