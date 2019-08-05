@@ -7,12 +7,10 @@ class User extends Service {
 
 	// 简化用户信息 
 	getSimpleUser() {
-
-
 	}
 
 	async getUser({userId, kid, username, cellphone, email}) {
-		const user await this.app.model.users.findOne({
+		const user = await this.app.model.users.findOne({
 			where: {
 				"$or" : [
 				{userId: _.toNumber(userId) || 0},
