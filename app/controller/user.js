@@ -72,6 +72,9 @@ const User = class extends Controller {
 
 		user.info = await this.ctx.service.user.getUserinfoByUserId(user.id);
 
+		user.cellphone = undefined;
+		user.email = undefined;
+
 		return this.success(user);
 	}
 
@@ -586,6 +589,9 @@ const User = class extends Controller {
 		const {id, username} = this.validate();
 		const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
 		if (!user) this.throw(400);
+
+		user.cellphone = undefined;
+		user.email = undefined;
 
 		const userId = user.id;
 		const rank = await this.model.userRanks.getByUserId(userId);
