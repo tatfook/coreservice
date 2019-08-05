@@ -46,7 +46,7 @@ const User = class extends Controller {
 
 		this.formatQuery(query);
 
-		const attributes = ["id", "username", "nickname", "portrait", "email"];
+		const attributes = ["id", "username", "nickname", "portrait"];
 		const data = await this.model.users.findAndCount({...this.queryOptions, attributes, where:query});
 
 		return this.success(data);
@@ -57,7 +57,7 @@ const User = class extends Controller {
 
 		this.formatQuery(query);
 
-		const attributes = ["id", "username", "nickname", "portrait", "email"];
+		const attributes = ["id", "username", "nickname", "portrait"];
 		const list = await this.model.users.findAll({...this.queryOptions, attributes, where:query});
 
 		return this.success(list);
@@ -71,13 +71,6 @@ const User = class extends Controller {
 		if (!user) return this.throw(404);
 
 		user.info = await this.ctx.service.user.getUserinfoByUserId(user.id);
-
-		user.cellphone = undefined;
-		user.email = undefined;
-		user.password = undefined;
-		user.realname = undefined;
-		user.roleId = undefined;
-		user.sex = undefined;
 
 		return this.success(user);
 	}
@@ -592,15 +585,8 @@ const User = class extends Controller {
 		//const user = await this.model.users.getById(id);
 		const {id, username} = this.validate();
 		//const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
-		const user = await this.model.users.getByName(username);
+		const user = await this.ctx.service.user.getUser({username});
 		if (!user) this.throw(400);
-
-		user.cellphone = undefined;
-		user.email = undefined;
-		user.password = undefined;
-		user.realname = undefined;
-		user.roleId = undefined;
-		user.sex = undefined;
 
 		const userId = user.id;
 		const rank = await this.model.userRanks.getByUserId(userId);

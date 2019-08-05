@@ -209,7 +209,7 @@ const Site = class extends Controller {
 		let {username, sitename} = this.validate({username:"string", sitename:'string'});
 		username = decodeURIComponent(username);
 		sitename = decodeURIComponent(sitename);
-		const user = await this.model.users.getByName(username);
+		const user = await this.ctx.service.user.getUser({username});
 		if (!user) return this.throw(404);
 
 		let site = await this.model.sites.findOne({where:{userId:user.id, sitename}});

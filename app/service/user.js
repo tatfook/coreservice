@@ -5,18 +5,35 @@ const Service = require('egg').Service;
 
 class User extends Service {
 
+	// 简化用户信息 
+	getSimpleUser() {
+
+
+	}
+
 	async getUser({userId, kid, username, cellphone, email}) {
-		return await this.app.model.users.findOne({
+		const user await this.app.model.users.findOne({
 			where: {
 				"$or" : [
 				{userId: _.toNumber(userId) || 0},
-				{userId: (_.toNumber(kid) || 0) - 10000},
+				//{userId: (_.toNumber(kid) || 0) - 10000},
 				{username: username},
 				{cellphone: cellphone},
 				{email: email},
 				]
 			}
 		}).then(o => o && o.toJSON());
+
+		if (!user) return;
+
+		user.cellphone = undefined;
+		user.email = undefined;
+		user.password = undefined;
+		user.realname = undefined;
+		user.roleId = undefined;
+		user.sex = undefined;
+
+		return user;
 	}
 
 	async getUserByUserId(userId) {
