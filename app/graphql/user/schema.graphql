@@ -3,22 +3,22 @@ type User {
 	id: Int
 	username: String
 	nickname: String
-	email: String
-	cellphone: String
+	#email: String
+	#cellphone: String
 	portrait: String
-	sex: String
+	#sex: String
 	description: String
-	extra: Json
+	#extra: Json
 	identify: Int
 	rank: UserRank
 	contributions(years: String): Contribution 
-	account: Account
+	#account: Account
 	info: Userinfo
 	projects: [Project]
 	joinProjects: [Project]
 	tutor: Tutor
 	teacher: Teacher
-	roles: [Role]
+	#roles: [Role]
 }
 
 type Contribution {

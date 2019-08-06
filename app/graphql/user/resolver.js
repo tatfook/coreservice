@@ -15,9 +15,9 @@ module.exports = {
 			return ctx.connector.user.fetchInfoByUserId(root.id);
 		},
 
-		account(root, _, ctx) {
-			return ctx.connector.user.fetchAccountByUserId(root.id);
-		},
+		//account(root, _, ctx) {
+			//return ctx.connector.user.fetchAccountByUserId(root.id);
+		//},
 
 		contributions(root, {years}, ctx) {
 			years = (years || "").split(",");
@@ -40,9 +40,9 @@ module.exports = {
 			return ctx.connector.user.fetchTeacherByUserId(root.id);
 		},
 
-		roles(root, _, ctx) {
-			return ctx.connector.user.fetchRolesByUserId(root.id);
-		}
+		//roles(root, _, ctx) {
+			//return ctx.connector.user.fetchRolesByUserId(root.id);
+		//}
 	},
 
 	Mutation: {
