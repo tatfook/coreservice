@@ -15,10 +15,12 @@ const User = class extends Controller {
 	}
 
 	getPayload(str) {
-		str = str.substring(2, str.length - 2);
+		str = str.substring(2);
+		console.log(str);
 		try {
-			return JSON.parse(str);
+			return JSON.parse(Base64.decode(str));
 		} catch(e) {
+			console.log(e);
 			return ;
 		}
 	}
