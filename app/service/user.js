@@ -13,7 +13,7 @@ class User extends Service {
 		const user = await this.app.model.users.findOne({
 			where: {
 				"$or" : [
-				{userId: _.toNumber(userId) || 0},
+				{id: _.toNumber(userId) || 0},
 				//{userId: (_.toNumber(kid) || 0) - 10000},
 				{username: username},
 				{cellphone: cellphone},
