@@ -14,6 +14,15 @@ const User = class extends Controller {
 		return "users";
 	}
 
+	getPayload(str) {
+		str = str.substring(2, str.length - 2);
+		try {
+			return JSON.parse(str);
+		} catch(e) {
+			return ;
+		}
+	}
+
 	tokeninfo() {
 		try {
 			const user = this.app.util.jwt_decode(this.ctx.state.token, this.app.config.self.secret, true);
@@ -68,12 +77,9 @@ const User = class extends Controller {
 		const {ctx, model} = this;
 		const {id} = this.validate();
 
-		let payload = {};
-		try {
-			payload = jwt.decode(["", id, ""].join("."), "keepwork", true);
-		} catch(e) {
-			return this.throw(400);
-		}
+		const payload = this.getPayload(id);
+		if (!payload) return this.throw(400);
+
 		const user = await this.ctx.service.user.getUser({userId: payload.userId, username: payload.username});
 		//const user = await this.ctx.service.user.getUser({username:id});
 		if (!user) return this.throw(404);
@@ -589,19 +595,11 @@ const User = class extends Controller {
 	};
 
 	async detail() {
-		//const {id} = this.validate({id:'int'});
-		//const user = await this.model.users.getById(id);
-		const {id, username} = this.validate();
+		const {id} = this.validate();
 
-		let payload = {};
-		try {
-			payload = jwt.decode(["", id, ""].join("."), "keepwork", true);
-		} catch(e) {
-			return this.throw(400);
-		}
+		const payload = this.getPayload(id);
+		if (!payload) return this.throw(400);
 		const user = await this.ctx.service.user.getUser({userId: payload.userId, username: payload.username});
-		//const user = username ? await this.model.users.getByName(username) : await this.model.users.get(id);
-		//const user = await this.ctx.service.user.getUser({username: username || id});
 		if (!user) this.throw(400);
 
 		const userId = user.id;
