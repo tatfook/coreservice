@@ -24,13 +24,13 @@ module.exports = app => {
 			allowNull: false,
 		},
 
-		kid: {
-			type: BIGINT,
-		},
+		//kid: {
+			//type: BIGINT,
+		//},
 
-		registerUsername: {     // 注册用户名
-			type: STRING(48),
-		},
+		//registerUsername: {     // 注册用户名
+			//type: STRING(48),
+		//},
 
 		name: {
 			type: STRING(48), // 用户姓名
