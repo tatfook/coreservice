@@ -38,10 +38,10 @@ module.exports = app => {
 			type: STRING,
 		},
 
-		bind: {                      // 是否绑定机构
-			type: INTEGER,
-			defaultValue: 0,
-		},
+		//bind: {                      // 是否绑定机构
+			//type: INTEGER,
+			//defaultValue: 0,
+		//},
 
 		roleId: {                      // 角色  1 -- 学生  2 -- 教师  64 -- 管理员
 			type: INTEGER,
