@@ -102,10 +102,11 @@ const User = class extends Controller {
 		delete params.roleId;
 
 		const info = params.info;
-		info.email = info.email || params.email;
 
 		if (info) {
 			delete info.id;
+
+			info.email = info.email || params.email;
 			await this.model.userinfos.upsert({...info, userId});
 		}
 
