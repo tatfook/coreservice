@@ -28,12 +28,3 @@ exports.onerror = {
 		}
 	}
 }
-
-exports.redis = {
-	client: {
-		host: "10.28.18.20",
-		port: 6379,
-		password: null,
-		db: 6,
-	}
-}
