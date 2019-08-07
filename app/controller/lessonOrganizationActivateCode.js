@@ -24,7 +24,9 @@ const LessonOrganizationActivateCode = class extends Controller {
 			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
 		}
 
-		const {count = 1, classId} = params;
+		const classId = params.classId;
+		const names = params.name || [];
+		const count = params.count || names.length || 1;
 
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
 
@@ -37,6 +39,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 				organizationId,
 				classId,
 				key: classId + "" + i + "" +  (new Date()).getTime() + _.random(10,99),
+				extra: names.length > i ? {name: names[i]} : {},
 			});
 		}
 		const list = await this.model.lessonOrganizationActivateCodes.bulkCreate(datas);
