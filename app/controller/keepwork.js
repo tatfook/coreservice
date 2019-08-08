@@ -83,6 +83,22 @@ class Keepwork extends Controller {
 		this.success(await this.app.redis.scard(ipsetkey));
 	}
 
+	// 增加 paracraft 下载量
+	async postParacraftDownloadCount() {
+		const key = "paracraft_download_count";
+		const count = await this.app.redis.incr(key);
+
+		return this.success(count);
+	}
+
+	// 获取 paracraft 下载量
+	async getParacraftDownloadCount() {
+		const key = "paracraft_download_count";
+		const count = await this.app.redis.get(key) || 0;
+
+		return this.success(count);
+	}
+
 	async statistics() {
 		const {app} = this;
 

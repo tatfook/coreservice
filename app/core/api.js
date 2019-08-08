@@ -101,6 +101,7 @@ class Api  {
 		if (!inst) return console.log("参数为空");
 		inst = inst.get ? inst.get({plain:true}) : inst;
 
+		if (!inst.realname) return;
 		_.each(inst, (val, key) => {
 			if (val == null) delete inst[key];
 		});

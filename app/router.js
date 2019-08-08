@@ -22,6 +22,8 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/ip`, keepwork.ip);
 	router.post(`${prefix}keepworks/page_visit`, keepwork.postPageVisit);
 	router.get(`${prefix}keepworks/page_visit`, keepwork.getPageVisit);
+	router.post(`${prefix}keepworks/paracraft_download_count`, keepwork.postParacraftDownloadCount);
+	router.get(`${prefix}keepworks/paracraft_download_count`, keepwork.getParacraftDownloadCount);
 
 	const user = controller.user;
 	router.get(`${prefix}users/rank`, user.rank);
@@ -304,6 +306,10 @@ module.exports = app => {
 	router.put(`${prefix}lessonOrganizationForms/:id/submit/:submitId`, lessonOrganizationForm.updateSubmit);
 	router.post(`${prefix}lessonOrganizationForms/search`, lessonOrganizationForm.search);
 	router.resources(`${prefix}lessonOrganizationForms`, lessonOrganizationForm);
+
+	// organization 
+	const organization = controller.organization.index;
+	router.post(`${prefix}organizations/changepwd`, organization.changepwd);
 
 	// Message
 	const userMessage = controller.userMessage;

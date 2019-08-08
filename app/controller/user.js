@@ -311,6 +311,13 @@ const User = class extends Controller {
 			} 
 		}
 
+		if (params.key && params.captcha) {
+			const key = params.key;
+			const captcha = params.captcha;
+			const value = await this.model.caches.get(key);
+			if (value != captcha) return this.fail(5);
+		}
+
 		// 同步用户到wikicraft
 		if (this.app.config.env != "unittest") {
 			const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
