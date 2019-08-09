@@ -11,13 +11,14 @@ module.exports = (options, app) => {
 		
 		if (path == `${prefix}users/login`) {
 			action = "login";
+			await app.model.activities.create({userId, action, description, extra});
 		} else if(path == `${prefix}ussers/register`) {
 			action = "register";
+			await app.model.activities.create({userId, action, description, extra});
 		} else {
 			action = "unknow";
 		}
 		
-		//await app.model.activities.create({userId, action, description, extra});
 	} 
 
 	return async function(ctx, next) {
