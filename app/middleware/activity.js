@@ -17,7 +17,7 @@ module.exports = (options, app) => {
 			action = "unknow";
 		}
 		
-		await app.model.activities.create({userId, action, description, extra});
+		//await app.model.activities.create({userId, action, description, extra});
 	} 
 
 	return async function(ctx, next) {
