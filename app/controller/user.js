@@ -330,12 +330,12 @@ const User = class extends Controller {
 		}
 
 		user = await model.users.create({
-			cellphone: params.cellphone,
+			cellphone: params.cellphone || null,
 			nickname: params.nickname || username,
 			username: username,
 			password: util.md5(params.password),
-			realname: cellphone,
-			email: params.email,
+			realname: cellphone || null,
+			email: params.email || null,
 		});
 
 		if (!user) return this.fail(0);
