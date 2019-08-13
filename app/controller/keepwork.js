@@ -105,6 +105,7 @@ class Keepwork extends Controller {
 		const {url} = this.validate({url:"string"});
 		const key = `${url}-page-visit-count`;
 		const count = await this.app.redis.get(key) || 0;
+
 		return this.success(count);
 		//this.success(await this.app.redis.scard(ipsetkey));
 	}
