@@ -141,7 +141,7 @@ const LessonOrganizationClassMember = class extends Controller {
 	}
 
 	async create() {
-		let {organizationId, roleId, userId} = this.authenticated();
+		let {organizationId, roleId, userId, username} = this.authenticated();
 		const params = this.validate();
 
 		if (params.organizationId && params.organizationId != organizationId) {
@@ -185,6 +185,9 @@ const LessonOrganizationClassMember = class extends Controller {
 			const usedCount = await this.model.lessonOrganizations.getUsedCount(organizationId);
 			if (usedCount >= organCount && classIds.length > 0) return this.fail(1, "学生人数已达上限");
 		}
+		//  LOG
+		this.model.lessonOrganizationLogs.studentLog({...params, handleId: userId, username, classIds});
+
 		// 合并其它身份
 		const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));
 		// 删除要创建的
@@ -193,7 +196,9 @@ const LessonOrganizationClassMember = class extends Controller {
 		ids.length && await this.model.query(`update lessonOrganizationClassMembers set roleId = roleId & ~${params.roleId} where id in (:ids)`, {type: this.model.QueryTypes.UPDATE, replacements:{ids}});
 		// 删除roleId=0为0的成员
 		await this.model.lessonOrganizationClassMembers.destroy({where:{organizationId, memberId: params.memberId, roleId:0}});
-		if (datas.length == 0) return this.success();
+		if (datas.length == 0) {
+			return this.success();
+		}
 		const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
 
 		if (params.realname && classIds.length) {

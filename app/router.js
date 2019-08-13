@@ -24,6 +24,8 @@ module.exports = app => {
 	router.get(`${prefix}keepworks/page_visit`, keepwork.getPageVisit);
 	router.post(`${prefix}keepworks/paracraft_download_count`, keepwork.postParacraftDownloadCount);
 	router.get(`${prefix}keepworks/paracraft_download_count`, keepwork.getParacraftDownloadCount);
+	router.post(`${prefix}keepworks/paracraft_download_url`, keepwork.setParacraftDownloadUrl);
+	router.get(`${prefix}keepworks/paracraft_download_url`, keepwork.getParacraftDownloadUrl);
 
 	const user = controller.user;
 	router.get(`${prefix}users/rank`, user.rank);

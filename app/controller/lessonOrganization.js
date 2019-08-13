@@ -184,6 +184,10 @@ const LessonOrganization = class extends Controller {
 			await this.model.lessonOrganizations.update(params, {where:{id}});
 		} 
 
+		if (params.privilege) {
+
+		}
+
 		if (params.packages) {
 			await this.model.lessonOrganizationPackages.destroy({where:{organizationId: id, classId:0}});
 			const datas = _.map(params.packages, pkg => ({

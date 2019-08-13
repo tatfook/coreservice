@@ -34,6 +34,28 @@ class Keepwork extends Controller {
 		return this.success(ok);
 	}
 
+	// paracraftDownloadUrl
+	async getParacraftDownloadUrl() {
+		const key = "paracraft_download_url";
+		const value = await this.app.redis.get(key);
+		try {
+			return this.success(JSON.parse(value || ""));
+		} catch(e) {
+			return this.success({});
+		}
+	}
+
+	// 设置 paracraft 下载链接
+	async setParacraftDownloadUrl() {
+		this.adminAuthenticated();
+
+		const key = "paracraft_download_url";
+		const data = this.validate();
+		const value = await this.app.redis.set(key, JSON.stringify(data));
+
+		return this.success(value);
+	}
+
 	// 获取 svg 验证码
 	async getSvgCaptcha() {
 		const captcha = svgCaptcha.createMathExpr({
@@ -67,20 +89,24 @@ class Keepwork extends Controller {
 	async postPageVisit() {
 		const ip = this.ctx.ip;
 		const {url} = this.validate({url:"string"});
-		const ipsetkey = `${url}-page-visit-ip-sets`;
-		const ret = await this.app.redis.sadd(ipsetkey, ip);
+		const key = `${url}-page-visit-count`;
+		const count = await this.app.redis.incr(key);
+		//const ret = await this.app.redis.sadd(ipsetkey, ip);
 
 		const timestamp = moment(moment(new Date()).format("YYYY-MM-DD")).add(1, "days").unix();
-		await this.app.redis.expireat(ipsetkey, timestamp);
+		await this.app.redis.expireat(key, timestamp);
 
-		this.success(await this.app.redis.scard(ipsetkey));
+		//this.success(await this.app.redis.scard(ipsetkey));
+		this.success(count);
 	}
 
 	// 或取页面访问量
 	async getPageVisit() {
 		const {url} = this.validate({url:"string"});
-		const ipsetkey = `${url}-page-visit-ip-sets`;
-		this.success(await this.app.redis.scard(ipsetkey));
+		const key = `${url}-page-visit-count`;
+		const count = await this.app.redis.get(key) || 0;
+		return this.success(count);
+		//this.success(await this.app.redis.scard(ipsetkey));
 	}
 
 	// 增加 paracraft 下载量
