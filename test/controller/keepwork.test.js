@@ -17,6 +17,11 @@ describe("KEEPWORK", () => {
 	});
 
 	it("002 parcraft 下载量 下载地址 页面访问量", async () => {
+		// 增加页面访问量
+		await app.httpRequest().post("/v0/keepworks/page_visit").send({ url:"www.baidu.com" }).expect(res => res.statusCode === 200);
 
+		// 获取页面访问量
+		const count = await app.httpRequest().get("/v0/keepworks/page_visit?url=www.baidu.com").expect(res => res.statusCode === 200).then(res=> res.body);
+		assert(count === 2);
 	});
 });
