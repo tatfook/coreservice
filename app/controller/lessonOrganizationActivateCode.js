@@ -16,7 +16,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 	}
 
 	async create() {
-		let {userId, organizationId, roleId} = this.authenticated();
+		let {userId, organizationId, roleId, username} = this.authenticated();
 		const params = this.validate({count:"number", classId:"number"});
 
 		if (params.organizationId && params.organizationId != organizationId) {
@@ -27,6 +27,9 @@ const LessonOrganizationActivateCode = class extends Controller {
 		const classId = params.classId;
 		const names = params.name || [];
 		const count = params.count || names.length || 1;
+
+		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id:classId}}).then(o => o && o.toJSON());
+		if (!cls) return this.throw(400);
 
 		if (!(roleId & CLASS_MEMBER_ROLE_ADMIN)) return this.throw(411);
 
@@ -43,6 +46,9 @@ const LessonOrganizationActivateCode = class extends Controller {
 			});
 		}
 		const list = await this.model.lessonOrganizationActivateCodes.bulkCreate(datas);
+
+		this.model.lessonOrganizationLogs.classLog({cls, action:"activateCode", count, handleId: userId, username});
+
 		return this.success(list);
 	}
 

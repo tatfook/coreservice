@@ -175,18 +175,26 @@ const LessonOrganization = class extends Controller {
 		const params = this.validate({id:'number'});
 		const id = params.id;
 
+		const organ = await this.model.lessonOrganizations.findOne({where:{id}});
+		if (!organ) return this.throw(400);
+
 		delete params.userId;
 		if (this.ctx.state.admin && this.ctx.state.admin.userId) {
 			await this.model.lessonOrganizations.update(params, {where:{id}});
 		} else {
-			const {userId, roleId = 0} = this.authenticated();
+			const {userId, roleId = 0, username} = this.authenticated();
 			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411, "无效token");
 			await this.model.lessonOrganizations.update(params, {where:{id}});
+
+			if (params.privilege && organ.privilege != params.privilege) {
+				await this.model.lessonOrganizationLogs.create({
+					type: "系统",
+					description: params.privilege == 1 ? "允许任课教师管理学生信息" : "不允许任课教师管理学生信息",
+					handleId: userId,
+					usernames,
+				});
+			}
 		} 
-
-		if (params.privilege) {
-
-		}
 
 		if (params.packages) {
 			await this.model.lessonOrganizationPackages.destroy({where:{organizationId: id, classId:0}});

@@ -77,6 +77,28 @@ module.exports = app => {
 		await app.model.lessonOrganizationLogs.create(log);
 	}
 
+	model.classLog = async function({cls, params = {}, action, count = 0, username, handleId}) {
+		const begin = moment(new Date(cls.begin)).format("YYYY/MM/DD");
+		const end = moment(new Date(cls.end)).format("YYYY/MM/DD");
+		const paramsBegin = params.begin ? moment(new Date(params.begin)).format("YYYY/MM/DD") : begin;
+		const paramsEnd = params.en ? moment(new Date(params.end)).format("YYYY/MM/DD") : end;
+		if (action == "createClass") {
+			return await app.model.lessonOrganizationLogs.create({type:"班级", description: `新建, 班级: ${cls.name}, 开班时间 ${begin} - ${end}`, username, handleId});
+		} else if (action == "updateClass") {
+			if (cls.name != params.name) {
+				await app.model.lessonOrganizationLogs.create({type:"班级", description: `改名, 班级: ${cls.name}, 修改为: ${params.name}`, username, handleId});
+			}
+			if (paramsBegin != begin || paramsEnd != end) {
+				await app.model.lessonOrganizationLogs.create({type:"班级", description: `修改有效期, 班级: ${cls.name}, 开班时间修改为: ${paramsBegin} - ${paramsEnd}`, username, handleId});
+			}
+			if (params.packages) {
+				await app.model.lessonOrganizationLogs.create({type:"班级", description: `变更课程包, 班级: ${cls.name}`, username, handleId});
+			}
+		} else if (action == "activateCode") {
+			await app.model.lessonOrganizationLogs.create({type:"班级", description: `生成邀请码: ${cls.name}, 生成 ${count} 个`, username, handleId});
+		}
+	}
+
 	model.studentLog = async function({oldmembers, roleId,  classIds, realname = "", memberId}) {
 		if (classIds.length == 0) {
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {

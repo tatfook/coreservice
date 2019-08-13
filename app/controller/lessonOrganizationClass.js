@@ -89,7 +89,7 @@ const LessonOrganizationClass = class extends Controller {
 	}
 
 	async create() {
-		const {roleId, organizationId} = this.authenticated();
+		const {roleId, organizationId, userId, username} = this.authenticated();
 		const params = this.validate({name:"string"});
 		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
@@ -112,12 +112,14 @@ const LessonOrganizationClass = class extends Controller {
 		
 		await this.model.lessonOrganizationPackages.bulkCreate(datas);
 
+		this.model.lessonOrganizationLogs.classLog({cls, params, action:"createClass", handleId: userId, username});
+
 		return this.success(cls);
 	}
 	
 	// 禁止更新
 	async update() {
-		const {roleId, organizationId} = this.authenticated();
+		const {roleId, organizationId, userId, username} = this.authenticated();
 		const params = this.validate({id:"number"});
 		if (!organizationId) return this.throw(400);
 		if (roleId & CLASS_MEMBER_ROLE_ADMIN == 0) return this.throw(411, "无权限");
@@ -154,6 +156,7 @@ const LessonOrganizationClass = class extends Controller {
 			await this.model.lessonOrganizationPackages.bulkCreate(datas);
 		}
 
+		this.model.lessonOrganizationLogs.classLog({cls, params, action:"updateClass", handleId: userId, username});
 		return this.success();
 	}
 
