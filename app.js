@@ -22,7 +22,6 @@ module.exports = app => {
   app.unittest = app.config.env == 'unittest';
 
   //console.log(app.config.self);
-  //console.log(app.lessonModel);
 
   sms(app);
   email(app);

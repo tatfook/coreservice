@@ -99,7 +99,7 @@ module.exports = app => {
 		}
 	}
 
-	model.studentLog = async function({oldmembers, roleId,  classIds, realname = "", memberId}) {
+	model.studentLog = async function({oldmembers, roleId,  classIds, realname = "", memberId, username, handleId}) {
 		if (classIds.length == 0) {
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 				return await app.model.lessonOrganizationLogs.create({type: "学生", description:"删除, 学生: " + oldmembers[0].realname, username, handleId});
@@ -109,12 +109,17 @@ module.exports = app => {
 			} 
 		}
 
-		if (classIds.length == 1 && classIds[0] == 0) {
+		if (classIds.length == 1 && classIds[0] == 0 && oldmembers.length == 0) {
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 				return await app.model.lessonOrganizationLogs.create({type: "学生", description:"添加学生: " + realname, username, handleId});
 			} 
 			if (roleId == CLASS_MEMBER_ROLE_TEACHER) {
-				return await app.model.lessonOrganizationLogs.create({type: "老师", description:"添加老师: " + realname, username, handleId});
+				const member = _.find(oldmembers, o => o.classId == 0 && o.roleId && CLASS_MEMBER_ROLE_TEACHER);
+				if (member) {
+					return await app.model.lessonOrganizationLogs.create({type: "老师", description:`改名, 教师: ${member.realname} 修改为: ${realname}`, username, handleId});
+				} else {
+					return await app.model.lessonOrganizationLogs.create({type: "老师", description:"添加老师: " + realname, username, handleId});
+				}
 			} 
 		}
 
@@ -122,7 +127,7 @@ module.exports = app => {
 			const member = oldmembers[i];
 			const index = classIds.indexOf(member.classId);
 			const cls = await app.model.lessonOrganizationClasses.findOne({where:{id: member.classId}});
-			if (index < 0) {
+			if (index < 0 && cls) {
 				if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 					await app.model.lessonOrganizationLogs.create({type: "班级", description:`移除学生, ${cls.name}, 移除学生: ${member.realname}`, handleId, username});
 				}
@@ -148,6 +153,8 @@ module.exports = app => {
 			const classId = classIds[i];
 			const member = _.find(oldmembers, o => o.classIds == classId && o.roleId & roleId);
 			if (member) continue;
+			const cls = await app.model.lessonOrganizationClasses.findOne({where:{id: classId}});
+			if (!cls) continue;
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 				await app.model.lessonOrganizationLogs.create({type: "班级", description:`添加学生, ${cls.name}, 添加学生: ${realname}`, handleId, username});
 			}

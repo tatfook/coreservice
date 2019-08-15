@@ -173,7 +173,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		const curtime = new Date();
 		let oldmembers = await this.model.lessonOrganizationClassMembers.findAll({
 			order: [["id", "desc"]],
-			include: [{as: "lessonOrganizationClasses", model: this.model.lessonOrganizationClasses}], 
+			include: [{as: "lessonOrganizationClasses", model: this.model.lessonOrganizationClasses, required: false}], 
 			where:{organizationId, memberId: params.memberId}}).then(list => list.map(o => o.toJSON()));
 		oldmembers = _.filter(oldmembers, o => o.classId == 0 || new Date(o.lessonOrganizationClasses.end).getTime() > new Date().getTime());
 		const ids = _.map(oldmembers, o => o.id);
@@ -185,8 +185,10 @@ const LessonOrganizationClassMember = class extends Controller {
 			const usedCount = await this.model.lessonOrganizations.getUsedCount(organizationId);
 			if (usedCount >= organCount && classIds.length > 0) return this.fail(1, "学生人数已达上限");
 		}
+
+		//console.log(oldmembers, classIds);
 		//  LOG
-		this.model.lessonOrganizationLogs.studentLog({...params, handleId: userId, username, classIds});
+		await this.model.lessonOrganizationLogs.studentLog({...params, handleId: userId, username, classIds, oldmembers});
 
 		// 合并其它身份
 		const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));

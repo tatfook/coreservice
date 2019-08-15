@@ -191,7 +191,7 @@ const LessonOrganization = class extends Controller {
 					type: "系统",
 					description: params.privilege == 1 ? "允许任课教师管理学生信息" : "不允许任课教师管理学生信息",
 					handleId: userId,
-					usernames,
+					username,
 				});
 			}
 		} 
