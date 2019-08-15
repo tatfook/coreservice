@@ -9,7 +9,7 @@ module.exports = (options, app) => {
 		const prefix = app.config.self.apiUrlPrefix;
 		let action = "", description = "", extra = {path, params: ctx.getParams()};
 		
-		console.log(extra);
+		//console.log(extra);
 		if (path == `${prefix}users/login`) {
 			action = "login";
 			await app.model.activities.create({userId, action, description, extra});
@@ -18,6 +18,9 @@ module.exports = (options, app) => {
 			await app.model.activities.create({userId, action, description, extra});
 		} else {
 			action = "unknow";
+			if (ctx.app.config.self.env != "prod") {
+				await app.model.activities.create({userId, action, description, extra});
+			}
 		}
 		
 	} 
