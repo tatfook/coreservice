@@ -3,6 +3,10 @@ const _ = require("lodash");
 const DataLoader = require('dataloader');
 
 module.exports = {
+	getParams() {
+		return _.merge({}, this.request.body, this.query, this.params);
+	},
+
 	authenticated() {
 		const user = this.state.user;
 		const admin = this.state.admin;

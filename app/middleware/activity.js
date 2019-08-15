@@ -7,8 +7,9 @@ module.exports = (options, app) => {
 		const userId = (ctx.state.user || {}).userId || 0;
 		const path = ctx.path;
 		const prefix = app.config.self.apiUrlPrefix;
-		let action = "", description = "", extra = {};
+		let action = "", description = "", extra = {path, params: ctx.getParams()};
 		
+		console.log(extra);
 		if (path == `${prefix}users/login`) {
 			action = "login";
 			await app.model.activities.create({userId, action, description, extra});
@@ -22,8 +23,8 @@ module.exports = (options, app) => {
 	} 
 
 	return async function(ctx, next) {
-		await next();
-
 		activity(ctx);
+
+		await next();
 	}
 }
