@@ -9,7 +9,7 @@ module.exports = (options, app) => {
 		const path = ctx.path;
 		if (path.indexOf(`${apiPathPrefix}organizations`) == 0) {
 			const {userId, organizationId, roleId} = ctx.state.user;
-			const params =  _.merge({}, this.ctx.request.body, this.ctx.query, this.ctx.params);
+			const params =  _.merge({}, ctx.request.body, ctx.query, ctx.params);
 
 			if (userId && params.organizationId && params.organizationId != organizationId) {
 				organizationId = params.organizationId;

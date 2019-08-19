@@ -38,6 +38,19 @@ const Index = class extends Controller {
 
 		return this.success(ok);
 	}
+
+	// 日志
+	async log() {
+		let {userId, username, organizationId, roleId} = this.authenticated();
+		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
+
+		const query = this.validate();
+		this.formatQuery(query);
+
+		const logs = await this.model.lessonOrganizationLogs.findAndCount(query);
+
+		return this.success(logs);
+	}
 }
 
 module.exports = Index;

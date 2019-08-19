@@ -20,11 +20,13 @@ describe("机构激活码", () => {
 		await app.model.lessonOrganizationClassMembers.create({organizationId:organ.id, memberId:user.id, roleId:64, classId: 0});
 
 		// 测试生成激活码
-		await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").send({
+		const data = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes").send({
 			organizationId: organ.id,
 			count: 20,
 			classId: cls.id,
-		}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body.data).catch(e => console.log(e));
+			names: ["tset1", "test2", "test3"],
+		}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+		//console.log(data);
 
 		// 测试获取激活码
 		await app.httpRequest().get("/api/v0/lessonOrganizationActivateCodes?organizationId=" + organ.id).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body.data).catch(e => console.log(e));

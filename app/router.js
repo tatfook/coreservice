@@ -311,6 +311,7 @@ module.exports = app => {
 
 	// organization 
 	const organization = controller.organization.index;
+	router.post(`${prefix}organizations/log`, organization.log);
 	router.post(`${prefix}organizations/changepwd`, organization.changepwd);
 
 	// Message

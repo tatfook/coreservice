@@ -25,7 +25,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 		}
 
 		const classId = params.classId;
-		const names = params.name || [];
+		const names = params.names || [];
 		const count = params.count || names.length || 1;
 
 		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id:classId}}).then(o => o && o.toJSON());
