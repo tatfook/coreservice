@@ -26,11 +26,11 @@ const Index = class extends Controller {
 		const member = await this.model.lessonOrganizationClassMembers.findOne({organizationId, classId: params.classId, memberId: params.memberId})
 		if (!member) return this.success(false);
 
-		const ok = await ctx.model.users.update({
-			password: app.util.md5(params.password),
+		const ok = await this.model.users.update({
+			password: this.app.util.md5(params.password),
 		}, {where:{id: params.memberId}});
 
-		ctx.model.lessonOrganizationLogs.create({
+		this.model.lessonOrganizationLogs.create({
 			memberId: params.memberId,
 			username,
 			handleId:userId,

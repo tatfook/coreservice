@@ -32,7 +32,7 @@ describe("机构", () => {
 		const cls2 = await app.httpRequest().post("/api/v0/lessonOrganizationClasses").send({organizationId: organ.id, name:"class001", begin: new Date(), end: new Date().getTime() + 1000 * 60 * 60 * 24}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 		
 		// 更新班级
-		await app.httpRequest().put("/api/v0/lessonOrganizationClasses/" + cls.id).send({name:"class001", end:"2110-01-01", packages:[]}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+		await app.httpRequest().put("/api/v0/lessonOrganizationClasses/" + cls.id).send({name:"class0000", end:"2110-01-01", packages:[]}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 
 		// 添加老师
 		let member = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({organizationId: organ.id, classIds:[0], memberId:2, realname:"xiaoyao", roleId: 2}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
@@ -54,9 +54,14 @@ describe("机构", () => {
 		member = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({organizationId: organ.id, classIds:[cls.id, cls2.id], memberId:2, realname:"xiaoyao", roleId: 1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 		// 移除班级学生 并改名
 		member = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({organizationId: organ.id, classIds:[cls.id], memberId:2, realname:"xiaoyao1", roleId: 1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+		
+		// 改密码
+		await app.httpRequest().post("/api/v0/organizations/changepwd").send({organizationId: organ.id, classId: cls.id, memberId: 2, password: "test123"}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+
 		// 移除学生
 		member = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({organizationId: organ.id, classIds:[], memberId:2, realname:"xiaoyao1", roleId: 1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 		// 获取机构日志
 		await app.httpRequest().post("/api/v0/organizations/log").send({organizationId: organ.id}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+
 	});
 });
