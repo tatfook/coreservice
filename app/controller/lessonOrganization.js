@@ -188,6 +188,7 @@ const LessonOrganization = class extends Controller {
 
 			if (params.privilege && organ.privilege != params.privilege) {
 				await this.model.lessonOrganizationLogs.create({
+					organizationId: id,
 					type: "系统",
 					description: params.privilege == 1 ? "允许任课教师管理学生信息" : "不允许任课教师管理学生信息",
 					handleId: userId,

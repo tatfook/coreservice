@@ -31,6 +31,7 @@ const Index = class extends Controller {
 		}, {where:{id: params.memberId}});
 
 		this.model.lessonOrganizationLogs.create({
+			organizationId,
 			memberId: params.memberId,
 			username,
 			handleId:userId,
@@ -50,7 +51,7 @@ const Index = class extends Controller {
 		//query.organizationId = query.organizationId || organizationId;
 		query.organizationId = organizationId;
 
-		const logs = await this.model.lessonOrganizationLogs.findAndCount(query);
+		const logs = await this.model.lessonOrganizationLogs.findAndCount({...this.queryOptions, where:query});
 
 		return this.success(logs);
 	}

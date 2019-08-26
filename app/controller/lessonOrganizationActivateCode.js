@@ -47,7 +47,7 @@ const LessonOrganizationActivateCode = class extends Controller {
 		}
 		const list = await this.model.lessonOrganizationActivateCodes.bulkCreate(datas);
 
-		this.model.lessonOrganizationLogs.classLog({cls, action:"activateCode", count, handleId: userId, username});
+		this.model.lessonOrganizationLogs.classLog({organizationId, cls, action:"activateCode", count, handleId: userId, username});
 
 		return this.success(list);
 	}

@@ -188,7 +188,7 @@ const LessonOrganizationClassMember = class extends Controller {
 
 		//console.log(oldmembers, classIds);
 		//  LOG
-		await this.model.lessonOrganizationLogs.studentLog({...params, handleId: userId, username, classIds, oldmembers});
+		await this.model.lessonOrganizationLogs.studentLog({...params, handleId: userId, username, classIds, oldmembers, organizationId});
 
 		// 合并其它身份
 		const datas = _.map(classIds, classId => ({...params, classId, roleId: params.roleId | (_.find(oldmembers, m => m.classId == classId) || {roleId:0}).roleId}));

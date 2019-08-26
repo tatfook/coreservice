@@ -61,7 +61,7 @@ describe("机构", () => {
 		// 移除学生
 		member = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({organizationId: organ.id, classIds:[], memberId:2, realname:"xiaoyao1", roleId: 1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 		// 获取机构日志
-		await app.httpRequest().post("/api/v0/organizations/log").send({organizationId: organ.id}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
-
+		const logs = await app.httpRequest().post("/api/v0/organizations/log").send({organizationId: organ.id}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+		console.log(logs);
 	});
 });

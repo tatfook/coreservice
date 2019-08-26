@@ -112,7 +112,7 @@ const LessonOrganizationClass = class extends Controller {
 		
 		await this.model.lessonOrganizationPackages.bulkCreate(datas);
 
-		this.model.lessonOrganizationLogs.classLog({cls, params, action:"createClass", handleId: userId, username});
+		this.model.lessonOrganizationLogs.classLog({organizationId, cls, params, action:"createClass", handleId: userId, username});
 
 		return this.success(cls);
 	}
@@ -156,7 +156,7 @@ const LessonOrganizationClass = class extends Controller {
 			await this.model.lessonOrganizationPackages.bulkCreate(datas);
 		}
 
-		this.model.lessonOrganizationLogs.classLog({cls, params, action:"updateClass", handleId: userId, username});
+		this.model.lessonOrganizationLogs.classLog({organizationId, cls, params, action:"updateClass", handleId: userId, username});
 		return this.success();
 	}
 
