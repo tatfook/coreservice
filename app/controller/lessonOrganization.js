@@ -62,7 +62,7 @@ const LessonOrganization = class extends Controller {
 			],
 			where: {organizationId, memberId: user.id}
 		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
-		if (members.length == 0) return this.throw(400, "成员不存在");
+		//if (members.length == 0) return this.throw(400, "成员不存在");   // 成员不存在允许登录
 		let roleId = 0;
 		_.each(members, o => roleId = roleId | o.roleId);
 
