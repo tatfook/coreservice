@@ -82,7 +82,7 @@ module.exports = app => {
 		const begin = moment(new Date(cls.begin)).format("YYYY/MM/DD");
 		const end = moment(new Date(cls.end)).format("YYYY/MM/DD");
 		const paramsBegin = params.begin ? moment(new Date(params.begin)).format("YYYY/MM/DD") : begin;
-		const paramsEnd = params.en ? moment(new Date(params.end)).format("YYYY/MM/DD") : end;
+		const paramsEnd = params.end ? moment(new Date(params.end)).format("YYYY/MM/DD") : end;
 		if (action == "createClass") {
 			return await app.model.lessonOrganizationLogs.create({organizationId, type:"班级", description: `新建, 班级: ${cls.name}, 开班时间 ${begin} - ${end}`, username, handleId});
 		} else if (action == "updateClass") {

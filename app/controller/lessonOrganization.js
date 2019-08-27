@@ -190,7 +190,7 @@ const LessonOrganization = class extends Controller {
 				await this.model.lessonOrganizationLogs.create({
 					organizationId: id,
 					type: "系统",
-					description: params.privilege == 1 ? "允许任课教师管理学生信息" : "不允许任课教师管理学生信息",
+					description: params.privilege == 0 ? "不允许任课教师管理学生信息" : "允许任课教师管理学生信息",
 					handleId: userId,
 					username,
 				});
