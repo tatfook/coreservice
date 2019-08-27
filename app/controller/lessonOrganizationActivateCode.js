@@ -82,13 +82,14 @@ const LessonOrganizationActivateCode = class extends Controller {
 
 	async activate() {
 		const {userId, username} = this.authenticated();
-		const {key, realname, organizationId} = this.validate({key:"string", organizationId:"number"});
+		let {key, realname, organizationId} = this.validate({key:"string", organizationId:"number_optional"});
 
 		const curtime = new Date().getTime();
 		const data = await this.model.lessonOrganizationActivateCodes.findOne({where:{key, state:0}}).then(o => o && o.toJSON());
 		if (!data) return this.fail({code:2, message:"无效激活码"});
 
-		if (data.organizationId != organizationId) return this.fail({code:7, message:"激活码不属于这个机构"});
+		if (organizationId && data.organizationId != organizationId) return this.fail({code:7, message:"激活码不属于这个机构"});
+		organizationId = data.organizationId;
 
 		const cls = await this.model.lessonOrganizationClasses.findOne({where:{id: data.classId}}).then(o => o && o.toJSON());
 		if (!cls) return this.fail({code:2, message:"无效激活码"});

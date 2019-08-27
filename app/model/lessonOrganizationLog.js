@@ -117,7 +117,7 @@ module.exports = app => {
 			if (roleId == CLASS_MEMBER_ROLE_TEACHER) {
 				const member = _.find(oldmembers, o => o.classId == 0 && o.roleId && CLASS_MEMBER_ROLE_TEACHER);
 				if (member) {
-					return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:`改名, 教师: ${member.realname} 修改为: ${realname}`, username, handleId});
+					return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:`改名, 教师: ${member.realname || ""} 修改为: ${realname}`, username, handleId});
 				} else {
 					return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:"添加老师: " + realname, username, handleId});
 				}
@@ -128,6 +128,7 @@ module.exports = app => {
 			const member = oldmembers[i];
 			const index = classIds.indexOf(member.classId);
 			const cls = await app.model.lessonOrganizationClasses.findOne({where:{id: member.classId}});
+			member.realname = member.realname || "";
 			if (index < 0 && cls) {
 				if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 					await app.model.lessonOrganizationLogs.create({organizationId, type: "班级", description:`移除学生, ${cls.name}, 移除学生: ${member.realname}`, handleId, username});
@@ -139,10 +140,10 @@ module.exports = app => {
 			} else {
 				if (member.realname != realname && realname) {
 					if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
-						await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:`改名, 学生: ${member.realname}, 修改为: ${realname}`, handleId, username});
+						await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:`改名, 学生: ${member.realname || ""}, 修改为: ${realname}`, handleId, username});
 					}
 					if (roleId == CLASS_MEMBER_ROLE_TEACHER) {
-						await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:`改名, 教师: ${member.realname}, 修改为: ${realname}`, handleId, username});
+						await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:`改名, 教师: ${member.realname || ""}, 修改为: ${realname}`, handleId, username});
 					}
 					realname = member.realname;
 					continue;
