@@ -175,7 +175,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			order: [["id", "desc"]],
 			include: [{as: "lessonOrganizationClasses", model: this.model.lessonOrganizationClasses, required: false}], 
 			where:{organizationId, memberId: params.memberId}}).then(list => list.map(o => o.toJSON()));
-		oldmembers = _.filter(oldmembers, o => o.classId == 0 || new Date(o.lessonOrganizationClasses.end).getTime() > new Date().getTime());
+		oldmembers = _.filter(oldmembers, o => o.classId == 0 || params.roleId != CLASS_MEMBER_ROLE_STUDENT || (new Date(o.lessonOrganizationClasses.end).getTime() > new Date().getTime()));
 		const ids = _.map(oldmembers, o => o.id);
 		const organ = await this.model.lessonOrganizations.findOne({where:{id:organizationId}}).then(o => o.toJSON());
 		if (!organ) return this.throw(400);
