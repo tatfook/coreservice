@@ -106,10 +106,10 @@ module.exports = app => {
 				oldmembers = await app.model.lessonOrganizationClassMembers.findAll({where:{memberId, organizationId}}).then(list => list.map(o => o.toJSON()));
 			}
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
-				return await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:"删除, 学生: " + oldmembers[0].realname, username, handleId});
+				return await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:"删除, 学生: " + (oldmembers[0].realname || ""), username, handleId});
 			} 
 			if (roleId == CLASS_MEMBER_ROLE_TEACHER) {
-				return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:"删除, 老师: " + oldmembers[0].realname, username, handleId});
+				return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:"删除, 老师: " + (oldmembers[0].realname || ""), username, handleId});
 			} 
 			return;
 		}
