@@ -102,12 +102,16 @@ module.exports = app => {
 
 	model.studentLog = async function({oldmembers, roleId,  classIds, realname = "", memberId, username, handleId, organizationId}) {
 		if (classIds.length == 0) {
+			if (!oldmembers || oldmembers.length == 0) {
+				oldmembers = await this.model.lessonOrganizationClassMembers.findAll({where:{memberId, organizationId}}).then(list => list.map(o => o.toJSON()));
+			}
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 				return await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:"删除, 学生: " + oldmembers[0].realname, username, handleId});
 			} 
 			if (roleId == CLASS_MEMBER_ROLE_TEACHER) {
 				return await app.model.lessonOrganizationLogs.create({organizationId, type: "老师", description:"删除, 老师: " + oldmembers[0].realname, username, handleId});
 			} 
+			return;
 		}
 
 		if (classIds.length == 1 && classIds[0] == 0 && oldmembers.length == 0) {
