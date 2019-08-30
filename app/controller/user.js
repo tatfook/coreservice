@@ -275,7 +275,7 @@ const User = class extends Controller {
 		const {ctx} = this;
 		const {model, util} = this.app;
 		const config = this.app.config.self;
-		const usernameReg = /^[\w\d]{4,30}$/;
+		const usernameReg = /^\w[\w\d]{3,40}$/;
 		const params = this.validate({
 			//"cellphone":"string",
 			//"captcha":"string",
