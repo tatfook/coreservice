@@ -115,13 +115,13 @@ const LessonOrganizationActivateCode = class extends Controller {
 		if (m) {
 			await this.model.lessonOrganizationClassMembers.update({roleId, realname}, {where:{id:m.id}});
 		} else {
-			m = await this.model.lessonOrganizationClassMembers.upsert({
+			m = await this.model.lessonOrganizationClassMembers.create({
 				organizationId: data.organizationId,
 				classId: data.classId,
 				memberId: userId,
 				roleId,
 				realname,
-			});
+			}).then(o => o.toJSON());
 		}
 
 		await this.model.lessonOrganizationClassMembers.update({realname}, {where:{organizationId, memberId:userId}});
