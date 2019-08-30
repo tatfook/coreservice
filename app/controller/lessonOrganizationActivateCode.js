@@ -110,21 +110,25 @@ const LessonOrganizationActivateCode = class extends Controller {
 			if (organ.count <= usedCount) return this.fail({code:5, message: "人数已达上限"});
 		}
 
-		const m = _.find(ms, o => o.classId == data.classId);
+		let m = _.find(ms, o => o.classId == data.classId);
 		const roleId = m ? (m.roleId | CLASS_MEMBER_ROLE_STUDENT) : CLASS_MEMBER_ROLE_STUDENT;
-		const member = await this.model.lessonOrganizationClassMembers.upsert({
-			organizationId: data.organizationId,
-			classId: data.classId,
-			memberId: userId,
-			roleId,
-			realname,
-		});
+		if (m) {
+			await this.model.lessonOrganizationClassMembers.update({roleId, realname}, {where:{id:m.id}});
+		} else {
+			m = await this.model.lessonOrganizationClassMembers.upsert({
+				organizationId: data.organizationId,
+				classId: data.classId,
+				memberId: userId,
+				roleId,
+				realname,
+			});
+		}
 
 		await this.model.lessonOrganizationClassMembers.update({realname}, {where:{organizationId, memberId:userId}});
 
 		await this.model.lessonOrganizationActivateCodes.update({activateTime: new Date(), activateUserId: userId, state:1, username, realname}, {where:{key}});
 
-		return this.success(m ? {...m, roleId} : member);
+		return this.success({...m, roleId, realname});
 	}
 }
 

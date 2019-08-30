@@ -29,6 +29,14 @@ describe("机构激活码", () => {
 		//console.log(data);
 
 		// 测试获取激活码
-		await app.httpRequest().get("/api/v0/lessonOrganizationActivateCodes?organizationId=" + organ.id).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body.data).catch(e => console.log(e));
+		const list = await app.httpRequest().get("/api/v0/lessonOrganizationActivateCodes?organizationId=" + organ.id).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+
+		// 使用激活码
+		const member = await app.httpRequest().post("/api/v0/lessonOrganizationActivateCodes/activate").send({
+			key: list.rows[0].key,
+			realname:"test",
+		}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+
+		console.log(member);
 	});
 });
