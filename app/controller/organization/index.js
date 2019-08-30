@@ -32,9 +32,10 @@ const Index = class extends Controller {
 
 		this.model.lessonOrganizationLogs.create({
 			organizationId,
-			memberId: params.memberId,
+			type: "学生",
 			username,
 			handleId:userId,
+			description: "修改密码, 学生: " + member.realname,
 		});
 
 		return this.success(ok);

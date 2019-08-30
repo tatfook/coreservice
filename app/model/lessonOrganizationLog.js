@@ -63,21 +63,6 @@ module.exports = app => {
 	
 	app.model.lessonOrganizationLogs = model;
 
-	model.changeStudentPwd = async function({organizationId, memberId, username, handleId}) {
-		const user = await app.model.users.findOne({where: {id: memberId}});
-		if (!user) return;
-
-		const log = {
-			organizationId,
-			type: "学生",
-			description:"修改密码, 学生: " + user.username,
-			username, 
-			handleId,
-		}
-		
-		await app.model.lessonOrganizationLogs.create(log);
-	}
-
 	model.classLog = async function({cls, params = {}, action, count = 0, username, handleId, organizationId}) {
 		const begin = moment(new Date(cls.begin)).format("YYYY/MM/DD");
 		const end = moment(new Date(cls.end)).format("YYYY/MM/DD");
