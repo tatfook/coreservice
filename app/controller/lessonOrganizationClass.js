@@ -172,6 +172,34 @@ const LessonOrganizationClass = class extends Controller {
 
 		return this.success();
 	}
+
+	// 班级最近项目
+	async latestProject() {
+		const {organizationId} = this.authenticated();
+		const {id} = this.validate({id:"number"});
+		
+		const members = await this.model.lessonOrganizationClassMembers.findAll({
+			include: [
+			{
+				as: "users",
+				model: this.model.users,
+				attributes: ["id", "username", "nickname", "portrait"],
+			}
+			],
+			where:{organizationId, classId: id},
+		}).then(list => list.map(o => o.toJSON()));
+		if (members.length == 0) return this.success([]);
+		const userIds = members.map(o => o.memberId);
+		const projects = await this.model.projects.findAll({
+			order: [["updatedAt", "desc"]],
+			userId: {"$in": userIds},
+			type: 0, // 只取 paracraft 
+		}).then(list => list.map(o => o.toJSON()));
+
+		_.each(members, m => m.projects = projects.filter(o => o.userId == m.memberId).slice(0, 2));
+		
+		return this.success(members);
+	}
 }
 
 module.exports = LessonOrganizationClass;

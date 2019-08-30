@@ -20,6 +20,9 @@ describe("lesson organization class", () => {
 		// 登录机构
 		const token = await app.httpRequest().post("/api/v0/lessonOrganizations/login").send({organizationId:organ.id, username:"user001", password:"123456"}).expect(200).then(res => res.body.token).catch(e => console.log(e));
 
+		// 获取班级项目
+		const list = await app.httpRequest().get(`/api/v0/lessonOrganizationClasses/${cls.id}/project`).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+
 		// 结业班级
 		await app.httpRequest().put("/api/v0/lessonOrganizationClasses/" + cls.id).send({end: "2019-01-01"}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body.data).catch(e => console.log(e));
 		cls = await app.model.lessonOrganizationClasses.findOne({where:{id:cls.id}}).then(o => o && o.toJSON());
@@ -59,9 +62,11 @@ describe("lesson organization class", () => {
 		let students = await app.httpRequest().get("/api/v0/lessonOrganizationClassMembers/student").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(students.count == 2);
 
+		// 获取班级学生
 		students = await app.httpRequest().get("/api/v0/lessonOrganizationClassMembers/student?classId=" + cls1.id).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(students.count == 1);
 
+		// 获取班级老师
 		let teachers = await app.httpRequest().get("/api/v0/lessonOrganizationClassMembers/teacher").set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(teachers.length == 2);
 	});
