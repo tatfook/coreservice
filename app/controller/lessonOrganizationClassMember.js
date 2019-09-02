@@ -109,7 +109,6 @@ const LessonOrganizationClassMember = class extends Controller {
 				o.classes = [];
 				rows.push(o);
 			}
-			map[o.memberId].id = 
 			map[o.memberId].realname = map[o.memberId].realname || o.realname;
 			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
 			delete o.lessonOrganizationClasses;
