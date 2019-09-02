@@ -176,10 +176,9 @@ const LessonOrganizationClassMember = class extends Controller {
 			include: [{as: "lessonOrganizationClasses", model: this.model.lessonOrganizationClasses, required: false}], 
 			where:{organizationId, memberId: params.memberId}}).then(list => list.map(o => o.toJSON()));
 		oldmembers = _.filter(oldmembers, o => {
-			if (o.classId == 0) return true;
-			if (params.roleId == CLASS_MEMBER_ROLE_TEACHER && o.roleId & CLASS_MEMBER_ROLE_TEACHER) return true;
-			if (params.roleId == CLASS_MEMBER_ROLE_STUDENT && o.roleId & CLASS_MEMBER_ROLE_STUDENT && (new Date(o.lessonOrganizationClasses.end).getTime() > new Date().getTime())) return true;
-			return false;
+			if (o.roleId == CLASS_MEMBER_ROLE_STUDENT && (new Date(o.lessonOrganizationClasses.end).getTime() < new Date().getTime())) return false;
+			//if (o.classId == 0 || o.roleId & CLASS_MEMBER_ROLE_TEACHER) return true;
+			return true;
 		});
 		const ids = _.map(oldmembers, o => o.id);
 		const organ = await this.model.lessonOrganizations.findOne({where:{id:organizationId}}).then(o => o.toJSON());
