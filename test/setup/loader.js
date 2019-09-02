@@ -7,6 +7,9 @@ const loadFactory = require("./factory.js");
 module.exports = app => {
 	app.mock = app.mock || {};
 
+	app.token = (payload = {}) => {
+		return app.util.jwt_encode(payload, app.config.self.secret, 3600 * 24 * 2);
+	}
 	app.login = async (user = {}) => {
 		user.username = user.username || "user0001";
 		user.password = md5("123456");

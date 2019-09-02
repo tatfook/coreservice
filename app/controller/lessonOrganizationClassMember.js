@@ -224,9 +224,11 @@ const LessonOrganizationClassMember = class extends Controller {
 	
 	async destroy() {
 		const {organizationId, roleId} = this.authenticated();
-		const {id} = this.validate({id: "number"});
+		const params = this.validate({id: "number"});
+		const id = params.id;
 
 		const member = await this.model.lessonOrganizationClassMembers.findOne({where:{organizationId, id}}).then(o => o && o.toJSON());
+		if (!member) return this.success();
 		if (member.roleId >= roleId) return this.throw(411);
 
 		if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
@@ -236,7 +238,11 @@ const LessonOrganizationClassMember = class extends Controller {
 			if (organ.privilege && 2 == 0) return this.throw(411, "无权限");
 		} 
 		
-		await this.model.lessonOrganizationClassMembers.destroy({where:{id}});
+		if (!params.roleId || params.roleId == member.roleId) {
+			await this.model.lessonOrganizationClassMembers.destroy({where:{id}});
+		} else {
+			await this.model.lessonOrganizationClassMembers.update({roleId: member.roleId & (~params.roleId)}, {where:{id}});
+		}
 
 		return this.success("OK");
 	}
