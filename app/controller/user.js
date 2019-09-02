@@ -300,8 +300,8 @@ const User = class extends Controller {
 				if (!cache.captcha) return this.fail(4);
 				if (cache.captcha != params.captcha) return this.fail(5);
 			} 
-			const isBindCellphone = await model.users.findOne({where:{cellphone}});
-			if (isBindCellphone) delete params.cellphone;
+			//const isBindCellphone = await model.users.findOne({where:{cellphone}});
+			//if (isBindCellphone) delete params.cellphone;
 		}
 		if (params.email && params.captcha) {
 			const cache = await this.app.model.caches.get(params.email) || {};
@@ -330,7 +330,7 @@ const User = class extends Controller {
 		}
 
 		user = await model.users.create({
-			cellphone: params.cellphone || null,
+			//cellphone: params.cellphone || null,
 			nickname: params.nickname || username,
 			username: username,
 			password: util.md5(params.password),
