@@ -206,6 +206,7 @@ const LessonOrganizationClassMember = class extends Controller {
 			return this.success();
 		}
 		const members = await this.model.lessonOrganizationClassMembers.bulkCreate(datas);
+		if (params.realname) await this.model.lessonOrganizationClassMembers.update({realname: params.realname}, {where: {id: {"$in": ids}}});
 
 		if (params.realname && classIds.length) {
 			await this.model.lessonOrganizationActivateCodes.update({realname: params.realname}, {
