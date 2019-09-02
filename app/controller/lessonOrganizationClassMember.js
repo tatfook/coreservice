@@ -48,7 +48,8 @@ const LessonOrganizationClassMember = class extends Controller {
 				organizationId,
 				memberId: {
 					[this.model.Op.in]: memberIds,
-				}
+				},
+				classId: classId ? classId : {"$gte":0},
 			}
 		}).then(list => list.map(o => o.toJSON()));
 		//}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
@@ -93,7 +94,8 @@ const LessonOrganizationClassMember = class extends Controller {
 			],
 			where: {
 				organizationId,
-				memberId: {$in: memberIds}
+				memberId: {$in: memberIds},
+				classId: classId ? classId : {"$gt":0},
 			},
 		}).then(list => list.map(o => o.toJSON()));
 		const map = {};
@@ -107,6 +109,7 @@ const LessonOrganizationClassMember = class extends Controller {
 				o.classes = [];
 				rows.push(o);
 			}
+			map[o.memberId].id = 
 			map[o.memberId].realname = map[o.memberId].realname || o.realname;
 			o.lessonOrganizationClasses && map[o.memberId].classes.push(o.lessonOrganizationClasses);
 			delete o.lessonOrganizationClasses;
