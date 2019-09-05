@@ -25,6 +25,7 @@
     "memory-cache": "^0.2.0",
     "moment": "^2.22.2",
     "mysql2": "^1.5.3",
+    "newrelic": "^5.11.0",
     "nodemailer": "^4.6.7",
     "path-to-regexp": "^2.3.0",
     "pingpp": "^2.1.4",

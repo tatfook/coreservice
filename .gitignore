@@ -18,5 +18,6 @@ logs/
 run/
 coverage/
 config/config.*.js
+newrelic_*
 
 yarn.lock
