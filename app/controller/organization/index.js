@@ -23,7 +23,7 @@ const Index = class extends Controller {
 			if (teacher.roleId < CLASS_MEMBER_ROLE_TEACHER) return this.throw(400);
 		}
 		
-		const member = await this.model.lessonOrganizationClassMembers.findOne({organizationId, classId: params.classId, memberId: params.memberId})
+		const member = await this.model.lessonOrganizationClassMembers.findOne({where: {organizationId, classId: params.classId, memberId: params.memberId}}).then(o => o.toJSON());
 		if (!member) return this.success(false);
 
 		const ok = await this.model.users.update({
