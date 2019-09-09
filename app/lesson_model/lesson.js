@@ -36,6 +36,10 @@ module.exports = app => {
 			//allowNull: false,
 		},
 
+		coursewareUrl: {            // 课程URL 允许为空
+			type: STRING,
+		},
+
 		goals: {
 			type: TEXT,
 		},
