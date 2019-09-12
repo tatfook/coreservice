@@ -14,6 +14,7 @@ module.exports = app => {
 	router.get(`${prefix}migrations/generateAll`, migration.generateAll);
 
 	const keepwork = controller.keepwork;
+	//router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
 	router.post(`${prefix}keepworks/email`, keepwork.email);
 	router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
 	router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);

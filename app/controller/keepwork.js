@@ -224,6 +224,21 @@ class Keepwork extends Controller {
 
 		return this.success(ips);
 	}
+
+	async issue5270() {
+		const str = `select * from projects where userId in (select id from users where realname is null)`;
+		const projects = await this.model.query(str, {
+			type: this.model.QueryTypes.SELECT,
+		});
+		console.log(projects.length);
+		for (let i = 0; i < projects.length; i++) {
+			const project = projects[i];
+			console.log("project:", project.id);
+			await this.app.api.projectsUpsert(project);
+		}
+
+		return this.success("OK");
+	}
 }
 
 module.exports = Keepwork;

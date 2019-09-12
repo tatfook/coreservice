@@ -37,7 +37,7 @@ class Api  {
 		}
 
 		this.app.logger.debug(`发送请求: ${url}`);
-		return axios.request(config)
+		return await axios.request(config)
 			.then(res => {
 				console.log(`请求:${url}成功`, JSON.stringify(res.config));
 				this.app.logger.debug(`请求:${url}成功`, JSON.stringify(res.config));
@@ -152,13 +152,13 @@ class Api  {
 
 		if (!user) return;
 
-		return this.curl('post', `/projects/${inst.id}/upsert`, {
+		return await this.curl('post', `/projects/${inst.id}/upsert`, {
 		//return await this.curl('post', `/projects/${inst.id}/upsert`, {
 			id: inst.id,
 			name: inst.name,
 			username: user.username,
 			user_portrait: user.portrait,
-			visibility: inst.visibility == 0 ? "public" : "private",
+			visibility: user.realname ? (inst.visibility == 0 ? "public" : "private") : "private",
 			recruiting: (inst.privilege & 1) ? true : false,
 			type: inst.type == 1 ? "paracraft" : "site",
 			created_at: inst.createdAt,
