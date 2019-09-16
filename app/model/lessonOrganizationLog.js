@@ -143,7 +143,7 @@ module.exports = app => {
 
 		for (let i = 0; i < classIds.length; i++) {
 			const classId = classIds[i];
-			const member = _.find(oldmembers, o => o.classIds == classId && o.roleId & roleId);
+			const member = _.find(oldmembers, o => o.classId == classId && o.roleId & roleId);
 			if (member) continue;
 			const cls = await app.model.lessonOrganizationClasses.findOne({where:{id: classId}});
 			if (!cls) continue;
