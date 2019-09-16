@@ -99,7 +99,7 @@ module.exports = app => {
 			return;
 		}
 
-		if (classIds.length == 1 && classIds[0] == 0 && oldmembers.length == 0) {
+		if (classIds.length == 1 && classIds[0] == 0) {
 			if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 				return await app.model.lessonOrganizationLogs.create({organizationId, type: "学生", description:"添加学生: " + realname, username, handleId});
 			} 
@@ -118,6 +118,7 @@ module.exports = app => {
 			const index = classIds.indexOf(member.classId);
 			const cls = await app.model.lessonOrganizationClasses.findOne({where:{id: member.classId}});
 			member.realname = member.realname || "";
+			if (!(roleId & member.roleId)) continue;
 			if (index < 0 && cls) {
 				if (roleId == CLASS_MEMBER_ROLE_STUDENT) {
 					await app.model.lessonOrganizationLogs.create({organizationId, type: "班级", description:`移除学生, ${cls.name}, 移除学生: ${member.realname}`, handleId, username});
