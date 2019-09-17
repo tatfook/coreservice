@@ -23,10 +23,11 @@ describe("机构学生", () => {
 		await app.model.lessonOrganizationClassMembers.create({organizationId:organ.id, memberId:user.id, roleId:64, classId: 0});
 
 		// 测试接口添加学生
-		const members = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({memberId: 2, organizationId: organ.id, classIds:[cls.id, cls1.id, cls2.id], roleId:1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
-		assert(members.length == 1);
+		let members = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({memberId: 2, organizationId: organ.id, classIds:[cls.id, cls1.id, cls2.id], roleId:1}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
+		assert(members.length == 3);
+		members = await app.httpRequest().post("/api/v0/lessonOrganizationClassMembers").send({memberId: 2, organizationId: organ.id, classIds:[cls.id, cls1.id, cls2.id], roleId:2}).set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 
-		// 删除班级成员
+		//// 删除班级成员
 		await app.httpRequest().delete("/api/v0/lessonOrganizationClassMembers/" + members[0].id + "?roleId=2").set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 		await app.httpRequest().delete("/api/v0/lessonOrganizationClassMembers/" + members[0].id + "?roleId=1").set("Authorization", `Bearer ${token}`).expect(200).then(res => res.body).catch(e => console.log(e));
 	});
