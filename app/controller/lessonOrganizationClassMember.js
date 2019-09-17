@@ -247,7 +247,7 @@ const LessonOrganizationClassMember = class extends Controller {
 		}
 
 		const memberRoleId = params.roleId ? params.roleId : member.roleId;
-		await this.model.lessonOrganizationLog.studentLog({
+		await this.model.lessonOrganizationLogs.studentLog({
 			oldmembers:[member],
 			classIds:[-1],
 			roleId: memberRoleId & CLASS_MEMBER_ROLE_TEACHER ? CLASS_MEMBER_ROLE_TEACHER : CLASS_MEMBER_ROLE_STUDENT,
