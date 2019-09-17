@@ -225,7 +225,7 @@ const LessonOrganizationClassMember = class extends Controller {
 	}
 	
 	async destroy() {
-		const {organizationId, roleId} = this.authenticated();
+		const {organizationId, roleId, userId, username} = this.authenticated();
 		const params = this.validate({id: "number"});
 		const id = params.id;
 
@@ -248,6 +248,9 @@ const LessonOrganizationClassMember = class extends Controller {
 
 		const memberRoleId = params.roleId ? params.roleId : member.roleId;
 		await this.model.lessonOrganizationLogs.studentLog({
+			organizationId,
+			handleId:userId,
+			username,
 			oldmembers:[member],
 			classIds:[-1],
 			roleId: memberRoleId & CLASS_MEMBER_ROLE_TEACHER ? CLASS_MEMBER_ROLE_TEACHER : CLASS_MEMBER_ROLE_STUDENT,
