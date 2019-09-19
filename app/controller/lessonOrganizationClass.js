@@ -192,8 +192,11 @@ const LessonOrganizationClass = class extends Controller {
 		const userIds = members.map(o => o.memberId);
 		const projects = await this.model.projects.findAll({
 			order: [["updatedAt", "desc"]],
-			userId: {"$in": userIds},
-			type: 0, // 只取 paracraft 
+			where: {
+				userId: {"$in": userIds},
+				type: 0, // 只取 paracraft 
+				visibility: 0,
+			}
 		}).then(list => list.map(o => o.toJSON()));
 
 		_.each(members, m => m.projects = projects.filter(o => o.userId == m.memberId).slice(0, 2));
