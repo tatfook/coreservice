@@ -194,7 +194,6 @@ const LessonOrganizationClass = class extends Controller {
 			order: [["updatedAt", "desc"]],
 			where: {
 				userId: {"$in": userIds},
-				type: 0, // 只取 paracraft 
 				visibility: 0,
 			}
 		}).then(list => list.map(o => o.toJSON()));
