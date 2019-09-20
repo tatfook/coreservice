@@ -7,6 +7,7 @@
     "aho-corasick.js": "0.0.1",
     "axios": "^0.18.1",
     "blueimp-md5": "^2.10.0",
+    "captchapng": "0.0.1",
     "dataloader": "^1.4.0",
     "egg": "^2.10.0",
     "egg-cors": "^2.1.0",

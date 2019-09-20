@@ -5,6 +5,7 @@ const moment = require("moment");
 const axios = require("axios");
 const uuidv1 = require('uuid/v1');
 const svgCaptcha = require('svg-captcha');
+const captchapng = require("captchapng");
 
 const Controller = require("../core/controller.js");
 
@@ -58,20 +59,30 @@ class Keepwork extends Controller {
 
 	// 获取 svg 验证码
 	async getSvgCaptcha() {
-		const captcha = svgCaptcha.createMathExpr({
-			mathMin: 1,
-			mathMax: 9,
-			mathOperator: "+",
-		});
-		//const captcha = svgCaptcha.create({});
-
+		const {png = false} = this.validate();
 		const key = "svg-captcha-" + uuidv1();
+		let text = "";
+		let captcha = "";
+		if (png) {
+			text = Math.random() * 9000 + 1000;
+			const p = new captchapng(80,30,parseInt(text)); // width,height,numeric captcha
+			p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
+			p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
+			captcha = "data:image/jpeg;base64, " + p.getBase64();
+		} else {
+			const tmp = svgCaptcha.createMathExpr({
+				mathMin: 1,
+				mathMax: 9,
+				mathOperator: "+",
+			});
+			captcha = tmp.data;
+			text = tmp.text;
+		}
 
-		await this.model.caches.set(key, captcha.text, 1000 * 60 * 10); // 有效期十分钟
 
-		//console.log(captcha);
+		await this.model.caches.set(key, text, 1000 * 60 * 10); // 有效期十分钟
 
-		return this.success({key, captcha: captcha.data});
+		return this.success({key, captcha});
 	}
 
 	// 验证 svg 验证码
