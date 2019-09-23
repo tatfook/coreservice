@@ -69,13 +69,16 @@ class Keepwork extends Controller {
 
 	// 获取 svg 验证码
 	async getSvgCaptcha() {
-		const {png = false} = this.validate();
+		const {png = false, width = 80, height = 30} = this.validate({
+			width: "number_optional",
+			height: "number_optional",
+		});
 		const key = "svg-captcha-" + uuidv1();
 		let text = "";
 		let captcha = "";
 		if (png) {
 			text = Math.random() * 9000 + 1000;
-			const p = new captchapng(80,30,parseInt(text)); // width,height,numeric captcha
+			const p = new captchapng(width, height, parseInt(text)); // width,height,numeric captcha
 			p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
 			p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
 			captcha = "data:image/jpeg;base64, " + p.getBase64();
