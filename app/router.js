@@ -16,6 +16,7 @@ module.exports = app => {
 	const keepwork = controller.keepwork;
 	//router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
 	router.post(`${prefix}keepworks/email`, keepwork.email);
+	router.get(`${prefix}keepworks/captcha/:key`, keepwork.captcha);
 	router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
 	router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);
 	router.get(`${prefix}keepworks/words`, keepwork.words);

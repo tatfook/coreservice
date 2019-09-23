@@ -57,6 +57,16 @@ class Keepwork extends Controller {
 		return this.success(value);
 	}
 
+	async captcha() {
+		const {key} = this.validate({key: "string"});
+		console.log(key);
+		const img = await this.app.redis.get(key);
+		if (!img) this.throw(404);
+		const imgbase64 = new Buffer(img, 'base64');
+		this.ctx.set("Content-Type", "image/png");
+		this.success(imgbase64);
+	}
+
 	// 获取 svg 验证码
 	async getSvgCaptcha() {
 		const {png = false} = this.validate();
@@ -69,6 +79,7 @@ class Keepwork extends Controller {
 			p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
 			p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
 			captcha = "data:image/jpeg;base64, " + p.getBase64();
+			await this.app.redis.set(key, p.getBase64(), "EX", 60 * 10);
 		} else {
 			const tmp = svgCaptcha.createMathExpr({
 				mathMin: 1,
@@ -78,7 +89,6 @@ class Keepwork extends Controller {
 			captcha = tmp.data;
 			text = tmp.text;
 		}
-
 
 		await this.model.caches.set(key, text, 1000 * 60 * 10); // 有效期十分钟
 
