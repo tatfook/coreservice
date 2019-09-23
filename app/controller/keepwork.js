@@ -77,7 +77,7 @@ class Keepwork extends Controller {
 		let text = "";
 		let captcha = "";
 		if (png) {
-			text = Math.random() * 9000 + 1000;
+			text = _.random(1000, 9999) + "";
 			const p = new captchapng(width, height, parseInt(text)); // width,height,numeric captcha
 			p.color(0, 0, 0, 0);  // First color: background (red, green, blue, alpha)
 			p.color(80, 80, 80, 255); // Second color: paint (red, green, blue, alpha)
