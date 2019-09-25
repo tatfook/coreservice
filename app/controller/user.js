@@ -212,6 +212,7 @@ const User = class extends Controller {
 				nickname,
 				username: username,
 				password: this.app.util.md5(password),
+				channel: 4,
 			});
 			if (!user) return this.fail(0);
 			user = user.get({plain:true});
@@ -281,6 +282,7 @@ const User = class extends Controller {
 			//"captcha":"string",
 			"username":"string",
 			"password":"string",
+			"channel": "number_optional",
 		});
 		let {username, password} = params;
 		username = username.toLowerCase();
@@ -336,6 +338,7 @@ const User = class extends Controller {
 			password: util.md5(params.password),
 			realname: cellphone || null,
 			email: params.email || null,
+			channel: params.channel || 0,
 		});
 
 		if (!user) return this.fail(0);

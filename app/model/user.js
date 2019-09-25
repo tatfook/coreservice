@@ -34,6 +34,11 @@ module.exports = app => {
 			defaultValue: 0,
 		},
 
+		channel: {    // 注册渠道 0 -- keepwork 1 -- haqi 2 -- haqi2 3 -- paracraft  4 -- qq hall 
+			type: INTEGER,
+			defaultValue: 0,
+		},
+
 		email: {      // 邮箱
 			type: STRING(64),
 			unique: true,
