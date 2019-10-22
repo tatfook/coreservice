@@ -1,114 +1,151 @@
+'use strict';
 
-const joi = require("joi");
-const _ = require("lodash");
-
+const joi = require('joi');
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-	ENTITY_TYPE_PROJECT,
-} = require("../core/consts.js");
-const ENTITYS = [ENTITY_TYPE_USER, ENTITY_TYPE_SITE, ENTITY_TYPE_PAGE, ENTITY_TYPE_GROUP, ENTITY_TYPE_PROJECT];
-const Controller = require("../core/controller.js");
+    ENTITY_TYPE_USER,
+    ENTITY_TYPE_SITE,
+    ENTITY_TYPE_PAGE,
+    ENTITY_TYPE_GROUP,
+    ENTITY_TYPE_PROJECT,
+} = require('../core/consts.js');
+const ENTITYS = [
+    ENTITY_TYPE_USER,
+    ENTITY_TYPE_SITE,
+    ENTITY_TYPE_PAGE,
+    ENTITY_TYPE_GROUP,
+    ENTITY_TYPE_PROJECT,
+];
+const Controller = require('../core/controller.js');
 
 const Member = class extends Controller {
-	get modelName() {
-		return "members";
-	}
+    get modelName() {
+        return 'members';
+    }
 
-	getModel(objectType) {
-		const models = {
-			[ENTITY_TYPE_PROJECT]: this.model.projects,
-			[ENTITY_TYPE_SITE]: this.model.sites,
-			[ENTITY_TYPE_GROUP]: this.model.groups,
-		};
+    getModel(objectType) {
+        const models = {
+            [ENTITY_TYPE_PROJECT]: this.model.projects,
+            [ENTITY_TYPE_SITE]: this.model.sites,
+            [ENTITY_TYPE_GROUP]: this.model.groups,
+        };
 
-		return models[objectType];
-	}
+        return models[objectType];
+    }
 
-	async index() {
-		const params = this.validate({
-			objectId: 'int',
-			objectType: joi.number().valid(ENTITYS).required(),
-		});
+    async index() {
+        const params = this.validate({
+            objectId: 'int',
+            objectType: joi
+                .number()
+                .valid(ENTITYS)
+                .required(),
+        });
 
-		const list = await this.model.members.getObjectMembers(params.objectId, params.objectType);
+        const list = await this.model.members.getObjectMembers(
+            params.objectId,
+            params.objectType
+        );
 
-		return this.success(list);
-	}
+        return this.success(list);
+    }
 
-	// 块创建
-	async bulkCreate() {
-		const {userId} = this.authenticated();
-		const {objectId, objectType, memberIds=[]} = this.validate({
-			objectId: 'int',
-			objectType: joi.number().valid(ENTITYS).required(),
-		});
-		if (memberIds.length == 0) return this.success("OK");
-		const list = [];
+    // 块创建
+    async bulkCreate() {
+        const { userId } = this.authenticated();
+        const { objectId, objectType, memberIds = [] } = this.validate({
+            objectId: 'int',
+            objectType: joi
+                .number()
+                .valid(ENTITYS)
+                .required(),
+        });
+        if (memberIds.length === 0) return this.success('OK');
+        // const list = [];
 
-		const model = this.getModel(objectType);
-		const data = await model.getById(objectId, userId);
-		if (!data) return this.throw(400);
+        const model = this.getModel(objectType);
+        const data = await model.getById(objectId, userId);
+        if (!data) return this.throw(400);
 
-		for (let i = 0; i < memberIds.length; i++) {
-			await this.model.members.upsert({userId, objectId, objectType, memberId: memberIds[i]});
-		}
+        for (let i = 0; i < memberIds.length; i++) {
+            await this.model.members.upsert({
+                userId,
+                objectId,
+                objectType,
+                memberId: memberIds[i],
+            });
+        }
 
-		//const result = await this.model.members.bulkCreate(list);
+        // const result = await this.model.members.bulkCreate(list);
 
-		return this.success("OK");
-	}
+        return this.success('OK');
+    }
 
-	async create() {
-		const {userId} = this.authenticated();
-		const params = this.validate({
-			objectId: 'int',
-			objectType: joi.number().valid(ENTITYS).required(),
-			memberId: 'int',
-		});
-		params.userId = userId;
+    async create() {
+        const { userId } = this.authenticated();
+        const params = this.validate({
+            objectId: 'int',
+            objectType: joi
+                .number()
+                .valid(ENTITYS)
+                .required(),
+            memberId: 'int',
+        });
+        params.userId = userId;
 
-		const model = this.getModel(params.objectType);
-		let data = await model.getById(params.objectId, userId);
-		if (!data) return this.throw(400);
+        const model = this.getModel(params.objectType);
+        let data = await model.getById(params.objectId, userId);
+        if (!data) return this.throw(400);
 
-		data = await this.model.members.create(params);
+        data = await this.model.members.create(params);
 
-		return this.success(data);
-	}
+        return this.success(data);
+    }
 
-	async destroy() {
-		const {userId} = this.authenticated();
-		const {id} = this.validate({id:"int"});
+    async destroy() {
+        const { userId } = this.authenticated();
+        const { id } = this.validate({ id: 'int' });
 
-		const member = await this.model.members.findOne({where:{id, userId}});
-		if (!member) return this.throw(404);
+        const member = await this.model.members.findOne({
+            where: { id, userId },
+        });
+        if (!member) return this.throw(404);
 
-		await this.model.members.destroy({where:{id, userId}});
+        await this.model.members.destroy({ where: { id, userId } });
 
-		await this.model.applies.destroy({where:{objectId:member.objectId, objectType:member.objectType, userId: member.memberId}});
+        await this.model.applies.destroy({
+            where: {
+                objectId: member.objectId,
+                objectType: member.objectType,
+                userId: member.memberId,
+            },
+        });
 
-		return this.success("OK");
-	}
+        return this.success('OK');
+    }
 
-	async exist() {
-		const {userId} = this.authenticated();
-		const {objectId, objectType, memberId=userId} = this.validate({
-			memberId:"int_optional",
-			objectId:'int',
-			objectType: joi.number().valid(ENTITYS).required(),
-		});
-		
-		const data = await this.model.members.findOne({where: {
-			objectId,objectType, memberId,
-		}});
+    async exist() {
+        const { userId } = this.authenticated();
+        const { objectId, objectType, memberId = userId } = this.validate({
+            memberId: 'int_optional',
+            objectId: 'int',
+            objectType: joi
+                .number()
+                .valid(ENTITYS)
+                .required(),
+        });
 
-		if (!data) return this.success(false);
+        const data = await this.model.members.findOne({
+            where: {
+                objectId,
+                objectType,
+                memberId,
+            },
+        });
 
-		return this.success(true);
-	}
-}
+        if (!data) return this.success(false);
+
+        return this.success(true);
+    }
+};
 
 module.exports = Member;

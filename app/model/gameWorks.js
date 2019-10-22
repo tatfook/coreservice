@@ -1,98 +1,99 @@
-
-const _ = require("lodash");
+/* eslint-disable no-magic-numbers */
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		DATE,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const attrs = {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                        // 用户id
-			type: BIGINT,
-			allowNull: false,
-		},
+    const attrs = {
+        id: {
+            type: BIGINT,
+            autoIncrement: true,
+            primaryKey: true,
+        },
 
-		gameId: {                        // 比赛id
-			type: BIGINT,
-			allowNull: false,
-		},
+        userId: {
+            // 用户id
+            type: BIGINT,
+            allowNull: false,
+        },
 
-		projectId: {                     // 项目id
-			type: BIGINT,
-			allowNull: false,
-		},
+        gameId: {
+            // 比赛id
+            type: BIGINT,
+            allowNull: false,
+        },
 
-		worksName: {                     // 作品名称 
-			type: STRING,
-		},
+        projectId: {
+            // 项目id
+            type: BIGINT,
+            allowNull: false,
+        },
 
-		worksSubject: {                  // 作品主题
-			type: STRING,
-		},
+        worksName: {
+            // 作品名称
+            type: STRING,
+        },
 
-		worksLogo: {                     // 作品封面
-			type: STRING(512),
-		},
+        worksSubject: {
+            // 作品主题
+            type: STRING,
+        },
 
-		worksDescription: {              // 作品简介
-			type: STRING(2048),
-		},
+        worksLogo: {
+            // 作品封面
+            type: STRING(512),
+        },
 
-		worksRate: {                     // 作品评分
-			type: INTEGER,
-		},
+        worksDescription: {
+            // 作品简介
+            type: STRING(2048),
+        },
 
-		worksRateCount: {                // 作品评分人数
-			type: INTEGER,
-		},
+        worksRate: {
+            // 作品评分
+            type: INTEGER,
+        },
 
-		win: {                           // 是否获奖
-			type: INTEGER,
-			defaultValue: 0,
-		},
+        worksRateCount: {
+            // 作品评分人数
+            type: INTEGER,
+        },
 
-		reward: {                        // 获奖情况
-			type: STRING,
-		},
+        win: {
+            // 是否获奖
+            type: INTEGER,
+            defaultValue: 0,
+        },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	};
+        reward: {
+            // 获奖情况
+            type: STRING,
+        },
 
-	const opts = {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+        extra: {
+            type: JSON,
+            defaultValue: {},
+        },
+    };
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["projectId"],
-		},
-		],
-	}
+    const opts = {
+        underscored: false,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_bin',
 
-	const model = app.model.define("gameWorks", attrs, opts);
+        indexes: [
+            {
+                unique: true,
+                fields: [ 'projectId' ],
+            },
+        ],
+    };
 
-	//model.sync({force:true});
+    const model = app.model.define('gameWorks', attrs, opts);
 
-	app.model.gameWorks = model;
+    // model.sync({force:true});
 
-	return model;
+    app.model.gameWorks = model;
+
+    return model;
 };
-
-

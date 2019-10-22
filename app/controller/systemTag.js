@@ -1,24 +1,21 @@
+'use strict';
 
-const _ = require("lodash");
-
-const Controller = require("../core/controller.js");
-const {
-	TAG_CLASSIFY_USER,
-	TAG_CLASSIFY_PROJECT,
-} = require("../core/consts.js");
+const Controller = require('../core/controller.js');
 
 const SystemTag = class extends Controller {
-	get modelName() {
-		return "systemTags";
-	}
+    get modelName() {
+        return 'systemTags';
+    }
 
-	async index() {
-		const params = this.validate();
+    async index() {
+        const params = this.validate();
 
-		const  list = await this.model.systemTags.findAll({where: params}).then(list => list.map(o => o.toJSON()));
+        const list = await this.model.systemTags
+            .findAll({ where: params })
+            .then(list => list.map(o => o.toJSON()));
 
-		return this.success(list);
-	}
-}
+        return this.success(list);
+    }
+};
 
 module.exports = SystemTag;

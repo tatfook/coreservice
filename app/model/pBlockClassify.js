@@ -1,55 +1,52 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const {
+        BIGINT,
 
-	const model = app.model.define("pBlockClassifies", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+        JSON,
+    } = app.Sequelize;
 
-		blockId: {
-			type: BIGINT,
-			defaultValue:0,
-		},
+    const model = app.model.define(
+        'pBlockClassifies',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		classifyId: {
-			type: BIGINT,
-			defaultValue:0,
-		},
+            blockId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-		}
+            classifyId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+            extra: {
+                type: JSON,
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["blockId", "classifyId"],
-		},
-		]
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'blockId', 'classifyId' ],
+                },
+            ],
+        }
+    );
 
-	});
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.pBlockClassifies = model;
-	return model;
+    app.model.pBlockClassifies = model;
+    return model;
 };
-

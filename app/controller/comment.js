@@ -1,64 +1,74 @@
-const joi = require("joi");
-const _ = require("lodash");
+'use strict';
 
-const Controller = require("../core/controller.js");
+const joi = require('joi');
+const _ = require('lodash');
+
+const Controller = require('../core/controller.js');
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-	ENTITY_TYPE_ISSUE,
-	ENTITY_TYPE_PROJECT,
-} = require("../core/consts.js");
+    ENTITY_TYPE_USER,
+    ENTITY_TYPE_SITE,
+    ENTITY_TYPE_PAGE,
+    ENTITY_TYPE_GROUP,
+    ENTITY_TYPE_ISSUE,
+    ENTITY_TYPE_PROJECT,
+} = require('../core/consts.js');
 
 const ENTITYS = [
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-	ENTITY_TYPE_ISSUE,
-	ENTITY_TYPE_PROJECT,
+    ENTITY_TYPE_USER,
+    ENTITY_TYPE_SITE,
+    ENTITY_TYPE_PAGE,
+    ENTITY_TYPE_GROUP,
+    ENTITY_TYPE_ISSUE,
+    ENTITY_TYPE_PROJECT,
 ];
 
 const Comment = class extends Controller {
-	get modelName() {
-		return "comments";
-	}
+    get modelName() {
+        return 'comments';
+    }
 
-	async index() {
-		const params = this.validate();
-		
-		this.formatQuery(params);
+    async index() {
+        const params = this.validate();
 
-		console.log(params);
+        this.formatQuery(params);
 
-		const list = await this.model.comments.findAndCount({...this.queryOptions, where:params});
-		return this.success(list);
-	}
-	
-	async create() {
-		const userId = this.authenticated().userId;
-		let {objectType, objectId, content} = this.validate({
-			objectType: joi.number().valid(ENTITYS),
-			content: "string",
-		});
-		if (!objectId) return this.throw(400, "参数错误");
-		objectId = _.toString(objectId);
+        // console.log(params);
 
-		const data = await this.model.comments.createComment(userId, objectId, objectType, content);
-		if (!data) this.throw(400);
+        const list = await this.model.comments.findAndCount({
+            ...this.queryOptions,
+            where: params,
+        });
+        return this.success(list);
+    }
 
-		return this.success(data);
-	}
+    async create() {
+        const userId = this.authenticated().userId;
+        let { objectType, objectId, content } = this.validate({
+            objectType: joi.number().valid(ENTITYS),
+            content: 'string',
+        });
+        if (!objectId) return this.throw(400, '参数错误');
+        objectId = _.toString(objectId);
 
-	async destroy() {
-		const {userId} = this.authenticated();
-		const {id} = this.validate({id:'int'});
+        const data = await this.model.comments.createComment(
+            userId,
+            objectId,
+            objectType,
+            content
+        );
+        if (!data) this.throw(400);
 
-		await this.model.comments.deleteComment(id, userId);
+        return this.success(data);
+    }
 
-		return this.success("OK");
-	}
-}
+    async destroy() {
+        const { userId } = this.authenticated();
+        const { id } = this.validate({ id: 'int' });
+
+        await this.model.comments.deleteComment(id, userId);
+
+        return this.success('OK');
+    }
+};
 
 module.exports = Comment;

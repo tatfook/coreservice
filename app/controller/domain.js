@@ -1,31 +1,34 @@
-const joi = require("joi");
-const _ = require("lodash");
+'use strict';
 
-const Controller = require("../core/controller.js");
+const _ = require('lodash');
+
+const Controller = require('../core/controller.js');
 
 const Domain = class extends Controller {
-	get modelName() {
-		return "domains";
-	}
+    get modelName() {
+        return 'domains';
+    }
 
-	async show() {
-		const params = this.validate();
-		const id = _.toNumber(params.id) || decodeURIComponent(params.id);
-		let data = undefined;
+    async show() {
+        const params = this.validate();
+        const id = _.toNumber(params.id) || decodeURIComponent(params.id);
+        let data;
 
-		if (_.isNumber(id)) data = await this.model.domains.getById(id);
-		else data = await this.model.domains.getByDomain(id);
+        if (_.isNumber(id)) data = await this.model.domains.getById(id);
+        else data = await this.model.domains.getByDomain(id);
 
-		return this.success(data);
-	}
+        return this.success(data);
+    }
 
-	async exist() {
-		const domain = decodeURIComponent(this.validate({domain: "string"}).domain);
+    async exist() {
+        const domain = decodeURIComponent(
+            this.validate({ domain: 'string' }).domain
+        );
 
-		const data = await this.model.domains.findOne({where:{domain}});
+        const data = await this.model.domains.findOne({ where: { domain } });
 
-		return this.success(data ? true : false);
-	}
-}
+        return this.success(!!data);
+    }
+};
 
 module.exports = Domain;

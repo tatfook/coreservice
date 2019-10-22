@@ -1,62 +1,58 @@
-
-
-const _ = require("lodash");
+/* eslint-disable no-magic-numbers */
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, STRING } = app.Sequelize;
 
-	const model = app.model.define("ips", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		type: {                      // ipv4 ipv6
-			type: STRING(16),
-			defaultValue:"ipv4",
-		},
+    const model = app.model.define(
+        'ips',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		start: {                     // 起始值
-			type:BIGINT,
-			defaultValue:0,
-		},
+            type: {
+                // ipv4 ipv6
+                type: STRING(16),
+                defaultValue: 'ipv4',
+            },
 
-		end: {                       // 结束值
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            start: {
+                // 起始值
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		cc: {                        // 国家
-			type: STRING(8),
-			defaultValue:"CN",
-		},
+            end: {
+                // 结束值
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		ip: {                        // 实际IP
-			type: STRING(24),
-			defaultValue:"",
-		},
+            cc: {
+                // 国家
+                type: STRING(8),
+                defaultValue: 'CN',
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            ip: {
+                // 实际IP
+                type: STRING(24),
+                defaultValue: '',
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	//model.sync({force:true});
-	
-	app.model.ips = model;
+    // model.sync({force:true});
 
-	return model;
+    app.model.ips = model;
+
+    return model;
 };
-
-
-

@@ -1,124 +1,125 @@
-const _ = require('lodash');
+'use strict';
+
 const base32 = require('hi-base32');
 const Service = require('egg').Service;
 
 class World extends Service {
-  getArchiveUrl(username, worldName) {
-    const config = this.app.config.self.gitlab;
-    const host = config.host;
-    const baseWorldName = this.base32(worldName);
-    const gitUsername = config.usernamePrefix + username;
+    getArchiveUrl(username, worldName) {
+        const config = this.app.config.self.gitlab;
+        const host = config.host;
+        const baseWorldName = this.base32(worldName);
+        const gitUsername = config.usernamePrefix + username;
 
-    return `${host}/${gitUsername}/${baseWorldName}/repository/archive.zip`;
-  }
-
-  async generateDefaultWorld(worldName) {
-    let userInfo = this.ctx.state.user;
-    let token = this.ctx.state.token;
-    if (!userInfo || !userInfo.username) {
-      console.log('未认证');
-      return false;
+        return `${host}/${gitUsername}/${baseWorldName}/repository/archive.zip`;
     }
 
-    let baseWorldName = this.base32(worldName);
+    async generateDefaultWorld(worldName) {
+        const userInfo = this.ctx.state.user;
+        const token = this.ctx.state.token;
+        if (!userInfo || !userInfo.username) {
+            // console.log('未认证');
+            return false;
+        }
 
-    let {
-      gitlabToken,
-      gitlabUsername
-    } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
+        const baseWorldName = this.base32(worldName);
 
-    if (!gitlabToken) {
-      console.log('未找gitlab token');
-      return false;
+        const {
+            gitlabToken,
+            gitlabUsername,
+        } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
+
+        if (!gitlabToken) {
+            // console.log('未找gitlab token');
+            return false;
+        }
+
+        const result = await this.app.git.isProjectExist(
+            gitlabToken,
+            gitlabUsername,
+            baseWorldName
+        );
+
+        if (!result) {
+            const result = await this.app.git.createProject(
+                gitlabToken,
+                baseWorldName
+            );
+
+            if (result) {
+                return true;
+            }
+            // console.log('创建GIT项目失败', result);
+            return false;
+        }
     }
 
-    let result = await this.app.git.isProjectExist(
-      gitlabToken,
-      gitlabUsername,
-      baseWorldName
-    );
+    async removeProject(worldName) {
+        const userInfo = this.ctx.state.user;
+        const token = this.ctx.state.token;
+        if (!userInfo || !userInfo.username) {
+            // console.log('未认证');
+            return false;
+        }
 
-    if (!result) {
-      let result = await this.app.git.createProject(
-        gitlabToken,
-        baseWorldName
-      );
+        const {
+            gitlabToken,
+            gitlabUsername,
+        } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
 
-      if (result) {
-        return true
-      } else {
-        console.log('创建GIT项目失败', result);
-        return false;
-      }
-    }
-  }
+        if (!gitlabToken) {
+            // console.log('未找gitlab token');
+            return false;
+        }
 
-  async removeProject(worldName) {
-    let userInfo = this.ctx.state.user;
-    let token = this.ctx.state.token;
-    if (!userInfo || !userInfo.username) {
-      console.log('未认证');
-      return false;
-    }
+        const baseWorldName = this.base32(worldName);
 
-    let {
-      gitlabToken,
-      gitlabUsername
-    } = await this.app.gitGateway.getUserGitlabTokenAndUsername(token);
-
-    if (!gitlabToken) {
-      console.log('未找gitlab token');
-      return false;
+        try {
+            await this.app.git.removeProject(
+                gitlabToken,
+                gitlabUsername,
+                baseWorldName
+            );
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
-    let baseWorldName = this.base32(worldName);
+    base32(text) {
+        if (text) {
+            const notLetter = text.match(/[^a-zA-Z]/g);
 
-    try {
-      let result = await this.app.git.removeProject(gitlabToken, gitlabUsername, baseWorldName)
-	  return true;
-    } catch (error) {
-      return false
+            if (notLetter) {
+                text = base32.encode(text);
+
+                text = text.replace(/[=]/g, '');
+                text = text.toLocaleLowerCase();
+
+                text = 'world_base32_' + text;
+            } else {
+                text = 'world_' + text;
+            }
+
+            return text;
+        }
+        return null;
     }
-  }
 
-  base32(text) {
-    if (text) {
-      let notLetter = text.match(/[^a-zA-Z]/g);
+    unbase32(text) {
+        if (text) {
+            const notLetter = text.match('world_base32_');
 
-      if (notLetter) {
-        text = base32.encode(text);
+            if (notLetter) {
+                text = text.replace('world_base32_', '');
 
-        text = text.replace(/[=]/g, '');
-        text = text.toLocaleLowerCase();
+                return base32.decode(text);
+            }
+            text = text.replace('world_', '');
 
-        text = 'world_base32_' + text;
-      } else {
-        text = 'world_' + text;
-      }
-
-      return text;
-    } else {
-      return nil;
+            return text;
+        }
+        return null;
     }
-  }
-
-  unbase32(text) {
-    if (text) {
-      let notLetter = text.match('world_base32_');
-
-      if (notLetter) {
-        text = text.replace('world_base32_', '');
-
-        return Encoding.decode(text);
-      } else {
-        text = text.replace('world_', '');
-
-        return text;
-      }
-    } else {
-      return nil;
-    }
-  }
 }
 
 module.exports = World;

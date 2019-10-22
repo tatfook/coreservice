@@ -40,14 +40,17 @@
     "chance": "^1.0.18",
     "egg-bin": "^4.8.1",
     "egg-mock": "^3.17.3",
-    "factory-girl": "^5.0.4"
+    "factory-girl": "^5.0.4",
+    "eslint": "^5.13.0",
+    "eslint-config-egg": "^7.1.0"
   },
   "scripts": {
     "dev": "egg-bin dev",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
     "start": "egg-scripts start",
     "test": "egg-bin test ",
-    "cov": "egg-bin cov"
+    "cov": "egg-bin cov",
+    "lint": "eslint . --fix"
   },
   "repository": {
     "type": "git",

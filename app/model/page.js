@@ -1,118 +1,115 @@
-
+/* eslint-disable no-magic-numbers */
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, TEXT } = app.Sequelize;
 
-	const model = app.model.define("pages", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+    const model = app.model.define(
+        'pages',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		userId: {
-			type: BIGINT,
-		},
+            userId: {
+                type: BIGINT,
+            },
 
-		siteId: {
-			type: BIGINT,
-		},
+            siteId: {
+                type: BIGINT,
+            },
 
-		url: {
-			type: STRING(128),
-			allowNull: false,
-			unique: true,
-		},
+            url: {
+                type: STRING(128),
+                allowNull: false,
+                unique: true,
+            },
 
-		folder: {
-			type: STRING(128),
-			allowNull: false,
-		},
-		
-		hash: {
-			type: STRING(64),
-		},
-		
-		content: {
-			type: TEXT('long'),
-			//defaultValue: "",
-		},
+            folder: {
+                type: STRING(128),
+                allowNull: false,
+            },
 
-		keywords: {
-			type: STRING,
-		},
+            hash: {
+                type: STRING(64),
+            },
 
-		title: {
-			type: STRING(128),
-		},
+            content: {
+                type: TEXT('long'),
+                // defaultValue: "",
+            },
 
-		description: {
-			type: STRING(512),
-		},
+            keywords: {
+                type: STRING,
+            },
 
-		visitors: {    // 访客 id 列表  |1|2|3|
-			type: TEXT,
-			//defaultValue: "|",
-		},
+            title: {
+                type: STRING(128),
+            },
 
-		visitorCount: {  // 访问量
-			type: INTEGER,
-			defaultValue: 0,
-		},
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            description: {
+                type: STRING(512),
+            },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.getById = async function(id, userId) {
-		const where = {id};
+            visitors: {
+                // 访客 id 列表  |1|2|3|
+                type: TEXT,
+                // defaultValue: "|",
+            },
 
-		if (userId) where.userId = userId;
+            visitorCount: {
+                // 访问量
+                type: INTEGER,
+                defaultValue: 0,
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-		const data = await app.model.pages.findOne({where: where});
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-		return data && data.get({plain:true});
-	}
+    model.getById = async function(id, userId) {
+        const where = { id };
 
-	model.getByUrl = async function(url) {
-		const data = await app.model.pages.findOne({where: {url}});
+        if (userId) where.userId = userId;
 
-		return data && data.get({plain:true});
-	}
+        const data = await app.model.pages.findOne({ where });
 
-	model.visitor = async function(pageId, userId) {
-		const page = await this.getById(pageId);
-		if (!page) return;
+        return data && data.get({ plain: true });
+    };
 
-		page.visitorCount++;
-		console.log(userId);
-		if (userId) {
-			let visitors = page.visitors || "|";
-			visitors = visitors.replace("|" + userId + "|", "|");
-			visitors = "|" + userId + visitors;
-			page.visitors = visitors;
-		}
+    model.getByUrl = async function(url) {
+        const data = await app.model.pages.findOne({ where: { url } });
 
-		await app.model.pages.update(page, {
-			fields:["visitorCount", "visitors"],
-			where: {id:pageId},
-		});
+        return data && data.get({ plain: true });
+    };
 
-		return;
-	}
-	app.model.pages = model;
-	return model;
+    model.visitor = async function(pageId, userId) {
+        const page = await this.getById(pageId);
+        if (!page) return;
+
+        page.visitorCount++;
+        if (userId) {
+            let visitors = page.visitors || '|';
+            visitors = visitors.replace('|' + userId + '|', '|');
+            visitors = '|' + userId + visitors;
+            page.visitors = visitors;
+        }
+
+        await app.model.pages.update(page, {
+            fields: [ 'visitorCount', 'visitors' ],
+            where: { id: pageId },
+        });
+
+        return;
+    };
+    app.model.pages = model;
+    return model;
 };
-
