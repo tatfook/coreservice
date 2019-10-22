@@ -40,10 +40,14 @@
     "chance": "^1.0.18",
     "egg-bin": "^4.8.1",
     "egg-mock": "^3.17.3",
-    "factory-girl": "^5.0.4",
     "eslint": "^5.13.0",
-    "eslint-config-egg": "^7.1.0"
+    "eslint-config-egg": "^7.1.0",
+    "factory-girl": "^5.0.4",
+    "pre-commit": "^1.2.2"
   },
+  "pre-commit": [
+    "lint"
+  ],
   "scripts": {
     "dev": "egg-bin dev",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
