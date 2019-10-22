@@ -1,5 +1,5 @@
 'use strict';
-// require('newrelic');
+require('newrelic');
 // const _ = require('lodash');
 const cache = require('memory-cache');
 const consts = require('./app/core/consts.js');
