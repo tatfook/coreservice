@@ -6,29 +6,29 @@
  * description of configuration variables and their potential values.
  */
 exports.config = {
-  /**
+    /**
    * Array of application names.
    */
-  app_name: [ 'kp-dev-git-gateway' ],
-  /**
+    app_name: [ 'kp-dev-git-gateway' ],
+    /**
    * Your New Relic license key.
    */
-  license_key: '67109bd959237f9b5fa49f762fff6c5bd34d5724',
-  logging: {
+    license_key: '67109bd959237f9b5fa49f762fff6c5bd34d5724',
+    logging: {
     /**
      * Level at which to log. 'trace' is most useful to New Relic when diagnosing
      * issues with the agent, 'info' and higher will impose the least overhead on
      * production applications.
      */
-    level: 'info',
-  },
-  /**
+        level: 'info',
+    },
+    /**
    * When true, all request headers except for those listed in attributes.exclude
    * will be captured for all traces, unless otherwise specified in a destination's
    * attributes include/exclude lists.
    */
-  allow_all_headers: true,
-  attributes: {
+    allow_all_headers: true,
+    attributes: {
     /**
      * Prefix of attributes to exclude from all destinations. Allows * as wildcard
      * at end.
@@ -37,17 +37,17 @@ exports.config = {
      *
      * @env NEW_RELIC_ATTRIBUTES_EXCLUDE
      */
-    exclude: [
-      'request.headers.cookie',
-      'request.headers.authorization',
-      'request.headers.proxyAuthorization',
-      'request.headers.setCookie*',
-      'request.headers.x*',
-      'response.headers.cookie',
-      'response.headers.authorization',
-      'response.headers.proxyAuthorization',
-      'response.headers.setCookie*',
-      'response.headers.x*',
-    ],
-  },
+        exclude: [
+            'request.headers.cookie',
+            'request.headers.authorization',
+            'request.headers.proxyAuthorization',
+            'request.headers.setCookie*',
+            'request.headers.x*',
+            'response.headers.cookie',
+            'response.headers.authorization',
+            'response.headers.proxyAuthorization',
+            'response.headers.setCookie*',
+            'response.headers.x*',
+        ],
+    },
 };

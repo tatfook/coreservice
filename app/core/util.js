@@ -1,147 +1,153 @@
-//const jwt = require("jwt-simple");
-const jwt = require("./jwt.js");
-const crypto = require("crypto");
-const _ = require("lodash");
-const Hashes = require("jshashes");
-const md5 = require("blueimp-md5");
+/* eslint-disable no-magic-numbers */
+'use strict';
+// const jwt = require("jwt-simple");
+const jwt = require('./jwt.js');
+const crypto = require('crypto');
+const _ = require('lodash');
+const Hashes = require('jshashes');
+const md5 = require('blueimp-md5');
 
 const sha1 = new Hashes.SHA1().setUTF8(true);
 
 const util = {};
 
 const getStringByteLength = function(str) {
-	var totalLength = 0;     
-	var charCode;  
-	for (var i = 0; i < str.length; i++) {  
-		charCode = str.charCodeAt(i);  
-		if (charCode < 0x007f)  {     
-			totalLength++;     
-		} else if ((0x0080 <= charCode) && (charCode <= 0x07ff))  {     
-			totalLength += 2;     
-		} else if ((0x0800 <= charCode) && (charCode <= 0xffff))  {     
-			totalLength += 3;   
-		} else{  
-			totalLength += 4;   
-		}          
-	}  
-	return totalLength;   
-}
+    let totalLength = 0;
+    let charCode;
+    for (let i = 0; i < str.length; i++) {
+        charCode = str.charCodeAt(i);
+        if (charCode < 0x007f) {
+            totalLength++;
+        } else if (charCode >= 0x0080 && charCode <= 0x07ff) {
+            totalLength += 2;
+        } else if (charCode >= 0x0800 && charCode <= 0xffff) {
+            totalLength += 3;
+        } else {
+            totalLength += 4;
+        }
+    }
+    return totalLength;
+};
 // 与gitlab sha一致
 util.hash = function(content) {
-	var header = "blob " + getStringByteLength(content) + "\0";
-	var text = header + content;
-	return sha1.hex(text);
-}
+    const header = 'blob ' + getStringByteLength(content) + '\0';
+    const text = header + content;
+    return sha1.hex(text);
+};
 
 util.md5 = function(str) {
-	return md5(str);
-}
+    return md5(str);
+};
 
 const filetypes = {
-	"/": "folders",
+    '/': 'folders',
 
-	".md": "pages",
+    '.md': 'pages',
 
-	".jpg": "images",
-	".jpeg": "images",
-	".png": "images",
-	".svg": "images",
+    '.jpg': 'images',
+    '.jpeg': 'images',
+    '.png': 'images',
+    '.svg': 'images',
 
-	".mp4": "videos",
-	".webm": "videos",
+    '.mp4': 'videos',
+    '.webm': 'videos',
 
-	".mp3": "audios",
-	".ogg": "audios",
-	".wav": "audios",
+    '.mp3': 'audios',
+    '.ogg': 'audios',
+    '.wav': 'audios',
 
-	".json": "datas",
-	".yml": "datas",
+    '.json': 'datas',
+    '.yml': 'datas',
 
-	//unknow: "files",
-}
+    // unknow: "files",
+};
 
 util.jwt_encode = function(payload, key, expire = 3600 * 24 * 2) {
-	payload = payload || {};
-	payload.exp = Date.now() / 1000 + expire;
+    payload = payload || {};
+    payload.exp = Date.now() / 1000 + expire;
 
-	return jwt.encode(payload, key, "HS1");
-}
+    return jwt.encode(payload, key, 'HS1');
+};
 
 util.jwt_decode = function(token, key, noVerify) {
-	//return jwt.decode(token, key, noVerify, "HS1");
-	return jwt.decode(token, key, noVerify);
-}
+    // return jwt.decode(token, key, noVerify, "HS1");
+    return jwt.decode(token, key, noVerify);
+};
 
 util.getTypeByKey = function(key) {
-	for (let ext in filetypes) {
-		if (_.endsWith(key, ext)) return filetypes[ext];
-	}
+    for (const ext in filetypes) {
+        if (_.endsWith(key, ext)) return filetypes[ext];
+    }
 
-	return "files";
-}
+    return 'files';
+};
 
 util.isPage = function(key) {
-	return this.getTypeByKey(key) == "pages";
-}
+    return this.getTypeByKey(key) === 'pages';
+};
 
 util.getUsernameByKey = function(key) {
-	return key.substring(0, key.indexOf("/"));
-}
+    return key.substring(0, key.indexOf('/'));
+};
 // 获取目录
 util.getFolderByKey = function(key) {
-	return key.substring(0, key.lastIndexOf("/", key.length-2) + 1);
-}
+    return key.substring(0, key.lastIndexOf('/', key.length - 2) + 1);
+};
 
 util.getKeyByPath = function(path, filetype) {
-	const paths = path.split("/");
+    const paths = path.split('/');
 
-	filetype = filetype || this.getTypeByKey(path);
+    filetype = filetype || this.getTypeByKey(path);
 
-	paths.splice(1, 0, filetype);
+    paths.splice(1, 0, filetype);
 
-	return paths.join("/");
-}
+    return paths.join('/');
+};
 
 util.getPathByKey = function(key) {
-	const paths = key.split("/");
-	//if (paths.length < 3) return key;
-	paths.splice(1, 1);
+    const paths = key.split('/');
+    // if (paths.length < 3) return key;
+    paths.splice(1, 1);
 
-	return paths.join('/');
-}
+    return paths.join('/');
+};
 
 util.parseKey = function(key) {
-	const obj = {key};
-	obj.path = this.getPathByKey(key);
-	obj.type = this.getTypeByKey(key);
-	obj.url = key.substring(0, key.lastIndexOf("."));
+    const obj = { key };
+    obj.path = this.getPathByKey(key);
+    obj.type = this.getTypeByKey(key);
+    obj.url = key.substring(0, key.lastIndexOf('.'));
 
-	const paths = obj.path.split("/");
-	obj.username = paths[0];
-	obj.sitename = paths[1];
+    const paths = obj.path.split('/');
+    obj.username = paths[0];
+    obj.sitename = paths[1];
 
-	return obj;
-}
+    return obj;
+};
 
 util.getDate = function() {
-	const date = new Date();
-	const year = _.padStart(date.getFullYear(), 4, "0");
-	const month =  _.padStart(date.getMonth() + 1, 2, "0");
-    const day = _.padStart(date.getDate(), 2, "0");
-    const hour = _.padStart(date.getHours(), 2, "0");
-    const minute = _.padStart(date.getMinutes(), 2, "0");
-	const second = _.padStart(date.getSeconds(), 2, "0");
-	
-	const datetime = year + month + day + hour + minute + second;
-	return {year, month, day, hour, minute, second, datetime};
-}
+    const date = new Date();
+    const year = _.padStart(date.getFullYear(), 4, '0');
+    const month = _.padStart(date.getMonth() + 1, 2, '0');
+    const day = _.padStart(date.getDate(), 2, '0');
+    const hour = _.padStart(date.getHours(), 2, '0');
+    const minute = _.padStart(date.getMinutes(), 2, '0');
+    const second = _.padStart(date.getSeconds(), 2, '0');
+
+    const datetime = year + month + day + hour + minute + second;
+    return { year, month, day, hour, minute, second, datetime };
+};
 
 util.rsaEncrypt = function(prvKey, message) {
-	return crypto.privateEncrypt(prvKey, Buffer.from(message, "utf8")).toString("hex");
-}
+    return crypto
+        .privateEncrypt(prvKey, Buffer.from(message, 'utf8'))
+        .toString('hex');
+};
 
 util.rsaDecrypt = function(pubKey, sig) {
-	return crypto.publicDecrypt(pubKey, Buffer.from(sig, "hex")).toString("utf8");
-}
+    return crypto
+        .publicDecrypt(pubKey, Buffer.from(sig, 'hex'))
+        .toString('utf8');
+};
 
 module.exports = util;

@@ -1,9 +1,8 @@
-
-
-const gameWorks = require("./gameWroks.js");
-const pBlocks = require("./pBlocks.js");
+'use strict';
+const gameWorks = require('./gameWroks.js');
+const pBlocks = require('./pBlocks.js');
 
 module.exports = {
-	gameWorks,
-	pBlocks,
-}
+    gameWorks,
+    pBlocks,
+};

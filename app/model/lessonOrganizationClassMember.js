@@ -1,118 +1,125 @@
-
-const _ = require("lodash");
+'use strict';
+const _ = require('lodash');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationClassMembers", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		organizationId: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'lessonOrganizationClassMembers',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		classId: {                   // 0 -- 则为机构成员
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            organizationId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		memberId: {                  // 成员id
-			type: BIGINT,
-			defaultValue:0,
-		},
-		
-		realname: {                  // 真实姓名
-			type: STRING,
-		},
+            classId: {
+                // 0 -- 则为机构成员
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		//bind: {                      // 是否绑定机构
-			//type: INTEGER,
-			//defaultValue: 0,
-		//},
+            memberId: {
+                // 成员id
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		roleId: {                      // 角色  1 -- 学生  2 -- 教师  64 -- 管理员
-			type: INTEGER,
-			defaultValue: 0, 
-		},
+            realname: {
+                // 真实姓名
+                type: STRING,
+            },
 
-		privilege: {                 // 权限
-			type: INTEGER,
-			defaultValue: 0,
-		},
+            // bind: {                      // 是否绑定机构
+            // type: INTEGER,
+            // defaultValue: 0,
+            // },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+            roleId: {
+                // 角色  1 -- 学生  2 -- 教师  64 -- 管理员
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+            privilege: {
+                // 权限
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		indexes: [
-		{
-			name: "organizationId-classId-memberId",
-			unique: true,
-			fields: ["organizationId", "classId", "memberId"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
 
-	//model.sync({force:true});
-	
-	model.getClasses = async function({memberId, roleId, organizationId}) {
-		const sql = `select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId`;	
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				organizationId,
-				memberId,
-				roleId,
-			}
-		});
-		const classIds = _.uniq(_.map(list, o => o.classId));
+            indexes: [
+                {
+                    name: 'organizationId-classId-memberId',
+                    unique: true,
+                    fields: [ 'organizationId', 'classId', 'memberId' ],
+                },
+            ],
+        }
+    );
 
-		const classes = await app.model.lessonOrganizationClasses.findAll({
-			where: {
-				id: {$in: classIds},
-				end: {$gt: new Date()},
-			}
-		}).then(list => list.map(o => o.toJSON()));
+    // model.sync({force:true});
 
-		return classes;
-	}
+    model.getClasses = async function({ memberId, roleId, organizationId }) {
+        const sql =
+            'select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId';
+        const list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                organizationId,
+                memberId,
+                roleId,
+            },
+        });
+        const classIds = _.uniq(_.map(list, o => o.classId));
 
-	model.getAllClassIds = async function({memberId, roleId, organizationId}) {
-		const sql = `select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId`;	
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				organizationId,
-				memberId,
-				roleId,
-			}
-		});
-		const classIds = _.uniq(_.map(list, o => o.classId));
+        const classes = await app.model.lessonOrganizationClasses
+            .findAll({
+                where: {
+                    id: { $in: classIds },
+                    end: { $gt: new Date() },
+                },
+            })
+            .then(list => list.map(o => o.toJSON()));
 
-		return classIds;
-	}
+        return classes;
+    };
 
-	app.model.lessonOrganizationClassMembers = model;
+    model.getAllClassIds = async function({
+        memberId,
+        roleId,
+        organizationId,
+    }) {
+        const sql =
+            'select classId from lessonOrganizationClassMembers where organizationId = :organizationId and memberId = :memberId and roleId & :roleId';
+        const list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                organizationId,
+                memberId,
+                roleId,
+            },
+        });
+        const classIds = _.uniq(_.map(list, o => o.classId));
 
-	return model;
+        return classIds;
+    };
+
+    app.model.lessonOrganizationClassMembers = model;
+
+    return model;
 };
-

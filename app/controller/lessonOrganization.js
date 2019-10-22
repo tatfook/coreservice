@@ -1,396 +1,536 @@
+/* eslint-disable no-magic-numbers */
+'use strict';
 
-const joi = require("joi");
-const _ = require("lodash");
+const _ = require('lodash');
 
-const Controller = require("../core/controller.js");
+const Controller = require('../core/controller.js');
 
-const {
-	CLASS_MEMBER_ROLE_STUDENT,
-	CLASS_MEMBER_ROLE_TEACHER,
-	CLASS_MEMBER_ROLE_ADMIN,
-} = require("../core/consts.js");
+const { CLASS_MEMBER_ROLE_ADMIN } = require('../core/consts.js');
 
 const LessonOrganization = class extends Controller {
-	get modelName() {
-		return "lessonOrganizations";
-	}
+    get modelName() {
+        return 'lessonOrganizations';
+    }
 
-	async token() {
-		const {userId, username} = this.authenticated();
-		const {organizationId} = this.validate({organizationId: "number"});
-		const members = await this.model.lessonOrganizationClassMembers.findAll({where: {organizationId, memberId: userId}}).then(list => list.map(o => o.toJSON()));
-		if (members.length == 0) return this.throw(400);
-		let roleId = 0;
-		_.each(members, o => roleId = roleId | o.roleId);
-		const config = this.app.config.self;
-		const token = this.app.util.jwt_encode({
-			userId, 
-			roleId,
-			username,
-			organizationId,
-		}, config.secret, config.tokenExpire || 3600 * 24 * 2);
+    async token() {
+        const { userId, username } = this.authenticated();
+        const { organizationId } = this.validate({ organizationId: 'number' });
+        const members = await this.model.lessonOrganizationClassMembers
+            .findAll({ where: { organizationId, memberId: userId } })
+            .then(list => list.map(o => o.toJSON()));
+        if (members.length === 0) return this.throw(400);
+        let roleId = 0;
+        _.each(members, o => {
+            roleId = roleId | o.roleId;
+        });
+        const config = this.app.config.self;
+        const token = this.app.util.jwt_encode(
+            {
+                userId,
+                roleId,
+                username,
+                organizationId,
+            },
+            config.secret,
+            config.tokenExpire || 3600 * 24 * 2
+        );
 
-		await this.ctx.service.user.setToken(userId, token);
+        await this.ctx.service.user.setToken(userId, token);
 
-		return this.success(token);
-	}
+        return this.success(token);
+    }
 
-	async login() {
-		let {username, password, organizationId, organizationName} = this.validate({username:"string", password:"string"});
-		const user = await this.model.users.findOne({where: {[this.model.Op.or]: [{username: username}, {cellphone:username}, {email: username}], password: this.app.util.md5(password)}}).then(o => o && o.toJSON());
-		if (!user) return this.fail(1);
-	
-		if (!organizationId) {
-			if (!organizationName) return this.throw(400);
-			const organ = await this.model.lessonOrganizations.findOne({where:{name: organizationName}}).then(o => o && o.toJSON());
-			if (!organ) return this.throw(400);
-			organizationId = organ.id;
-		}
+    async login() {
+        let {
+            username,
+            password,
+            organizationId,
+            organizationName,
+        } = this.validate({ username: 'string', password: 'string' });
+        const user = await this.model.users
+            .findOne({
+                where: {
+                    [this.model.Op.or]: [
+                        { username },
+                        { cellphone: username },
+                        { email: username },
+                    ],
+                    password: this.app.util.md5(password),
+                },
+            })
+            .then(o => o && o.toJSON());
+        if (!user) return this.fail(1);
 
-		const curtime = new Date();
-		const members = await this.model.lessonOrganizationClassMembers.findAll({
-			include: [
-			{
-				as: "lessonOrganizationClasses",
-				model: this.model.lessonOrganizationClasses,
-				where: {
-					//begin: {$lte: curtime},
-					end: {$gte: curtime},
-				},
-				required: false,
-			}
-			],
-			where: {organizationId, memberId: user.id}
-		}).then(list => list.map(o => o.toJSON()).filter(o => o.classId == 0 || o.lessonOrganizationClasses));
-		//if (members.length == 0) return this.throw(400, "成员不存在");   // 成员不存在允许登录
-		let roleId = 0;
-		_.each(members, o => roleId = roleId | o.roleId);
+        if (!organizationId) {
+            if (!organizationName) return this.throw(400);
+            const organ = await this.model.lessonOrganizations
+                .findOne({ where: { name: organizationName } })
+                .then(o => o && o.toJSON());
+            if (!organ) return this.throw(400);
+            organizationId = organ.id;
+        }
 
-		const config = this.app.config.self;
-		const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
-		const token = this.app.util.jwt_encode({
-			userId: user.id, 
-			roleId: roleId,
-			username: user.username,
-			organizationId: organizationId,
-		}, config.secret, tokenExpire);
+        const curtime = new Date();
+        const members = await this.model.lessonOrganizationClassMembers
+            .findAll({
+                include: [
+                    {
+                        as: 'lessonOrganizationClasses',
+                        model: this.model.lessonOrganizationClasses,
+                        where: {
+                            // begin: {$lte: curtime},
+                            end: { $gte: curtime },
+                        },
+                        required: false,
+                    },
+                ],
+                where: { organizationId, memberId: user.id },
+            })
+            .then(list =>
+                list
+                    .map(o => o.toJSON())
+                    .filter(o => o.classId === 0 || o.lessonOrganizationClasses)
+            );
+        // if (members.length == 0) return this.throw(400, "成员不存在");   // 成员不存在允许登录
+        let roleId = 0;
+        _.each(members, o => {
+            roleId = roleId | o.roleId;
+        });
 
-		user.token = token;
-		user.roleId = roleId;
-		user.organizationId = organizationId;
-		delete user.password;
+        const config = this.app.config.self;
+        const tokenExpire = config.tokenExpire || 3600 * 24 * 2;
+        const token = this.app.util.jwt_encode(
+            {
+                userId: user.id,
+                roleId,
+                username: user.username,
+                organizationId,
+            },
+            config.secret,
+            tokenExpire
+        );
 
-		await this.ctx.service.user.setToken(user.id, token);
+        user.token = token;
+        user.roleId = roleId;
+        user.organizationId = organizationId;
+        delete user.password;
 
-		return this.success(user);
-	}
+        await this.ctx.service.user.setToken(user.id, token);
 
-	async index() {
-		const {userId} = this.authenticated();
-		const sql = `select organizationId from lessonOrganizationClassMembers where memberId = ${userId} group by organizationId`;
-		const ids = await this.model.query(sql, {type: this.model.QueryTypes.SELECT}).then(list => list.map(o => o.organizationId));
-		const list = await this.model.lessonOrganizations.findAll({where: {id: {$in: ids}}}).then(list => list.map(o => o.toJSON()));
-		return this.success(list);
-	}
+        return this.success(user);
+    }
 
-	async show() {
-		const {id} = this.validate({id: "number"});
+    async index() {
+        const { userId } = this.authenticated();
+        const sql = `select organizationId from lessonOrganizationClassMembers where memberId = ${userId} group by organizationId`;
+        const ids = await this.model
+            .query(sql, { type: this.model.QueryTypes.SELECT })
+            .then(list => list.map(o => o.organizationId));
+        const list = await this.model.lessonOrganizations
+            .findAll({ where: { id: { $in: ids } } })
+            .then(list => list.map(o => o.toJSON()));
+        return this.success(list);
+    }
 
-		const organ = await this.model.lessonOrganizations.findOne({where: {id}});
-		if (!organ) return this.throw(404);
+    async show() {
+        const { id } = this.validate({ id: 'number' });
 
-		return this.success(organ);
-	}
+        const organ = await this.model.lessonOrganizations.findOne({
+            where: { id },
+        });
+        if (!organ) return this.throw(404);
 
-	async getByUrl() {
-		const {url} = this.validate({url:"string"});
+        return this.success(organ);
+    }
 
-		const organ = await this.model.lessonOrganizations.findOne({where:{loginUrl: url}});
-		if (!organ) return this.throw(404);
+    async getByUrl() {
+        const { url } = this.validate({ url: 'string' });
 
-		return this.success(organ);
-	}
+        const organ = await this.model.lessonOrganizations.findOne({
+            where: { loginUrl: url },
+        });
+        if (!organ) return this.throw(404);
 
-	async getByName() {
-		const {name} = this.validate({name:"string"});
+        return this.success(organ);
+    }
 
-		const organ = await this.model.lessonOrganizations.findOne({where:{name}});
-		if (!organ) return this.throw(404);
+    async getByName() {
+        const { name } = this.validate({ name: 'string' });
 
-		return this.success(organ);
-	}
+        const organ = await this.model.lessonOrganizations.findOne({
+            where: { name },
+        });
+        if (!organ) return this.throw(404);
 
-	async create() {
-		this.adminAuthenticated();
+        return this.success(organ);
+    }
 
-		const params = this.validate();
+    async create() {
+        this.adminAuthenticated();
 
-		const organ = await this.model.lessonOrganizations.create(params).then(o => o && o.toJSON());
-		if (!organ) return this.throw(500);
+        const params = this.validate();
 
-		if (params.packages) {
-			const packages = _.map(params.packages, pkg => ({
-				organizationId: organ.id,
-				classId: 0,
-				packageId: pkg.packageId,
-				lessons: pkg.lessons,
-			}));
-			await this.model.lessonOrganizationPackages.bulkCreate(packages);
-		}
+        const organ = await this.model.lessonOrganizations
+            .create(params)
+            .then(o => o && o.toJSON());
+        if (!organ) return this.throw(500);
 
-		if (params.usernames) {
-			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
-			const members = _.map(users, o => ({
-				classId: 0,
-				organizationId: organ.id,
-				memberId: o.id,
-				roleId: CLASS_MEMBER_ROLE_ADMIN,
-			}));
-			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
-		}
+        if (params.packages) {
+            const packages = _.map(params.packages, pkg => ({
+                organizationId: organ.id,
+                classId: 0,
+                packageId: pkg.packageId,
+                lessons: pkg.lessons,
+            }));
+            await this.model.lessonOrganizationPackages.bulkCreate(packages);
+        }
 
-		return this.success(organ);
-	}
-	
-	async fixedClassPackage(organizationId, packages) {
-		const pkgs = await this.model.lessonOrganizationPackages.findAll({where:{organizationId, classId:{$gt:0}}}).then(list => list.map(o => o.toJSON()));
-		const datas = [];
-		_.each(pkgs, o => {
-			const pkg = _.find(packages, p => p.packageId == o.packageId);
-			if (!pkg) return;
-			const lessons = [];
-			_.each(o.lessons, l => {
-				const pl = _.find(pkg.lessons, pl => pl.lessonId == l.lessonId);
-				if (pl)	lessons.push(pl);
-			});
-			o.lessons = lessons;
-			datas.push(o);
-		});
-		await this.model.lessonOrganizationPackages.destroy({where:{organizationId, classId:{$gt:0}}});
-		await this.model.lessonOrganizationPackages.bulkCreate(datas);
-	}
+        if (params.usernames) {
+            const users = await this.model.users
+                .findAll({
+                    where: {
+                        username: { [this.model.Op.in]: params.usernames },
+                    },
+                })
+                .then(list => _.map(list, o => o.toJSON()));
+            const members = _.map(users, o => ({
+                classId: 0,
+                organizationId: organ.id,
+                memberId: o.id,
+                roleId: CLASS_MEMBER_ROLE_ADMIN,
+            }));
+            await this.model.lessonOrganizationClassMembers.bulkCreate(members);
+        }
 
-	// 禁止更新
-	async update() {
-		const params = this.validate({id:'number'});
-		const id = params.id;
+        return this.success(organ);
+    }
 
-		const organ = await this.model.lessonOrganizations.findOne({where:{id}});
-		if (!organ) return this.throw(400);
+    async fixedClassPackage(organizationId, packages) {
+        const pkgs = await this.model.lessonOrganizationPackages
+            .findAll({ where: { organizationId, classId: { $gt: 0 } } })
+            .then(list => list.map(o => o.toJSON()));
+        const datas = [];
+        _.each(pkgs, o => {
+            const pkg = _.find(packages, p => p.packageId === o.packageId);
+            if (!pkg) return;
+            const lessons = [];
+            _.each(o.lessons, l => {
+                const pl = _.find(
+                    pkg.lessons,
+                    pl => pl.lessonId === l.lessonId
+                );
+                if (pl) lessons.push(pl);
+            });
+            o.lessons = lessons;
+            datas.push(o);
+        });
+        await this.model.lessonOrganizationPackages.destroy({
+            where: { organizationId, classId: { $gt: 0 } },
+        });
+        await this.model.lessonOrganizationPackages.bulkCreate(datas);
+    }
 
-		delete params.userId;
-		if (this.ctx.state.admin && this.ctx.state.admin.userId) {
-			await this.model.lessonOrganizations.update(params, {where:{id}});
-		} else {
-			const {userId, roleId = 0, username} = this.authenticated();
-			if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(411, "无效token");
-			await this.model.lessonOrganizations.update(params, {where:{id}});
+    // 禁止更新
+    async update() {
+        const params = this.validate({ id: 'number' });
+        const id = params.id;
 
-			if (params.privilege && organ.privilege != params.privilege) {
-				await this.model.lessonOrganizationLogs.create({
-					organizationId: id,
-					type: "系统",
-					description: params.privilege == 0 ? "不允许任课教师管理学生信息" : "允许任课教师管理学生信息",
-					handleId: userId,
-					username,
-				});
-			}
-		} 
+        const organ = await this.model.lessonOrganizations.findOne({
+            where: { id },
+        });
+        if (!organ) return this.throw(400);
 
-		if (params.packages) {
-			await this.model.lessonOrganizationPackages.destroy({where:{organizationId: id, classId:0}});
-			const datas = _.map(params.packages, pkg => ({
-				organizationId: id,
-				classId: 0,
-				packageId: pkg.packageId,
-				lessons: pkg.lessons,
-			}));
-			await this.model.lessonOrganizationPackages.bulkCreate(datas);
-			await this.fixedClassPackage(id, params.packages);
-		}
+        delete params.userId;
+        if (this.ctx.state.admin && this.ctx.state.admin.userId) {
+            await this.model.lessonOrganizations.update(params, {
+                where: { id },
+            });
+        } else {
+            const { userId, roleId = 0, username } = this.authenticated();
+            if (roleId < CLASS_MEMBER_ROLE_ADMIN) {
+                return this.throw(411, '无效token');
+            }
+            await this.model.lessonOrganizations.update(params, {
+                where: { id },
+            });
 
-		if (params.endDate) {
-			await this.model.lessonOrganizationClasses.update({end: params.endDate}, {where: {
-				organizationId:id,
-				end: {$gt: params.endDate},
-			}});
-		}
+            if (params.privilege && organ.privilege !== params.privilege) {
+                await this.model.lessonOrganizationLogs.create({
+                    organizationId: id,
+                    type: '系统',
+                    description:
+                        params.privilege === 0
+                            ? '不允许任课教师管理学生信息'
+                            : '允许任课教师管理学生信息',
+                    handleId: userId,
+                    username,
+                });
+            }
+        }
 
-		if (params.usernames) {
-			await this.model.lessonOrganizationClassMembers.destroy({where:{classId:0, organizationId: id}});
-			const users = await this.model.users.findAll({where:{username:{[this.model.Op.in]: params.usernames}}}).then(list => _.map(list, o => o.toJSON()));
-			const members = _.map(users, o => ({
-				classId: 0,
-				organizationId: id,
-				memberId: o.id,
-				roleId: CLASS_MEMBER_ROLE_ADMIN,
-			}));
-			await this.model.lessonOrganizationClassMembers.bulkCreate(members);
-		}
+        if (params.packages) {
+            await this.model.lessonOrganizationPackages.destroy({
+                where: { organizationId: id, classId: 0 },
+            });
+            const datas = _.map(params.packages, pkg => ({
+                organizationId: id,
+                classId: 0,
+                packageId: pkg.packageId,
+                lessons: pkg.lessons,
+            }));
+            await this.model.lessonOrganizationPackages.bulkCreate(datas);
+            await this.fixedClassPackage(id, params.packages);
+        }
 
-		return this.success();
-	}
+        if (params.endDate) {
+            await this.model.lessonOrganizationClasses.update(
+                { end: params.endDate },
+                {
+                    where: {
+                        organizationId: id,
+                        end: { $gt: params.endDate },
+                    },
+                }
+            );
+        }
 
-	mergePackages(list = [], roleId) {
-		const pkgmap = {};
-		// 合并课程
-		_.each(list, o => {
-			if (roleId && o.lessonOrganizationClassMembers && (! (o.lessonOrganizationClassMembers.roleId & roleId))) return;
-			//if (o.lessonOrganizationClasses && new Date(o.lessonOrganizationClasses.end).getTime() < new Date().getTime()) return;
-			if (pkgmap[o.packageId]) {
-				pkgmap[o.packageId].lessons = (pkgmap[o.packageId].lessons || []).concat(o.lessons || []);
-				pkgmap[o.packageId].lessons = _.uniqBy(pkgmap[o.packageId].lessons, "lessonId");
-				if (pkgmap[o.packageId].lessonOrganizationClasses && o.lessonOrganizationClasses && pkgmap[o.packageId].lessonOrganizationClasses.end < o.lessonOrganizationClasses.end) {
-					pkgmap[o.packageId].lessonOrganizationClasses = o.lessonOrganizationClasses;
-				}
-			} else {
-				pkgmap[o.packageId] = o;
-			}
-		});
+        if (params.usernames) {
+            await this.model.lessonOrganizationClassMembers.destroy({
+                where: { classId: 0, organizationId: id },
+            });
+            const users = await this.model.users
+                .findAll({
+                    where: {
+                        username: { [this.model.Op.in]: params.usernames },
+                    },
+                })
+                .then(list => _.map(list, o => o.toJSON()));
+            const members = _.map(users, o => ({
+                classId: 0,
+                organizationId: id,
+                memberId: o.id,
+                roleId: CLASS_MEMBER_ROLE_ADMIN,
+            }));
+            await this.model.lessonOrganizationClassMembers.bulkCreate(members);
+        }
 
-		list = [];
-		_.each(pkgmap, o => list.push(o));
+        return this.success();
+    }
 
-		return list;
-	}
+    mergePackages(list = [], roleId) {
+        const pkgmap = {};
+        // 合并课程
+        _.each(list, o => {
+            if (
+                roleId &&
+                o.lessonOrganizationClassMembers &&
+                !(o.lessonOrganizationClassMembers.roleId & roleId)
+            ) {
+                return;
+            }
+            // if (o.lessonOrganizationClasses && new Date(o.lessonOrganizationClasses.end).getTime() < new Date().getTime()) return;
+            if (pkgmap[o.packageId]) {
+                pkgmap[o.packageId].lessons = (
+                    pkgmap[o.packageId].lessons || []
+                ).concat(o.lessons || []);
+                pkgmap[o.packageId].lessons = _.uniqBy(
+                    pkgmap[o.packageId].lessons,
+                    'lessonId'
+                );
+                if (
+                    pkgmap[o.packageId].lessonOrganizationClasses &&
+                    o.lessonOrganizationClasses &&
+                    pkgmap[o.packageId].lessonOrganizationClasses.end <
+                        o.lessonOrganizationClasses.end
+                ) {
+                    pkgmap[o.packageId].lessonOrganizationClasses =
+                        o.lessonOrganizationClasses;
+                }
+            } else {
+                pkgmap[o.packageId] = o;
+            }
+        });
 
-	// 课程包
-	async packages() {
-		const {userId, organizationId} = this.authenticated();
-		const {classId=0, roleId=67} = this.validate({classId: "number_optional", roleId:"number_optional"});
+        list = [];
+        _.each(pkgmap, o => list.push(o));
 
-		let list = [];
-		const curtime = new Date();
-		if (classId) {
-			list = await this.model.lessonOrganizationPackages.findAll({
-				where: {
-					organizationId,
-					classId,
-				},
-			}).then(list => _.map(list, o => o.toJSON()));
-		} else {
-			list = await this.model.lessonOrganizationPackages.findAll({
-				include: [
-				{
-					as: "lessonOrganizationClassMembers",
-					model: this.model.lessonOrganizationClassMembers,
-					where: {
-						memberId: userId, 
-						classId: roleId & CLASS_MEMBER_ROLE_ADMIN ? {$gte:0} : {$gt:0}
-					},
-				},
-				{
-					as: "lessonOrganizationClasses",
-					model: this.model.lessonOrganizationClasses,
-				},
-				],
-				where: {
-					organizationId,
-				}
-			}).then(list => _.map(list, o => o.toJSON()));
-		}
-		//console.log(list);
+        return list;
+    }
 
-		list = this.mergePackages(list, roleId);
+    // 课程包
+    async packages() {
+        const { userId, organizationId } = this.authenticated();
+        const { classId = 0, roleId = 67 } = this.validate({
+            classId: 'number_optional',
+            roleId: 'number_optional',
+        });
 
-		for(let i = 0; i < list.length; i++) {
-			const pkg = list[i];
-			const ids = _.map(pkg.lessons, o => o.lessonId);
-			const lrs = await this.app.lessonModel.userLearnRecords.findAll({
-				where: {
-					userId,
-					packageId: pkg.packageId,
-					lessonId: {$in:ids},
-				}
-			});
-			_.each(pkg.lessons, o => {
-				o.isLearned = _.find(lrs, lr => lr.lessonId == o.lessonId) ? true : false;
-			});
-		}
+        let list = [];
+        // const curtime = new Date();
+        if (classId) {
+            list = await this.model.lessonOrganizationPackages
+                .findAll({
+                    where: {
+                        organizationId,
+                        classId,
+                    },
+                })
+                .then(list => _.map(list, o => o.toJSON()));
+        } else {
+            list = await this.model.lessonOrganizationPackages
+                .findAll({
+                    include: [
+                        {
+                            as: 'lessonOrganizationClassMembers',
+                            model: this.model.lessonOrganizationClassMembers,
+                            where: {
+                                memberId: userId,
+                                classId:
+                                    roleId & CLASS_MEMBER_ROLE_ADMIN
+                                        ? { $gte: 0 }
+                                        : { $gt: 0 },
+                            },
+                        },
+                        {
+                            as: 'lessonOrganizationClasses',
+                            model: this.model.lessonOrganizationClasses,
+                        },
+                    ],
+                    where: {
+                        organizationId,
+                    },
+                })
+                .then(list => _.map(list, o => o.toJSON()));
+        }
+        // console.log(list);
 
-		const pkgIds = _.map(list, o => o.packageId);
-		const pkgs = await this.app.lessonModel.packages.findAll({where: {id: {[this.model.Op.in]:pkgIds}}}).then(list => _.map(list, o => o.toJSON()));
-		if (classId) {
-			const classrooms = await this.app.lessonModel.classrooms.findAll({where:{userId, classId, packageId:{$in: pkgIds}}}).then(list => list.map(o => o.toJSON()));
-			_.each(list, o => {
-				const cls = classrooms.filter(c => c.packageId == o.packageId);
-				const c = _.orderBy(cls, ['createdAt'], ['desc'])[0]; 
-				if (c) o.lastTeachTime = c.createdAt;
-			});
-		}
-		_.each(list, o => o.package = _.find(pkgs, p => p.id == o.packageId));
+        list = this.mergePackages(list, roleId);
 
-		return this.success(list);
-	}
+        for (let i = 0; i < list.length; i++) {
+            const pkg = list[i];
+            const ids = _.map(pkg.lessons, o => o.lessonId);
+            const lrs = await this.app.lessonModel.userLearnRecords.findAll({
+                where: {
+                    userId,
+                    packageId: pkg.packageId,
+                    lessonId: { $in: ids },
+                },
+            });
+            _.each(pkg.lessons, o => {
+                o.isLearned = !!_.find(lrs, lr => lr.lessonId === o.lessonId);
+            });
+        }
 
-	async getPackage(packageId, classId, roleId) {
-		const {userId, organizationId} = this.authenticated();
-		let list = [];
-		if (classId !== undefined) {
-			list = await this.model.lessonOrganizationPackages.findAll({where: {organizationId, packageId, classId}}).then(list => _.map(list, o => o.toJSON()));
-		} else {
-			const classIds = await this.model.lessonOrganizationClassMembers.getAllClassIds({memberId: userId, roleId, organizationId});
-			list = await this.model.lessonOrganizationPackages.findAll({
-				where: {
-					organizationId,
-					packageId,
-					classId:{$in: classIds},
-				}
-			}).then(list => _.map(list, o => o.toJSON()));
-		}
+        const pkgIds = _.map(list, o => o.packageId);
+        const pkgs = await this.app.lessonModel.packages
+            .findAll({ where: { id: { [this.model.Op.in]: pkgIds } } })
+            .then(list => _.map(list, o => o.toJSON()));
+        if (classId) {
+            const classrooms = await this.app.lessonModel.classrooms
+                .findAll({
+                    where: { userId, classId, packageId: { $in: pkgIds } },
+                })
+                .then(list => list.map(o => o.toJSON()));
+            _.each(list, o => {
+                const cls = classrooms.filter(c => c.packageId === o.packageId);
+                const c = _.orderBy(cls, [ 'createdAt' ], [ 'desc' ])[0];
+                if (c) o.lastTeachTime = c.createdAt;
+            });
+        }
+        _.each(list, o => {
+            o.package = _.find(pkgs, p => p.id === o.packageId);
+        });
 
-		list = this.mergePackages(list);
+        return this.success(list);
+    }
 
-		return list[0];
-	}
+    async getPackage(packageId, classId, roleId) {
+        const { userId, organizationId } = this.authenticated();
+        let list = [];
+        if (classId !== undefined) {
+            list = await this.model.lessonOrganizationPackages
+                .findAll({ where: { organizationId, packageId, classId } })
+                .then(list => _.map(list, o => o.toJSON()));
+        } else {
+            const classIds = await this.model.lessonOrganizationClassMembers.getAllClassIds(
+                { memberId: userId, roleId, organizationId }
+            );
+            list = await this.model.lessonOrganizationPackages
+                .findAll({
+                    where: {
+                        organizationId,
+                        packageId,
+                        classId: { $in: classIds },
+                    },
+                })
+                .then(list => _.map(list, o => o.toJSON()));
+        }
 
-	// 课程包详情页
-	async packageDetail() {
-		const {userId, organizationId} = this.authenticated();
-		const {packageId, classId, roleId = 1} = this.validate({packageId: "number", "classId":"number_optional", roleId:"number_optional"});
+        list = this.mergePackages(list);
 
-		const pkg = await this.getPackage(packageId, classId, roleId);
-		if (!pkg) return this.throw(400);
+        return list[0];
+    }
 
-		const pkginfo = await this.app.lessonModel.packages.findOne({where:{id: pkg.packageId}}).then(o => o && o.toJSON());
-		const lessonIds = _.map(pkg.lessons, o => o.lessonId);
-		const lessons = await this.app.lessonModel.lessons.findAll({where:{id:{[this.model.Op.in]: lessonIds}}}).then(list => _.map(list, o => o.toJSON()));
-		_.each(pkg.lessons, o => o.lesson = _.find(lessons, l => l.id == o.lessonId));
-		// 授课记录
-		const classrooms = await this.app.lessonModel.classrooms.findAll({
-			attributes: ["packageId", "lessonId", "classId"],
-			where: {
-				userId,
-				classId,
-				packageId,
-				lessonId:{
-					[this.model.Op.in]: lessonIds,
-				},
-			}
-		});
-		const learnRecords = await this.app.lessonModel.learnRecords.findAll({
-			attributes: ["packageId", "lessonId", "classId"],
-			where: {
-				userId,
-				packageId,
-				state: 1,
-				lessonId:{
-					[this.model.Op.in]: lessonIds,
-				},
-			}
-		});
+    // 课程包详情页
+    async packageDetail() {
+        const { userId } = this.authenticated();
+        const { packageId, classId, roleId = 1 } = this.validate({
+            packageId: 'number',
+            classId: 'number_optional',
+            roleId: 'number_optional',
+        });
 
-		pkg.package = pkginfo;
+        const pkg = await this.getPackage(packageId, classId, roleId);
+        if (!pkg) return this.throw(400);
 
-		_.each(pkg.lessons, o => {
-			o.isTeached = _.find(classrooms, c => c.lessonId == o.lessonId) ? true : false;
-			o.isLearned = _.find(learnRecords, l => l.lessonId == o.lessonId) ? true : false;
-		});
-		
-		return this.success(pkg);
-	}
+        const pkginfo = await this.app.lessonModel.packages
+            .findOne({ where: { id: pkg.packageId } })
+            .then(o => o && o.toJSON());
+        const lessonIds = _.map(pkg.lessons, o => o.lessonId);
+        const lessons = await this.app.lessonModel.lessons
+            .findAll({ where: { id: { [this.model.Op.in]: lessonIds } } })
+            .then(list => _.map(list, o => o.toJSON()));
+        _.each(pkg.lessons, o => {
+            o.lesson = _.find(lessons, l => l.id === o.lessonId);
+        });
+        // 授课记录
+        const classrooms = await this.app.lessonModel.classrooms.findAll({
+            attributes: [ 'packageId', 'lessonId', 'classId' ],
+            where: {
+                userId,
+                classId,
+                packageId,
+                lessonId: {
+                    [this.model.Op.in]: lessonIds,
+                },
+            },
+        });
+        const learnRecords = await this.app.lessonModel.learnRecords.findAll({
+            attributes: [ 'packageId', 'lessonId', 'classId' ],
+            where: {
+                userId,
+                packageId,
+                state: 1,
+                lessonId: {
+                    [this.model.Op.in]: lessonIds,
+                },
+            },
+        });
 
-	// 课程推荐
-}
+        pkg.package = pkginfo;
+
+        _.each(pkg.lessons, o => {
+            o.isTeached = !!_.find(classrooms, c => c.lessonId === o.lessonId);
+            o.isLearned = !!_.find(
+                learnRecords,
+                l => l.lessonId === o.lessonId
+            );
+        });
+
+        return this.success(pkg);
+    }
+
+    // 课程推荐
+};
 
 module.exports = LessonOrganization;

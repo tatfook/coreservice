@@ -1,54 +1,59 @@
+/* eslint-disable no-empty-pattern */
 'use strict';
 
 module.exports = {
-	User: {
-		async identify(root, _, ctx) {
-			const user = await ctx.connector.user.fetchLessonUserByUserId(root.id);
-			return user ? user.identify : 0;
-		},
+    User: {
+        async identify(root, _, ctx) {
+            const user = await ctx.connector.user.fetchLessonUserByUserId(
+                root.id
+            );
+            return user ? user.identify : 0;
+        },
 
-		rank(root, {userId}, ctx) {
-			return ctx.connector.user.fetchRankByUserId(root.id);
-		},
+        rank(root, {}, ctx) {
+            return ctx.connector.user.fetchRankByUserId(root.id);
+        },
 
-		info(root, {}, ctx) {
-			return ctx.connector.user.fetchInfoByUserId(root.id);
-		},
+        info(root, {}, ctx) {
+            return ctx.connector.user.fetchInfoByUserId(root.id);
+        },
 
-		//account(root, _, ctx) {
-			//return ctx.connector.user.fetchAccountByUserId(root.id);
-		//},
+        // account(root, _, ctx) {
+        // return ctx.connector.user.fetchAccountByUserId(root.id);
+        // },
 
-		contributions(root, {years}, ctx) {
-			years = (years || "").split(",");
-			return ctx.connector.user.fetchContributionsByUserId(root.id, years);
-		},
+        contributions(root, { years }, ctx) {
+            years = (years || '').split(',');
+            return ctx.connector.user.fetchContributionsByUserId(
+                root.id,
+                years
+            );
+        },
 
-		projects(root, _, ctx) {
-			return ctx.connector.project.fetchByUserId(root.id);
-		},
+        projects(root, _, ctx) {
+            return ctx.connector.project.fetchByUserId(root.id);
+        },
 
-		joinProjects(root, _, ctx) {
-			return ctx.connector.project.fetchJoinByUserId(root.id);
-		},
+        joinProjects(root, _, ctx) {
+            return ctx.connector.project.fetchJoinByUserId(root.id);
+        },
 
-		tutor(root, _, ctx) {
-			return ctx.connector.user.fetchTutorByUserId(root.id);
-		},
+        tutor(root, _, ctx) {
+            return ctx.connector.user.fetchTutorByUserId(root.id);
+        },
 
-		teacher(root, _, ctx) {
-			return ctx.connector.user.fetchTeacherByUserId(root.id);
-		},
+        teacher(root, _, ctx) {
+            return ctx.connector.user.fetchTeacherByUserId(root.id);
+        },
 
-		//roles(root, _, ctx) {
-			//return ctx.connector.user.fetchRolesByUserId(root.id);
-		//}
-	},
+        // roles(root, _, ctx) {
+        // return ctx.connector.user.fetchRolesByUserId(root.id);
+        // }
+    },
 
-	Mutation: {
-		async updateUser(root, {data={}}, ctx) {
-			return true;
-		},
-	},
+    Mutation: {
+        async updateUser() {
+            return true;
+        },
+    },
 };
-

@@ -1,131 +1,135 @@
-const _ = require("lodash");
+'use strict';
+
+const _ = require('lodash');
 
 module.exports = app => {
-	//app.model.afterCreate((instance, options) => {
-		//console.log(instance,_modelOptions);
-		//instance = instance.get({plain:true});
-		//console.log(instance, options);
-		//console.log("--------");
-	//});
-	
-	const models = {
-		users:"users", 
-		sites:"sites", 
-		worlds: "worlds",
-		packages:"packages", 
-		projects:"projects",
-		favorites: "favorites",
-		issues: "issues",
-		comments: "comments",
-		illegals:"illegals",
-		projectRates: "projectRates",
-	};
+    // app.model.afterCreate((instance, options) => {
+    // console.log(instance,_modelOptions);
+    // instance = instance.get({plain:true});
+    // console.log(instance, options);
+    // console.log("--------");
+    // });
 
-	const map = {};
+    const models = {
+        users: 'users',
+        sites: 'sites',
+        worlds: 'worlds',
+        packages: 'packages',
+        projects: 'projects',
+        favorites: 'favorites',
+        issues: 'issues',
+        comments: 'comments',
+        illegals: 'illegals',
+        projectRates: 'projectRates',
+    };
 
-	async function getList(options) {
-		const {model, where} = options;
-		const tableName = model.getTableName();
-		const modelName = models[tableName];
+    const map = {};
 
-		if (!modelName) return [];
+    async function getList(options) {
+        const { model, where } = options;
+        const tableName = model.getTableName();
+        const modelName = models[tableName];
 
-		const list = await app.model[modelName].findAll({where});
+        if (!modelName) return [];
 
-		_.each(list, (o, i) => list[i] = o.get ? o.get({plain:true}) : o);
+        const list = await app.model[modelName].findAll({ where });
 
-		return list;
-	}
+        _.each(list, (o, i) => {
+            list[i] = o.get ? o.get({ plain: true }) : o;
+        });
 
-	function hook(tableName, data, model,  oper) {
-		if (model && model.__hook__) {
-			return model.__hook__(data, oper);
-		}
-	}
+        return list;
+    }
 
-	async function afterCreate(inst) {
-		const cls = inst.constructor;
-		const tableName = cls.getTableName();
-		const modelName = models[tableName];
-		if (!modelName) return;
-		
-		inst = inst.get({plain:true});
+    function hook(tableName, data, model, oper) {
+        if (model && model.__hook__) {
+            return model.__hook__(data, oper);
+        }
+    }
 
-		const model = app.model[modelName];
+    async function afterCreate(inst) {
+        const cls = inst.constructor;
+        const tableName = cls.getTableName();
+        const modelName = models[tableName];
+        if (!modelName) return;
 
-		hook(tableName, inst, model, "create");
+        inst = inst.get({ plain: true });
 
-		const apiName = tableName + "Upsert";
-		if (!app.api[apiName]) return ;
-		await app.api[apiName](inst);
-	}
+        const model = app.model[modelName];
 
-	async function afterBulkCreate(inst) {
-		_.each(inst, o => afterCreate(o));
-	}
+        hook(tableName, inst, model, 'create');
 
-	async function afterBulkUpdate(options) {
-		const tableName = options.model.getTableName();
-		const modelName = models[tableName];
-		const list = await getList(options);
+        const apiName = tableName + 'Upsert';
+        if (!app.api[apiName]) return;
+        await app.api[apiName](inst);
+    }
 
-		const apiName = tableName + "Upsert";
-		const model = app.model[modelName];
+    async function afterBulkCreate(inst) {
+        _.each(inst, o => afterCreate(o));
+    }
 
-		if (!modelName) return;
+    async function afterBulkUpdate(options) {
+        const tableName = options.model.getTableName();
+        const modelName = models[tableName];
+        const list = await getList(options);
 
-		for (let i = 0; i < list.length; i++) {
-			const data = list[i];
+        const apiName = tableName + 'Upsert';
+        const model = app.model[modelName];
 
-			hook(tableName, data, model, "update");
+        if (!modelName) return;
 
-			if (app.api[apiName]) {
-				await app.api[apiName](data);
-			}
-		}
-	}
+        for (let i = 0; i < list.length; i++) {
+            const data = list[i];
 
-	async function beforeBulkDestroy(options) {
-		const tableName = options.model.getTableName();
-		const modelName = models[tableName];
-		const key = JSON.stringify({tableName, where:options.where});
-		const list = await getList(options);
+            hook(tableName, data, model, 'update');
 
-		if (!modelName) return;
+            if (app.api[apiName]) {
+                await app.api[apiName](data);
+            }
+        }
+    }
 
-		map[key] = _.concat(map[key] || [], list);
-	}
+    async function beforeBulkDestroy(options) {
+        const tableName = options.model.getTableName();
+        const modelName = models[tableName];
+        const key = JSON.stringify({ tableName, where: options.where });
+        const list = await getList(options);
 
-	async function afterBulkDestroy(options) {
-		const tableName = options.model.getTableName();
-		const modelName = models[tableName];
-		const key = JSON.stringify({tableName, where:options.where});
-		const list = map[key] || [];
-		const apiName = tableName + "Destroy";
+        if (!modelName) return;
 
-		if (!modelName) return;
-		const model = app.model[modelName];
+        map[key] = _.concat(map[key] || [], list);
+    }
 
-		map[key] = [];
-	
-		for (let i = 0; i < list.length; i++) {
-			const data = list[i];
+    async function afterBulkDestroy(options) {
+        const tableName = options.model.getTableName();
+        const modelName = models[tableName];
+        const key = JSON.stringify({ tableName, where: options.where });
+        const list = map[key] || [];
+        const apiName = tableName + 'Destroy';
 
-			hook(tableName, data, model, "destroy");
+        if (!modelName) return;
+        const model = app.model[modelName];
 
-			if (app.api[apiName]) {
-				await app.api[apiName](data);
-			}
-		}
-	}
+        map[key] = [];
 
-	app.model.afterBulkCreate((inst) => afterBulkCreate(inst));
+        for (let i = 0; i < list.length; i++) {
+            const data = list[i];
 
-	app.model.afterCreate((inst) =>  afterCreate(inst));
+            hook(tableName, data, model, 'destroy');
 
-	app.model.afterBulkUpdate((options) => afterBulkUpdate(options));
+            if (app.api[apiName]) {
+                await app.api[apiName](data);
+            }
+        }
+    }
 
-	app.model.beforeBulkDestroy((options) => beforeBulkDestroy(options));
+    app.model.afterBulkCreate(inst => afterBulkCreate(inst));
 
-	app.model.afterBulkDestroy(options => afterBulkDestroy(options));
-}
+    app.model.afterCreate(inst => afterCreate(inst));
+
+    app.model.afterBulkUpdate(options => afterBulkUpdate(options));
+
+    app.model.beforeBulkDestroy(options => beforeBulkDestroy(options));
+
+    app.model.afterBulkDestroy(options => afterBulkDestroy(options));
+};

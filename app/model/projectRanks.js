@@ -1,76 +1,71 @@
-
-const _ = require("lodash");
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, JSON } = app.Sequelize;
 
-	const model = app.model.define("projectRanks", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    const model = app.model.define(
+        'projectRanks',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		projectId: {
-			type: BIGINT,
-			unique: true,
-			allowNull: false,
-		},
+            userId: {
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		comment: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+            projectId: {
+                type: BIGINT,
+                unique: true,
+                allowNull: false,
+            },
 
-		visit: {
-			type: INTEGER,
-			defaultValue:0,
-		},
+            comment: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		star: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+            visit: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		favorite: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+            star: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+            favorite: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	//model.sync({force:true});
+    // model.sync({force:true});
 
-	model.getByProjectId = async function(projectId) {
-		let rank = await app.model.projectRanks.findOne({where:{projectId}});
-		if (!rank) rank = await app.model.projectRanks.create({projectId});
+    model.getByProjectId = async function(projectId) {
+        let rank = await app.model.projectRanks.findOne({
+            where: { projectId },
+        });
+        if (!rank) rank = await app.model.projectRanks.create({ projectId });
 
-		return rank && rank.get({plain:true});
-	}
+        return rank && rank.get({ plain: true });
+    };
 
-	app.model.projectRanks = model;
+    app.model.projectRanks = model;
 
-	return model;
+    return model;
 };
-

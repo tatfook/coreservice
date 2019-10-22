@@ -1,112 +1,118 @@
+'use strict';
+/**
+ * 废弃代码，逻辑在storage项目中
+ */
+const _ = require('lodash');
 
-const joi = require("joi");
-const _ = require("lodash");
-
-const Controller = require("../core/controller.js");
+const Controller = require('../core/controller.js');
 
 const SiteFile = class extends Controller {
-	get modelName() {
-		return "siteFiles";
-	}
+    get modelName() {
+        return 'siteFiles';
+    }
 
-	get storage() {
-		return this.app.storage;
-	}
+    get storage() {
+        return this.app.storage;
+    }
 
-	ERR(code, data) {
-		return this.success({code, data});
-	}
+    ERR(code, data) {
+        return this.success({ code, data });
+    }
 
-	async url() {
-		const config = this.app.config.self;
-		const baseURL = config.baseUrl + "siteFiles/";
+    async url() {
+        const config = this.app.config.self;
+        const baseURL = config.baseUrl + 'siteFiles/';
 
-		const params = this.validate({
-			fileId:"int",
-			siteId:"int",
-		});
-		const {userId} = this.authenticated();
-		params.userId = userId;
+        const params = this.validate({
+            fileId: 'int',
+            siteId: 'int',
+        });
+        const { userId } = this.authenticated();
+        params.userId = userId;
 
-		if (userId != params.userId) {
-			// 验证访问权限
-		}
-		
-		const where = {
-			userId: params.userId,
-			siteId: params.siteId,
-			fileId: params.fileId,
-		};
+        if (userId !== params.userId) {
+            // 验证访问权限
+        }
 
-		let data = await this.model.siteFiles.findOne({where});
-		if (!data) data = await this.model.siteFiles.create(where);
+        const where = {
+            userId: params.userId,
+            siteId: params.siteId,
+            fileId: params.fileId,
+        };
 
-		data = data.get({plain: true});
+        let data = await this.model.siteFiles.findOne({ where });
+        if (!data) data = await this.model.siteFiles.create(where);
 
-		const url = baseURL + data.id + "/raw";
+        data = data.get({ plain: true });
 
-		return this.ERR(0, url);
-	}
+        const url = baseURL + data.id + '/raw';
 
-	async getRawUrl(id) {
-		let data = await this.model.siteFiles.findOne({where: {id:id}});
-		if (!data) return;
+        return this.ERR(0, url);
+    }
 
-		data = data.get({plain:true});
+    async getRawUrl(id) {
+        let data = await this.model.siteFiles.findOne({ where: { id } });
+        if (!data) return;
 
-		let file = await this.model.files.findOne({where:{id:data.fileId}});
-		if (!file) return;
-		file = file.get({plain:true});
+        data = data.get({ plain: true });
 
-		const url = this.storage.getDownloadUrl(file.key);
+        let file = await this.model.files.findOne({
+            where: { id: data.fileId },
+        });
+        if (!file) return;
+        file = file.get({ plain: true });
 
-		return url;
-	}
+        const url = this.storage.getDownloadUrl(file.key);
 
-	async rawurl() {
-		const {id} = this.validate({id:'int'});
+        return url;
+    }
 
-		const url = await this.getRawUrl(id);
+    async rawurl() {
+        const { id } = this.validate({ id: 'int' });
 
-		return this.ERR(0, url);
-	}
+        const url = await this.getRawUrl(id);
 
-	async raw() {
-		const query = this.ctx.query;
-		const {id} = this.validate({id:'int'});
-		let url = await this.getRawUrl(id);
-		if (!url) this.throw(404);
+        return this.ERR(0, url);
+    }
 
-		for (let key in query) {
-			const value = query[key];
-			if (url.indexOf("?") >= 0) {
-				url = `${url}&${key}`;
-			} else {
-				url = `${url}?${key}`;
-			}
-			if (value) url += `=${value}`;
-		}
+    async raw() {
+        const query = this.ctx.query;
+        const { id } = this.validate({ id: 'int' });
+        let url = await this.getRawUrl(id);
+        if (!url) this.throw(404);
 
-		this.ctx.redirect(url);
-	}
+        for (const key in query) {
+            const value = query[key];
+            if (url.indexOf('?') >= 0) {
+                url = `${url}&${key}`;
+            } else {
+                url = `${url}?${key}`;
+            }
+            if (value) url += `=${value}`;
+        }
 
-	async index() {
-		const params = this.validate();
-		const {userId} = this.authenticated();
-		const config = this.app.config.self;
-		const baseURL = config.baseUrl + "siteFiles/";
-		params.userId = userId;
+        this.ctx.redirect(url);
+    }
 
-		const result = await this.model.siteFiles.findAndCount({where: params});
-		const rows = [];
-		_.each(result.rows, item => {
-			item = item.get({plain:true});
-			item.url = baseURL + item.id + "/raw";
-			rows.push(item);
-		});
+    async index() {
+        const params = this.validate();
+        const { userId } = this.authenticated();
+        const config = this.app.config.self;
+        const baseURL = config.baseUrl + 'siteFiles/';
+        params.userId = userId;
 
-		return this.ERR(0, {count:result.count, rows:rows});
-	}
-}
+        const result = await this.model.siteFiles.findAndCount({
+            where: params,
+        });
+        const rows = [];
+        _.each(result.rows, item => {
+            item = item.get({ plain: true });
+            item.url = baseURL + item.id + '/raw';
+            rows.push(item);
+        });
+
+        return this.ERR(0, { count: result.count, rows });
+    }
+};
 
 module.exports = SiteFile;
