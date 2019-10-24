@@ -32,7 +32,7 @@ module.exports = {
                     );
                     tags.forEach(tag => {
                         systemTagProjects.push({
-                            systemtagId: tag.id,
+                            systemTagId: tag.id,
                             projectId: project.id,
                             createdAt: new Date(),
                             updatedAt: new Date()
@@ -44,7 +44,7 @@ module.exports = {
             }
             if (systemTagProjects.length) {
                 await queryInterface.bulkInsert(
-                    'systemtagProjects',
+                    'systemTagProjects',
                     systemTagProjects,
                     { transaction }
                 );
@@ -60,7 +60,7 @@ module.exports = {
     down: async (queryInterface, Sequelize) => {
         const transaction = await queryInterface.sequelize.transaction();
         try {
-            await queryInterface.bulkDelete('systemtagProjects', null, {
+            await queryInterface.bulkDelete('systemTagProjects', null, {
                 transaction
             });
             await transaction.commit();

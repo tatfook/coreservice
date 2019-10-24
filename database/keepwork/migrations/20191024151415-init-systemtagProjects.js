@@ -1,16 +1,16 @@
 'use strict';
-
+const tableName = 'systemTagProjects';
 module.exports = {
-    up: (queryInterface, Sequelize) => {
+    up: async (queryInterface, Sequelize) => {
         return queryInterface.createTable(
-            'systemtagProjects',
+            tableName,
             {
                 id: {
                     type: Sequelize.INTEGER,
                     primaryKey: true,
                     autoIncrement: true
                 },
-                systemtagId: {
+                systemTagId: {
                     type: Sequelize.INTEGER,
                     allowNull: false,
                     comment: 'systemtag的主键Id'
@@ -41,7 +41,7 @@ module.exports = {
                 underscored: false,
                 charset: 'utf8mb4',
                 collate: 'utf8mb4_bin',
-                comment: 'systemTag和project的关联关系表' // comment for table
+                comment: 'systemTag和project的关联关系表'
             }
         );
     },
@@ -54,6 +54,6 @@ module.exports = {
       Example:
       return queryInterface.dropTable('users');
     */
-        return queryInterface.dropTable('systemtagProjects');
+        return queryInterface.dropTable(tableName);
     }
 };
