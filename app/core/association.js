@@ -162,14 +162,14 @@ module.exports = app => {
         through: {
             model: app.model.systemTagProjects,
         },
-        foreignKey: 'systemTagId',
+        foreignKey: 'projectId',
         constraints: false,
     });
     app.model.systemTags.belongsToMany(app.model.projects, {
         through: {
             model: app.model.systemTagProjects,
         },
-        foreignKey: 'projectId',
+        foreignKey: 'systemTagId',
         constraints: false,
     });
 

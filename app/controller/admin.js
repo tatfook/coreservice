@@ -23,7 +23,6 @@ const Admin = class extends Controller {
         const userId = this.ctx.state.admin.userId;
         const url = this.ctx.url;
         const data = this.validate();
-
         await this.model.adminActions.create({ userId, url, data });
 
         return;
@@ -53,7 +52,7 @@ const Admin = class extends Controller {
         user = user.get({ plain: true });
 
         // eslint-disable-next-line no-magic-numbers
-        const tokenExpire = 3600 * 24 * 2;
+        const tokenExpire = 3600 * 24 * 1000;
         const token = util.jwt_encode(
             {
                 userId: user.id,

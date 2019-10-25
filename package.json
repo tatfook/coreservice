@@ -55,7 +55,8 @@
     "start": "egg-scripts start",
     "test": "egg-bin test ",
     "cov": "egg-bin cov",
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "debug": "egg-bin debug"
   },
   "repository": {
     "type": "git",
