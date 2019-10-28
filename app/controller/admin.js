@@ -2,7 +2,7 @@
 
 const _ = require('lodash');
 const Controller = require('../core/controller.js');
-
+const joi = require('joi');
 const Admin = class extends Controller {
     parseParams() {
         const params = this.validate();
@@ -293,6 +293,94 @@ const Admin = class extends Controller {
         this.action();
 
         return this.success(data);
+    }
+
+    async createProjectTags() {
+        this.adminAuthenticated();
+        const { tags, projectId } = this.validate({
+            tags: joi.array().items(
+                joi.object({
+                    tagId: joi
+                        .number()
+                        .integer()
+                        .required()
+                        .description('标签的ID'),
+                    sn: joi
+                        .number()
+                        .integer()
+                        .optional()
+                        .description('该项目在此标签下的顺序'),
+                })
+            ),
+            projectId: joi
+                .number()
+                .integer()
+                .required()
+                .description('待增加标签的项目ID'),
+        });
+        const result = await this.service.systemTagProject.createProjectTags(
+            projectId,
+            tags
+        );
+        this.action();
+
+        return this.success(result);
+    }
+
+    async updateProjectTag() {
+        this.adminAuthenticated();
+        const { tagId, projectId, sn } = this.validate({
+            tagId: joi
+                .number()
+                .integer()
+                .required()
+                .description('标签的ID'),
+            projectId: joi
+                .number()
+                .integer()
+                .required()
+                .description('待增加标签的项目ID'),
+            sn: joi
+                .number()
+                .integer()
+                .required()
+                .description('该项目在此标签下的顺序'),
+        });
+        const result = await this.service.systemTagProject.updateProjectTag(
+            projectId,
+            tagId,
+            sn
+        );
+        this.action();
+
+        return this.success(result);
+    }
+
+    async deleteProjectTags() {
+        this.adminAuthenticated();
+        const { tagIds, projectId } = this.validate({
+            tagIds: joi
+                .array()
+                .items(
+                    joi
+                        .number()
+                        .integer()
+                        .description('tagId的数组')
+                )
+                .required(),
+            projectId: joi
+                .number()
+                .integer()
+                .required()
+                .description('待增加标签的项目ID'),
+        });
+        const result = await this.service.systemTagProject.deleteProjectTags(
+            projectId,
+            tagIds
+        );
+        this.action();
+
+        return this.success(result);
     }
 };
 

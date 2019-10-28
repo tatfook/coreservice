@@ -2,6 +2,7 @@
 'use strict';
 
 const _ = require('lodash');
+const joi = require('joi');
 
 const {
     ENTITY_TYPE_PROJECT,
@@ -89,6 +90,37 @@ const Project = class extends Controller {
             ...this.queryOptions,
             where: query,
         });
+        const rows = result.rows;
+
+        await this.setProjectUser(rows);
+
+        return this.success(result);
+    }
+
+    async searchForParacraft() {
+        const { tagIds, sortTag, projectId } = this.validate({
+            tagIds: joi
+                .array()
+                .items(joi.number().integer())
+                .required()
+                .description('系统标签数组'),
+            sortTag: joi
+                .number()
+                .integer()
+                .optional()
+                .description('要排序标签的ID'),
+            projectId: joi
+                .number()
+                .integer()
+                .optional()
+                .description('要所有的项目ID'),
+        });
+        const result = await this.service.project.searchForParacraft(
+            this.queryOptions,
+            tagIds,
+            sortTag,
+            projectId
+        );
         const rows = result.rows;
 
         await this.setProjectUser(rows);
@@ -395,7 +427,6 @@ const Project = class extends Controller {
         //     // const world = worlds[i].get({plain:true});
         //     const world = worlds[i];
         //     const { userid, worldsName, _id, commitId = 'master' } = world;
-
         //     if (!world.preview) continue;
         //     let previewUrl = world.preview;
         //     try {
@@ -403,14 +434,12 @@ const Project = class extends Controller {
         //     } catch (e) {
         //         previewUrl = world.preview;
         //     }
-
         //     let project = await this.model.projects.findOne({
         //         where: { userId: userid, name: worldsName },
         //     });
         //     if (!project) continue;
         //     project = project.get({ plain: true });
         //     const extra = project.extra;
-
         //     previewUrl = previewUrl.replace(/http:/, 'https:');
         //     const archiveUrl =
         //         previewUrl.replace(/\/raw\/.*$/, '') +
@@ -426,9 +455,7 @@ const Project = class extends Controller {
         //         { where: { id: project.id } }
         //     );
         // }
-
         // // console.log(worlds.length);
-
         // return this.success('OK');
     }
 

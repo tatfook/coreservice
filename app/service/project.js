@@ -95,6 +95,52 @@ class Project extends Service {
         );
         return;
     }
+
+    // paracraft项目搜索
+    async searchForParacraft(queryOptions, tagIds, sortTag, projectId) {
+        const whereClause = [];
+        if (projectId) {
+            whereClause.push({ id: projectId });
+        }
+        const includeWhere = {};
+        if (sortTag) {
+            includeWhere.id = sortTag;
+        }
+        const idsSet = new Set(tagIds);
+        idsSet.delete(sortTag);
+        idsSet.forEach(id => {
+            whereClause.push({
+                id: {
+                    [this.app.Sequelize.Op.in]: this.app.Sequelize.literal(
+                        `(SELECT a.id FROM projects a, systemTagProjects b where a.id = b.projectId and b.systemTagId=${id})`
+                    ),
+                },
+            });
+        });
+        const result = await this.model.projects.findAndCountAll({
+            ...queryOptions,
+            where: {
+                [this.app.Sequelize.Op.and]: whereClause,
+            },
+            include: [
+                {
+                    model: this.model.systemTags,
+                    nested: false,
+                    where: includeWhere,
+                },
+            ],
+            order: [
+                [
+                    this.model.systemTags,
+                    this.model.systemTagProjects,
+                    'sn',
+                    'desc',
+                ],
+            ],
+            distinct: true,
+        });
+        return result;
+    }
 }
 
 module.exports = Project;
