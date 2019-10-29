@@ -157,6 +157,21 @@ module.exports = app => {
         targetKey: 'id',
         constraints: false,
     });
+    // 项目和标签
+    app.model.projects.belongsToMany(app.model.systemTags, {
+        through: {
+            model: app.model.systemTagProjects,
+        },
+        foreignKey: 'projectId',
+        constraints: false,
+    });
+    app.model.systemTags.belongsToMany(app.model.projects, {
+        through: {
+            model: app.model.systemTagProjects,
+        },
+        foreignKey: 'systemTagId',
+        constraints: false,
+    });
 
     // 探索APP
     app.model.paracraftDevices.hasMany(app.model.paracraftGameCoinKeys, {

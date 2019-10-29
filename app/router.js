@@ -154,6 +154,10 @@ module.exports = app => {
     router.get(`${prefix}projects/:id/game`, project.game);
     router.get(`${prefix}projects/join`, project.join);
     router.post(`${prefix}projects/search`, project.search);
+    router.post(
+        `${prefix}projects/searchForParacraft`,
+        project.searchForParacraft
+    );
     router.get(`${prefix}projects/:id/detail`, project.detail);
     router.get(`${prefix}projects/:id/visit`, project.visit);
     router.get(`${prefix}projects/:id/star`, project.isStar);
@@ -210,6 +214,10 @@ module.exports = app => {
     router.put(`${prefix}admins/:resources/bulk`, admin.bulkUpdate);
     router.delete(`${prefix}admins/:resources/bulk`, admin.bulkDestroy);
     router.resources(`${prefix}admins/:resources`, admin);
+    // 标签和项目相关
+    router.post(`${prefix}admins/projects/:projectId/systemTags`, admin.createProjectTags);
+    router.put(`${prefix}admins/projects/:projectId/systemTags/:tagId`, admin.updateProjectTag);
+    router.delete(`${prefix}admins/projects/:projectId/systemTags`, admin.deleteProjectTags);
 
     const order = controller.order;
     router.post(`${prefix}orders/charge`, order.charge);

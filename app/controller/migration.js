@@ -112,7 +112,7 @@ module.exports = {
             const filename = `./database/migrations/keepwork/${datetime}-${tableName}.js`;
             const model = this.app.model;
             const text = await this.generateText({ tableName, model });
-            fs.writeFile(filename, text);
+            fs.writeFile(filename, text, function() {});
         }
         const lessonTables = await this.app.lessonModel.query('show tables', {
             type: this.app.lessonModel.QueryTypes.SHOWTABLES,
@@ -123,7 +123,7 @@ module.exports = {
             const filename = `./database/migrations/lesson/${datetime}-${tableName}.js`;
             const model = this.app.lessonModel;
             const text = await this.generateText({ tableName, model });
-            fs.writeFile(filename, text);
+            fs.writeFile(filename, text, function() {});
         }
         return this.success();
     }

@@ -16,7 +16,47 @@ describe("项目", () => {
 		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		assert(project.id);
 		const projectId = project.id;
-		
+		const tagId = 1;
+		// 创建系统标签
+		await app.model.systemTags.create({
+			id: tagId,
+			classify: 1,
+			tagname: '测试tag'
+		})
+		// 创建系统标签和项目的关联关系
+		await app.model.systemTagProjects.create({
+			projectId,
+			systemTagId: tagId,
+			sn: 10
+		})
+		let project2 = await app.httpRequest().post("/api/v0/projects").send({
+			name:"projectname2",
+			type:0,
+		}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
+		const projectId2 = project2.id;
+		// 创建系统标签和项目的关联关系
+		await app.model.systemTagProjects.create({
+			projectId: projectId2,
+			systemTagId: tagId,
+			sn: 9
+		})
+		// 根据标签查找项目
+		let res1 = await app.httpRequest().post('/api/v0/projects/searchForParacraft').send({
+			"tagIds": [
+			  1
+			],
+			"sortTag": 1
+		  }).expect(200).then(res => res.body);
+		assert(res1.count === 2 && res1.rows[0].id === 1);
+		// 根据ID搜索项目
+		let res2 = await app.httpRequest().post('/api/v0/projects/searchForParacraft').send({
+			"tagIds": [
+			  1
+			],
+			"projectId": 1
+		  }).expect(200).then(res => res.body);
+		assert(res2.count === 1 && res2.rows[0].id === 1);
+		await app.model.projects.destroy({where: {id: projectId2}})
 		// 更新项目
 		await app.httpRequest().put(`/api/v0/projects/${projectId}`).send({description:"test"}).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 
