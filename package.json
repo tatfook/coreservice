@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "chance": "^1.0.18",
-    "egg-bin": "^4.8.1",
+    "egg-bin": "^4.14.0",
     "egg-mock": "^3.17.3",
     "eslint": "^5.13.0",
     "eslint-config-egg": "^7.1.0",
@@ -50,7 +50,7 @@
     "lint"
   ],
   "scripts": {
-    "dev": "egg-bin dev",
+    "dev": "egg-bin dev --dts",
     "rls": "EGG_SERVER_ENV=rls egg-bin dev",
     "start": "egg-scripts start",
     "test": "egg-bin test ",
