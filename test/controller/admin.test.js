@@ -42,5 +42,31 @@ describe("管理员接口", () => {
 		// 删除
 		await app.httpRequest().delete("/api/v0/admins/users/" + resource.id).set("Authorization", `Bearer ${token}`).expect(res => assert(res.statusCode == 200)).then(res => res.body);
 		//const data = app.model.users.findOne({})
+
+		// 对项目增加标签
+		let result = await app.httpRequest().post('/api/v0/admins/projects/1/systemTags').set("Authorization", `Bearer ${token}`).send({
+			"tags": [
+			  {
+				"tagId": 1
+			  },
+			  {
+				"tagId": 2
+			  }
+			]
+		  }).expect(200).then(res => res.body);
+		assert(result.length === 2 && result[0] === true && result[1] === true);
+		await app.httpRequest().post('/api/v0/admins/projects/1/systemTags').set("Authorization", `Bearer ${token}`).expect(400);
+		
+		// 对项目修改标签顺序
+		result = await app.httpRequest().put('/api/v0/admins/projects/1/systemTags/1').set("Authorization", `Bearer ${token}`)
+		  .send({sn: 10}).expect(200).then(res => res.body);
+		assert(result.length === 1 && result[0] === 1);
+		await app.httpRequest().put('/api/v0/admins/projects/1/systemTags/aaa').set("Authorization", `Bearer ${token}`)
+		  .send({sn: 10}).expect(400);
+
+		// 对项目删除标签顺序
+		result = await app.httpRequest().delete('/api/v0/admins/projects/1/systemTags').set("Authorization", `Bearer ${token}`)
+		  .send({tagIds: [1,2]}).expect(200).then(res => res.body);
+	    assert(result.length === 2 && result[0] === 1 && result[1] === 1);
 	});
 });

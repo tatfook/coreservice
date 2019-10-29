@@ -13,21 +13,23 @@ class SystemTagProjectService extends Service {
             };
         });
         const transaction = await this.ctx.model.transaction();
+        let result;
         try {
             const promises = upsertArr.map(obj => {
                 return this.model.systemTagProjects.upsert(obj, {
                     transaction,
                 });
             });
-            await Promise.all(promises);
+            result = await Promise.all(promises);
             await transaction.commit();
         } catch (err) {
             await transaction.rollback();
             throw err;
         }
+        return result;
     }
     async updateProjectTag(projectId, tagId, sn) {
-        await this.model.systemTagProjects.update(
+        return await this.model.systemTagProjects.update(
             {
                 sn,
             },
@@ -47,6 +49,7 @@ class SystemTagProjectService extends Service {
             };
         });
         const transaction = await this.ctx.model.transaction();
+        let result;
         try {
             const promises = deleteArr.map(obj => {
                 return this.model.systemTagProjects.destroy({
@@ -54,12 +57,13 @@ class SystemTagProjectService extends Service {
                     transaction,
                 });
             });
-            await Promise.all(promises);
+            result = await Promise.all(promises);
             await transaction.commit();
         } catch (err) {
             await transaction.rollback();
             throw err;
         }
+        return result;
     }
 }
 

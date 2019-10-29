@@ -298,20 +298,23 @@ const Admin = class extends Controller {
     async createProjectTags() {
         this.adminAuthenticated();
         const { tags, projectId } = this.validate({
-            tags: joi.array().items(
-                joi.object({
-                    tagId: joi
-                        .number()
-                        .integer()
-                        .required()
-                        .description('标签的ID'),
-                    sn: joi
-                        .number()
-                        .integer()
-                        .optional()
-                        .description('该项目在此标签下的顺序'),
-                })
-            ),
+            tags: joi
+                .array()
+                .items(
+                    joi.object({
+                        tagId: joi
+                            .number()
+                            .integer()
+                            .required()
+                            .description('标签的ID'),
+                        sn: joi
+                            .number()
+                            .integer()
+                            .optional()
+                            .description('该项目在此标签下的顺序'),
+                    })
+                )
+                .required(),
             projectId: joi
                 .number()
                 .integer()
