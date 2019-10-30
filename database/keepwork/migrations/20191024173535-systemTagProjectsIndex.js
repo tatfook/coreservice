@@ -10,15 +10,15 @@ module.exports = {
                     fields: [
                         {
                             attribute: 'systemTagId',
-                            order: 'ASC'
+                            order: 'ASC',
                         },
                         {
                             attribute: 'projectId',
-                            order: 'ASC'
-                        }
+                            order: 'ASC',
+                        },
                     ],
                     unique: true,
-                    name: 'uk_systemTagId_projectId'
+                    name: 'uk_systemTagId_projectId',
                 },
                 { transaction }
             );
@@ -34,5 +34,5 @@ module.exports = {
             'systemTagProjects',
             'uk_systemTagId_projectId'
         );
-    }
+    },
 };

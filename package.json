@@ -1,71 +1,74 @@
 {
-  "name": "coreservice",
-  "version": "1.0.0",
-  "description": "curl http://localhost:7654/core/v0/users/test",
-  "main": "backpack.config.js",
-  "dependencies": {
-    "aho-corasick.js": "0.0.1",
-    "axios": "^0.18.1",
-    "blueimp-md5": "^2.10.0",
-    "captchapng": "0.0.1",
-    "dataloader": "^1.4.0",
-    "egg": "^2.10.0",
-    "egg-cors": "^2.1.0",
-    "egg-graphql": "^2.3.0",
-    "egg-redis": "^2.4.0",
-    "egg-scripts": "^2.11.0",
-    "egg-sequelize": "^4.2.0",
-    "egg-socket.io": "^4.1.5",
-    "egg-validate": "^1.0.0",
-    "hi-base32": "^0.5.0",
-    "joi": "^13.4.0",
-    "js-base64": "^2.4.8",
-    "jshashes": "^1.0.7",
-    "jwt-simple": "^0.5.6",
-    "lodash": "^4.17.15",
-    "memory-cache": "^0.2.0",
-    "moment": "^2.22.2",
-    "mysql2": "^1.5.3",
-    "newrelic": "^5.11.0",
-    "nodemailer": "^4.6.7",
-    "path-to-regexp": "^2.3.0",
-    "pingpp": "^2.1.4",
-    "qiniu": "^7.2.1",
-    "qrcode": "^1.2.0",
-    "svg-captcha": "^1.4.0",
-    "uuid": "^3.3.2",
-    "wurl": "^2.5.3"
-  },
-  "devDependencies": {
-    "chance": "^1.0.18",
-    "egg-bin": "^4.14.0",
-    "egg-mock": "^3.17.3",
-    "eslint": "^5.13.0",
-    "eslint-config-egg": "^7.1.0",
-    "factory-girl": "^5.0.4",
-    "pre-commit": "^1.2.2",
-    "sequelize-cli": "^5.5.1"
-  },
-  "pre-commit": [
-    "lint"
-  ],
-  "scripts": {
-    "dev": "egg-bin dev --dts",
-    "rls": "EGG_SERVER_ENV=rls egg-bin dev",
-    "start": "egg-scripts start",
-    "test": "egg-bin test ",
-    "cov": "egg-bin cov",
-    "lint": "eslint . --fix",
-    "debug": "egg-bin debug"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/tatfook/coreService.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/tatfook/coreService/issues"
-  },
-  "homepage": "https://github.com/tatfook/coreService#readme"
+    "name": "coreservice",
+    "version": "1.0.0",
+    "description": "curl http://localhost:7654/core/v0/users/test",
+    "main": "backpack.config.js",
+    "dependencies": {
+        "aho-corasick.js": "0.0.1",
+        "axios": "^0.18.1",
+        "blueimp-md5": "^2.10.0",
+        "captchapng": "0.0.1",
+        "dataloader": "^1.4.0",
+        "egg": "^2.10.0",
+        "egg-cors": "^2.1.0",
+        "egg-graphql": "^2.3.0",
+        "egg-redis": "^2.4.0",
+        "egg-scripts": "^2.11.0",
+        "egg-sequelize": "^4.2.0",
+        "egg-socket.io": "^4.1.5",
+        "egg-validate": "^1.0.0",
+        "hi-base32": "^0.5.0",
+        "joi": "^13.4.0",
+        "js-base64": "^2.4.8",
+        "jshashes": "^1.0.7",
+        "jwt-simple": "^0.5.6",
+        "lodash": "^4.17.15",
+        "memory-cache": "^0.2.0",
+        "moment": "^2.22.2",
+        "mysql2": "^1.5.3",
+        "newrelic": "^5.11.0",
+        "nodemailer": "^4.6.7",
+        "path-to-regexp": "^2.3.0",
+        "pingpp": "^2.1.4",
+        "qiniu": "^7.2.1",
+        "qrcode": "^1.2.0",
+        "svg-captcha": "^1.4.0",
+        "uuid": "^3.3.2",
+        "wurl": "^2.5.3"
+    },
+    "devDependencies": {
+        "chance": "^1.0.18",
+        "egg-bin": "^4.14.0",
+        "egg-mock": "^3.17.3",
+        "eslint": "^5.13.0",
+        "eslint-config-egg": "^7.1.0",
+        "factory-girl": "^5.0.4",
+        "pre-commit": "^1.2.2",
+        "prettier": "1.18.2",
+        "sequelize-cli": "^5.5.1"
+    },
+    "pre-commit": [
+        "format",
+        "lint"
+    ],
+    "scripts": {
+        "dev": "egg-bin dev --dts",
+        "rls": "EGG_SERVER_ENV=rls egg-bin dev",
+        "start": "egg-scripts start",
+        "test": "egg-bin test ",
+        "cov": "egg-bin cov",
+        "lint": "eslint . --fix",
+        "debug": "egg-bin debug",
+        "format": "prettier --write \"**/**/*.{js,json}\""
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/tatfook/coreService.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/tatfook/coreService/issues"
+    },
+    "homepage": "https://github.com/tatfook/coreService#readme"
 }

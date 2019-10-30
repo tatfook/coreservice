@@ -305,14 +305,12 @@ const OauthUsers = class extends Controller {
         // const userinfo = await axios.get(userApiUrl).then(res => res.data);
         // const externalId = userinfo.id;
         // const externalUsername = userinfo.username;
-
         // const key = params.code + params.client_id;
         // memoryCache.put(
         //     key,
         //     { userId, externalId, externalUsername },
         //     1000 * 60 * 10
         // ); // 10 分钟
-
         // return this.success('OK');
     }
     // 解绑删除记录即可

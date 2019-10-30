@@ -138,14 +138,20 @@ const LessonOrganizationActivateCode = class extends Controller {
         // if (curtime < begin) return this.fail({code:4, message:"班级未开始"});
         const organ = await this.model.lessonOrganizations
             .findOne({
-                where: { id: data.organizationId, endDate: { $gt: new Date() } },
+                where: {
+                    id: data.organizationId,
+                    endDate: { $gt: new Date() },
+                },
             })
             .then(o => o && o.toJSON());
         if (!organ) return this.fail({ code: 2, message: '无效机构' });
 
         const ms = await this.model.lessonOrganizationClassMembers
             .findAll({
-                where: { organizationId: data.organizationId, memberId: userId },
+                where: {
+                    organizationId: data.organizationId,
+                    memberId: userId,
+                },
             })
             .then(list => list.map(o => o.toJSON()));
         const isClassStudent = _.find(
