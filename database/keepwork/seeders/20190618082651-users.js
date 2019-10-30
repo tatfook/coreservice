@@ -10,38 +10,38 @@ module.exports = {
                     username: 'user001',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 },
                 {
                     username: 'user002',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 },
                 {
                     username: 'user003',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 },
                 {
                     username: 'user004',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 },
                 {
                     username: 'user005',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
+                    updatedAt: new Date(),
                 },
                 {
                     username: 'user006',
                     password: md5('123456'),
                     createdAt: new Date(),
-                    updatedAt: new Date()
-                }
+                    updatedAt: new Date(),
+                },
             ],
             {}
         );
@@ -49,5 +49,5 @@ module.exports = {
 
     down: (queryInterface, Sequelize) => {
         return queryInterface.bulkDelete('users', null, {});
-    }
+    },
 };

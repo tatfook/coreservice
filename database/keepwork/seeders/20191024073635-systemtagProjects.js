@@ -14,20 +14,22 @@ module.exports = {
                 let project = projects[i];
                 let classifyTags =
                     project.classifyTags && project.classifyTags.split('|');
-                classifyTags = classifyTags && classifyTags.filter(tag => {
-                    if (tag) {
-                        return true;
-                    } else {
-                        return false;
-                    }
-                });
+                classifyTags =
+                    classifyTags &&
+                    classifyTags.filter(tag => {
+                        if (tag) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    });
                 if (classifyTags && classifyTags.length) {
                     let tags = await queryInterface.sequelize.query(
                         'SELECT id FROM systemTags where classify=1 and tagname in (?);',
                         {
                             replacements: [classifyTags],
                             type: Sequelize.QueryTypes.SELECT,
-                            transaction
+                            transaction,
                         }
                     );
                     tags.forEach(tag => {
@@ -35,7 +37,7 @@ module.exports = {
                             systemTagId: tag.id,
                             projectId: project.id,
                             createdAt: new Date(),
-                            updatedAt: new Date()
+                            updatedAt: new Date(),
                         });
                     });
                 } else {
@@ -61,12 +63,12 @@ module.exports = {
         const transaction = await queryInterface.sequelize.transaction();
         try {
             await queryInterface.bulkDelete('systemTagProjects', null, {
-                transaction
+                transaction,
             });
             await transaction.commit();
         } catch (error) {
             await transaction.rollback();
             throw err;
         }
-    }
+    },
 };

@@ -143,7 +143,10 @@ const Project = class extends Controller {
         );
         const projects = authUserId
             ? await this.model.members.findAll({
-                where: { userId: authUserId, objectType: ENTITY_TYPE_PROJECT },
+                where: {
+                    userId: authUserId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                },
             })
             : [];
         list = _.filter(list, o => {
@@ -174,7 +177,10 @@ const Project = class extends Controller {
         });
         const projects = authUserId
             ? await this.model.members.findAll({
-                where: { userId: authUserId, objectType: ENTITY_TYPE_PROJECT },
+                where: {
+                    userId: authUserId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                },
             })
             : [];
         list = _.filter(list, o => {

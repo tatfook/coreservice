@@ -407,16 +407,13 @@ const Convert = class extends Controller {
         // if (params.token !== config.token) {
         //     return this.success('NO PERMISSTION');
         // }
-
         // const result = await model.destroy({ where: { id } });
-
         // if (tablename === 'groups') {
         //     const groupMembersModel = models.groupMembers;
         //     await groupMembersModel.destroy({ where: { groupId: id } });
         //     const siteGroupsModel = models.siteGroups;
         //     await siteGroupsModel.destroy({ where: { groupId: id } });
         // }
-
         // return this.success('OK');
     }
 };
