@@ -1,6 +1,6 @@
 
 module.exports = app => {
-	const {router, config,  controller} = app;
+	const { router, config, controller } = app;
 	const selfConfig = config.self;
 
 	const prefix = selfConfig.apiUrlPrefix;
@@ -53,6 +53,18 @@ module.exports = app => {
 	router.post(`${prefix}users/cellphone_captcha`, user.cellphoneVerifyTwo);
 	router.post(`${prefix}users/reset_password`, user.resetPassword);
 	router.resources(`${prefix}users`, user);
+
+	// -------------apis for lesson_api project---------------
+	const lesson = controller.lesson;
+	router.get(`${prefix}lessons/userdatas`, lesson.getUserDatas);
+	router.post(`${prefix}lessons/userdatas`, lesson.setUserDatas);
+	router.put(`${prefix}lessons/update`, lesson.update);
+	router.get(`${prefix}lessons/accountsAndRoles`, lesson.accountsAndRoles);
+	router.put(`${prefix}lessons/accountsIncrement`, lesson.accountsIncrement);
+	router.get(`${prefix}lessons/accounts`, lesson.getAccounts);
+	router.post(`${prefix}lessons/createRecord`, lesson.createRecord);
+	router.post(`${prefix}lessons/truncate`, lesson.truncate);
+	// -------------apis for lesson_api project---------------
 
 	const site = controller.site;
 	router.get(`${prefix}sites/getByName`, site.getByName);
