@@ -94,8 +94,10 @@ const Lesson = class extends Controller {
         const { condition, apiKey, order } = this.validate();
         if (apiKey !== lessonApiKey) return this.fail(-1);
 
-
-        const ret = await this.ctx.model.projects.findAll({ order, where: condition });
+        const ret = await this.ctx.model.projects.findAll({
+            order,
+            where: condition,
+        });
         return this.success(ret);
     }
     // -----------api for lesson-api project--------------------
