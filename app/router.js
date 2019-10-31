@@ -76,6 +76,7 @@ module.exports = app => {
     router.get(`${prefix}lessons/accounts`, lesson.getAccounts);
     router.post(`${prefix}lessons/createRecord`, lesson.createRecord);
     router.post(`${prefix}lessons/truncate`, lesson.truncate);
+    router.get(`${prefix}lessons/projects`, lesson.getAllPrjects);
     // -------------apis for lesson_api project---------------
 
     const site = controller.site;
