@@ -1,188 +1,229 @@
-
-const _ = require("lodash");
+/* eslint-disable no-magic-numbers */
+'use strict';
+const _ = require('lodash');
 
 const {
-	ENTITY_TYPE_USER,
-	ENTITY_TYPE_SITE,
-	ENTITY_TYPE_PAGE,
-	ENTITY_TYPE_GROUP,
-	ENTITY_TYPE_PROJECT,
+    ENTITY_TYPE_USER,
+    ENTITY_TYPE_SITE,
+    ENTITY_TYPE_PAGE,
+    ENTITY_TYPE_GROUP,
+    ENTITY_TYPE_PROJECT,
 
-	APPLY_STATE_DEFAULT,
-	APPLY_STATE_AGREE,
-	APPLY_STATE_REFUSE,
-	APPLY_TYPE_MEMBER,
-} = require("../core/consts.js");
+    APPLY_STATE_AGREE,
+    APPLY_STATE_REFUSE,
+    APPLY_TYPE_MEMBER,
+} = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const model = app.model.define("applies", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 所属者 记录创建者
-			type: BIGINT,
-			allowNull: false,
-		},
+    const model = app.model.define(
+        'applies',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		objectType: {                // 所属对象类型  0 -- 用户  1 -- 站点  2 -- 页面
-			type: INTEGER,
-			allowNull: false,
-		},
+            userId: {
+                // 所属者 记录创建者
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		objectId: {                  // 所属对象id
-			type: BIGINT,
-			allowNull: false,
-		},
+            objectType: {
+                // 所属对象类型  0 -- 用户  1 -- 站点  2 -- 页面
+                type: INTEGER,
+                allowNull: false,
+            },
 
-		applyId: {                   // 申请Id
-			type: BIGINT,
-			allowNull: false,
-		},
+            objectId: {
+                // 所属对象id
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		applyType: {                 // 申请类型
-			type: INTEGER,
-			defaultValue:0,
-		},
+            applyId: {
+                // 申请Id
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		state: {
-			type: INTEGER,           // 状态 0 --  未处理态  1 -- 同意  2 -- 拒绝
-			defaultValue:0, 
-		},
+            applyType: {
+                // 申请类型
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		legend: {                    // 备注
-			type: STRING(255),
-			defaultValue:"",
-		},
+            state: {
+                type: INTEGER, // 状态 0 --  未处理态  1 -- 同意  2 -- 拒绝
+                defaultValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+            legend: {
+                // 备注
+                type: STRING(255),
+                defaultValue: '',
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["objectId", "objectType", "applyId", "applyType"],
-		},
-		],
-	});
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'objectId', 'objectType', 'applyId', 'applyType' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	model.getById = async function(id, userId) {
-		const where = {id};
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-		if (userId) where.userId = userId;
+    model.getById = async function(id, userId) {
+        const where = { id };
 
-		const data = await app.model.applies.findOne({where: where});
+        if (userId) where.userId = userId;
 
-		return data && data.get({plain:true});
-	}
+        const data = await app.model.applies.findOne({ where });
 
-	model.getObject = async function(objectId, objectType, userId) {
-		const modelName = {
-			[ENTITY_TYPE_USER]: "users",
-			[ENTITY_TYPE_SITE]: "sites",
-			[ENTITY_TYPE_PAGE]: "pages",
-			[ENTITY_TYPE_GROUP]: "groups",
-			[ENTITY_TYPE_PROJECT]: "projects",
-		};
+        return data && data.get({ plain: true });
+    };
 
-		//console.log(objectType, modelName[objectType], modelName);
-		const data = await app.model[modelName[objectType]].getById(objectId, userId);
-		
-		return data;
-	}
+    model.getObject = async function(objectId, objectType, userId) {
+        const modelName = {
+            [ENTITY_TYPE_USER]: 'users',
+            [ENTITY_TYPE_SITE]: 'sites',
+            [ENTITY_TYPE_PAGE]: 'pages',
+            [ENTITY_TYPE_GROUP]: 'groups',
+            [ENTITY_TYPE_PROJECT]: 'projects',
+        };
 
-	model.getObjectApplies = async function(option) {
-		const applyType =  option.where.applyType;
-		const list = await app.model.applies.findAll(option);
-		if (list.length == 0) return [];
+        // console.log(objectType, modelName[objectType], modelName);
+        const data = await app.model[modelName[objectType]].getById(
+            objectId,
+            userId
+        );
 
-		const ids = [];
-		for (let i = 0; i < list.length; i++) {
-			const item = list[i].get ? list[i].get({plain:true}) : list[i];
-			ids.push(item.applyId);
-			list[i] = item;
-		}
-		
-		if (applyType == APPLY_TYPE_MEMBER) {
-			const users = await app.model.users.findAll({
-				attributes:[["id", "userId"], "username", "nickname", "portrait"],
-				where: {
-					id: {
-						[app.Sequelize.Op.in]:ids,
-					}
-				}
-			});
+        return data;
+    };
 
-			_.each(users, (val, i) => users[i] = val.get({plain:true}));
-			for (let i = 0; i < list.length; i++) {
-				const item = list[i].get ? list[i].get({plain:true}) : list[i];
-				const index = _.findIndex(users, o => o.userId == item.applyId);
-				item.object = users[index];
-			}
-		}
+    model.getObjectApplies = async function(option) {
+        const applyType = option.where.applyType;
+        const list = await app.model.applies.findAll(option);
+        if (list.length === 0) return [];
 
-		return list;
-	}
+        const ids = [];
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i].get ? list[i].get({ plain: true }) : list[i];
+            ids.push(item.applyId);
+            list[i] = item;
+        }
 
-	model.agree = async function(id, userId) {
-		let data = await app.model.applies.getById(id);
-		if (!data) {console.log("申请对象不存在"); return -1;};
+        if (applyType === APPLY_TYPE_MEMBER) {
+            const users = await app.model.users.findAll({
+                attributes: [
+                    [ 'id', 'userId' ],
+                    'username',
+                    'nickname',
+                    'portrait',
+                ],
+                where: {
+                    id: {
+                        [app.Sequelize.Op.in]: ids,
+                    },
+                },
+            });
 
-		let object = await app.model.applies.getObject(data.objectId, data.objectType, userId);
-		if (!object) {console.log("所属对象不存在"); return -1;};
-		
-		await app.model.applies.update({
-			state:APPLY_STATE_AGREE,
-		}, {where:{id}});
+            _.each(users, (val, i) => {
+                users[i] = val.get({ plain: true });
+            });
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i].get
+                    ? list[i].get({ plain: true })
+                    : list[i];
+                const index = _.findIndex(
+                    users,
+                    o => o.userId === item.applyId
+                );
+                item.object = users[index];
+            }
+        }
 
-		if (data.applyType == APPLY_TYPE_MEMBER) {
-			await app.model.members.upsert({
-				userId,
-				objectId: data.objectId,
-				objectType: data.objectType,
-				memberId: data.applyId,
-			});
-		}
-	
-		return 0;
-	}
+        return list;
+    };
 
-	model.refuse = async function(id, userId) {
-		let data = await app.model.applies.getById(id);
-		if (!data) {console.log("申请对象不存在"); return -1;};
+    model.agree = async function(id, userId) {
+        const data = await app.model.applies.getById(id);
+        if (!data) {
+            return -1;
+        }
 
-		let object = await app.model.applies.getObject(data.objectId, data.objectType, userId);
-		if (!object) {console.log("所属对象不存在"); return -1;};
-	
-		await app.model.applies.update({
-			state:APPLY_STATE_REFUSE,
-		}, {where:{id}});
+        const object = await app.model.applies.getObject(
+            data.objectId,
+            data.objectType,
+            userId
+        );
+        if (!object) {
+            return -1;
+        }
 
-		return 0;
-	}
+        await app.model.applies.update(
+            {
+                state: APPLY_STATE_AGREE,
+            },
+            { where: { id } }
+        );
 
-	app.model.applies = model;
-	return model;
+        if (data.applyType === APPLY_TYPE_MEMBER) {
+            await app.model.members.upsert({
+                userId,
+                objectId: data.objectId,
+                objectType: data.objectType,
+                memberId: data.applyId,
+            });
+        }
+
+        return 0;
+    };
+
+    model.refuse = async function(id, userId) {
+        const data = await app.model.applies.getById(id);
+        if (!data) {
+            // console.log('申请对象不存在');
+            return -1;
+        }
+
+        const object = await app.model.applies.getObject(
+            data.objectId,
+            data.objectType,
+            userId
+        );
+        if (!object) {
+            // console.log('所属对象不存在');
+            return -1;
+        }
+
+        await app.model.applies.update(
+            {
+                state: APPLY_STATE_REFUSE,
+            },
+            { where: { id } }
+        );
+
+        return 0;
+    };
+
+    app.model.applies = model;
+    return model;
 };

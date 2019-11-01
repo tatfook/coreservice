@@ -1,54 +1,49 @@
-
+/* eslint-disable no-magic-numbers */
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const model = app.model.define("systemTags", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		classify: {
-			type: INTEGER,
-			defaulValue: 0,
-		},
+    const model = app.model.define(
+        'systemTags',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		tagname: {
-			type: STRING(24),
-			allowNull: false,
-		},
+            classify: {
+                type: INTEGER,
+                defaulValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-			defaulValue:{},
-		},
+            tagname: {
+                type: STRING(24),
+                allowNull: false,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["classify", "tagname"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaulValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'classify', 'tagname' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.systemTags = model;
-	return model;
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
+
+    app.model.systemTags = model;
+    return model;
 };
-

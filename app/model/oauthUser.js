@@ -1,101 +1,66 @@
+/* eslint-disable no-magic-numbers */
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const model = app.model.define("oauthUsers", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {  // 文件所属者
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'oauthUsers',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		externalId: {
-			type: STRING(128),
-			allowNull: false,
-		},
+            userId: {
+                // 文件所属者
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		externalUsername: {
-			type: STRING,
-			defaultValue:"",
-		},
+            externalId: {
+                type: STRING(128),
+                allowNull: false,
+            },
 
-		type: {
-			type: INTEGER,
-			allowNull: false,
-		},
+            externalUsername: {
+                type: STRING,
+                defaultValue: '',
+            },
 
-		token: {
-			type: STRING,
-			defaultValue:"",
-		},
+            type: {
+                type: INTEGER,
+                allowNull: false,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+            token: {
+                type: STRING,
+                defaultValue: '',
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["externalId", "type"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'externalId', 'type' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.oauthUsers = model;
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-	return model;
+    app.model.oauthUsers = model;
+
+    return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

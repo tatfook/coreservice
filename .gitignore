@@ -21,3 +21,6 @@ config/config.*.js
 newrelic_*
 
 yarn.lock
+
+.vscode
+typings

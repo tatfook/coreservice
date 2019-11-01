@@ -1,132 +1,152 @@
+'use strict';
 
-const joi = require("joi");
-const _ = require("lodash");
+const _ = require('lodash');
 
-const Controller = require("../core/controller.js");
-const {
-	CLASS_MEMBER_ROLE_STUDENT,
-	CLASS_MEMBER_ROLE_TEACHER,
-	CLASS_MEMBER_ROLE_ADMIN,
-} = require("../core/consts.js");
+const Controller = require('../core/controller.js');
+const { CLASS_MEMBER_ROLE_ADMIN } = require('../core/consts.js');
 
 const LessonOrganizationForm = class extends Controller {
-	get modelName() {
-		return "lessonOrganizationForms";
-	}
+    get modelName() {
+        return 'lessonOrganizationForms';
+    }
 
-	async search() {
-		const query = this.validate({organizationId:"number"});
-		
-		const list = await this.model.lessonOrganizationForms.findAll({
-			include: [
-			{
-				as: "lessonOrganizationFormSubmits",
-				model: this.model.lessonOrganizationFormSubmits,
-				//attributes: {exclude:["userId", "organizationId", "quizzes", "state", "comment", "extra", "createdAt", "updatedAt"]},
-				attributes: ["formId"],
-				limit: 100000,
-			}
-			],
-			where: query,
-		}).then(list => list.map(o => o.toJSON()));
+    async search() {
+        const query = this.validate({ organizationId: 'number' });
 
-		_.each(list, o => {
-			o.submitCount = o.lessonOrganizationFormSubmits.length;
-			o.lessonOrganizationFormSubmits = undefined;
-		});
+        const list = await this.model.lessonOrganizationForms
+            .findAll({
+                include: [
+                    {
+                        as: 'lessonOrganizationFormSubmits',
+                        model: this.model.lessonOrganizationFormSubmits,
+                        // attributes: {exclude:["userId", "organizationId", "quizzes", "state", "comment", "extra", "createdAt", "updatedAt"]},
+                        attributes: [ 'formId' ],
+                        limit: 100000,
+                    },
+                ],
+                where: query,
+            })
+            .then(list => list.map(o => o.toJSON()));
 
-		return this.success(list);
-	}
+        _.each(list, o => {
+            o.submitCount = o.lessonOrganizationFormSubmits.length;
+            o.lessonOrganizationFormSubmits = undefined;
+        });
 
-	async create() {
-		let {organizationId, userId, roleId} = this.authenticated();
-		const params = this.validate();
-		if (!organizationId && !params.organizationId) return this.throw(400);
-		if (params.organizationId && params.organizationId != organizationId) {
-			organizationId = params.organizationId;
-			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
-		}
+        return this.success(list);
+    }
 
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
+    async create() {
+        let { organizationId, userId, roleId } = this.authenticated();
+        const params = this.validate();
+        if (!organizationId && !params.organizationId) return this.throw(400);
+        if (params.organizationId && params.organizationId !== organizationId) {
+            organizationId = params.organizationId;
+            roleId = await this.ctx.service.organization.getRoleId(
+                organizationId,
+                userId
+            );
+        }
 
-		params.organizationId = organizationId;
-		params.userId = userId;
+        if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
 
-		const data = await this.model.lessonOrganizationForms.create(params);
+        params.organizationId = organizationId;
+        params.userId = userId;
 
-		return this.success(data);
-	}
+        const data = await this.model.lessonOrganizationForms.create(params);
 
-	async update() {
-		let {organizationId, userId, roleId} = this.authenticated();
-		const params = this.validate({id:"number"});
-		if (!organizationId && !params.organizationId) return this.throw(400);
-		if (params.organizationId && params.organizationId != organizationId) {
-			organizationId = params.organizationId;
-			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
-		}
+        return this.success(data);
+    }
 
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
-		delete params.organizationId;
-		delete params.userId;
+    async update() {
+        let { organizationId, userId, roleId } = this.authenticated();
+        const params = this.validate({ id: 'number' });
+        if (!organizationId && !params.organizationId) return this.throw(400);
+        if (params.organizationId && params.organizationId !== organizationId) {
+            organizationId = params.organizationId;
+            roleId = await this.ctx.service.organization.getRoleId(
+                organizationId,
+                userId
+            );
+        }
 
-		const data = await this.model.lessonOrganizationForms.update(params, {where:{id:params.id}});
+        if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
+        delete params.organizationId;
+        delete params.userId;
 
-		return this.success(data);
-	}
+        const data = await this.model.lessonOrganizationForms.update(params, {
+            where: { id: params.id },
+        });
 
-	async postSubmit() {
-		//const {userId} = this.authenticated();
-		const params = this.validate({id: "number"});
-		const formId = params.id;
-		delete params.id;
+        return this.success(data);
+    }
 
-		const form = await this.model.lessonOrganizationForms.findOne({where:{id: formId}}).then(o => o && o.toJSON());
-		if (!form) return this.throw(400);
+    async postSubmit() {
+        // const {userId} = this.authenticated();
+        const params = this.validate({ id: 'number' });
+        const formId = params.id;
+        delete params.id;
 
-		params.organizationId = form.organizationId;
-		params.userId = this.getUser().userId || 0;
-		params.formId = formId;
+        const form = await this.model.lessonOrganizationForms
+            .findOne({ where: { id: formId } })
+            .then(o => o && o.toJSON());
+        if (!form) return this.throw(400);
 
-		const submit = await this.model.lessonOrganizationFormSubmits.create(params);
+        params.organizationId = form.organizationId;
+        params.userId = this.getUser().userId || 0;
+        params.formId = formId;
 
-		return this.success(submit);
-	}
+        const submit = await this.model.lessonOrganizationFormSubmits.create(
+            params
+        );
 
-	async getSubmit() {
-		let {userId, organizationId, roleId} = this.authenticated();
-		const params = this.validate({id: "number"});
-		if (!organizationId && !params.organizationId) return this.throw(400);
-		if (params.organizationId && params.organizationId != organizationId) {
-			organizationId = params.organizationId;
-			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
-		}
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
-		
+        return this.success(submit);
+    }
 
-		const {id} = params;
-		const result = await this.model.lessonOrganizationFormSubmits.findAndCountAll({...this.queryOptions, where:{formId:id}});
+    async getSubmit() {
+        let { userId, organizationId, roleId } = this.authenticated();
+        const params = this.validate({ id: 'number' });
+        if (!organizationId && !params.organizationId) return this.throw(400);
+        if (params.organizationId && params.organizationId !== organizationId) {
+            organizationId = params.organizationId;
+            roleId = await this.ctx.service.organization.getRoleId(
+                organizationId,
+                userId
+            );
+        }
+        if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
 
-		return this.success(result);
-	}
+        const { id } = params;
+        const result = await this.model.lessonOrganizationFormSubmits.findAndCountAll(
+            { ...this.queryOptions, where: { formId: id } }
+        );
 
-	async updateSubmit() {
-		let {userId, organizationId, roleId} = this.authenticated();
-		const params = this.validate({id:"number", submitId: "number"});
+        return this.success(result);
+    }
 
-		if (!organizationId && !params.organizationId) return this.throw(400);
-		if (params.organizationId && params.organizationId != organizationId) {
-			organizationId = params.organizationId;
-			roleId = await this.ctx.service.organization.getRoleId(organizationId, userId);
-		}
-		if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
+    async updateSubmit() {
+        let { userId, organizationId, roleId } = this.authenticated();
+        const params = this.validate({ id: 'number', submitId: 'number' });
 
-		const {id, submitId, comment, state, quizzes} = params;
+        if (!organizationId && !params.organizationId) return this.throw(400);
+        if (params.organizationId && params.organizationId !== organizationId) {
+            organizationId = params.organizationId;
+            roleId = await this.ctx.service.organization.getRoleId(
+                organizationId,
+                userId
+            );
+        }
+        if (roleId < CLASS_MEMBER_ROLE_ADMIN) return this.throw(400);
 
-		const ok = await this.model.lessonOrganizationFormSubmits.update({comment, state, quizzes}, {where:{id:submitId, formId:id}});
+        const { id, submitId, comment, state, quizzes } = params;
 
-		return this.success(ok);
-	}
-}
+        const ok = await this.model.lessonOrganizationFormSubmits.update(
+            { comment, state, quizzes },
+            { where: { id: submitId, formId: id } }
+        );
+
+        return this.success(ok);
+    }
+};
 
 module.exports = LessonOrganizationForm;

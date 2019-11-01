@@ -1,52 +1,50 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, STRING, TEXT, JSON } = app.Sequelize;
 
-	const model = app.model.define("activities", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                    // 用户
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'activities',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		action: {                    // 行为
-			type: STRING, 
-			defaultValue: "",
-		},
+            userId: {
+                // 用户
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		description: {               // 描述
-			type: TEXT,
-			defaultValue:"",
-		},
+            action: {
+                // 行为
+                type: STRING,
+                defaultValue: '',
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue:{},
-		},
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            description: {
+                // 描述
+                type: TEXT,
+                defaultValue: '',
+            },
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.activities = model;
-	return model;
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
+
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
+
+    app.model.activities = model;
+    return model;
 };
-

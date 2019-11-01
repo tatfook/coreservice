@@ -1,4 +1,4 @@
-
+'use strict';
 module.exports = app => {
     const { router, config, controller } = app;
     const selfConfig = config.self;
@@ -14,7 +14,7 @@ module.exports = app => {
     router.get(`${prefix}migrations/generateAll`, migration.generateAll);
 
     const keepwork = controller.keepwork;
-    //router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
+    // router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
     router.post(`${prefix}keepworks/email`, keepwork.email);
     router.get(`${prefix}keepworks/captcha/:key`, keepwork.captcha);
     router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
@@ -24,10 +24,22 @@ module.exports = app => {
     router.get(`${prefix}keepworks/ip`, keepwork.ip);
     router.post(`${prefix}keepworks/page_visit`, keepwork.postPageVisit);
     router.get(`${prefix}keepworks/page_visit`, keepwork.getPageVisit);
-    router.post(`${prefix}keepworks/paracraft_download_count`, keepwork.postParacraftDownloadCount);
-    router.get(`${prefix}keepworks/paracraft_download_count`, keepwork.getParacraftDownloadCount);
-    router.post(`${prefix}keepworks/paracraft_download_url`, keepwork.setParacraftDownloadUrl);
-    router.get(`${prefix}keepworks/paracraft_download_url`, keepwork.getParacraftDownloadUrl);
+    router.post(
+        `${prefix}keepworks/paracraft_download_count`,
+        keepwork.postParacraftDownloadCount
+    );
+    router.get(
+        `${prefix}keepworks/paracraft_download_count`,
+        keepwork.getParacraftDownloadCount
+    );
+    router.post(
+        `${prefix}keepworks/paracraft_download_url`,
+        keepwork.setParacraftDownloadUrl
+    );
+    router.get(
+        `${prefix}keepworks/paracraft_download_url`,
+        keepwork.getParacraftDownloadUrl
+    );
 
     const user = controller.user;
     router.get(`${prefix}users/rank`, user.rank);
@@ -146,12 +158,19 @@ module.exports = app => {
     router.resources(`${prefix}tags`, tag);
 
     const project = controller.project;
-    router.get(`${prefix}projects/importProjectCover`, project.importProjectCover);
+    router.get(
+        `${prefix}projects/importProjectCover`,
+        project.importProjectCover
+    );
     router.get(`${prefix}projects/import`, project.importProject);
     router.get(`${prefix}projects/:id/status`, project.status);
     router.get(`${prefix}projects/:id/game`, project.game);
     router.get(`${prefix}projects/join`, project.join);
     router.post(`${prefix}projects/search`, project.search);
+    router.post(
+        `${prefix}projects/searchForParacraft`,
+        project.searchForParacraft
+    );
     router.get(`${prefix}projects/:id/detail`, project.detail);
     router.get(`${prefix}projects/:id/visit`, project.visit);
     router.get(`${prefix}projects/:id/star`, project.isStar);
@@ -186,7 +205,10 @@ module.exports = app => {
 
     const convert = controller.convert;
     router.get(`${prefix}converts`, convert.convert);
-    router.get(`${prefix}converts/siteVisibility`, convert.convertSiteVisibility);
+    router.get(
+        `${prefix}converts/siteVisibility`,
+        convert.convertSiteVisibility
+    );
     router.get(`${prefix}converts/siteFile`, convert.convertSiteFile);
     router.get(`${prefix}converts/userEmail`, convert.userEmail);
     router.get(`${prefix}converts/users`, convert.users);
@@ -205,6 +227,19 @@ module.exports = app => {
     router.put(`${prefix}admins/:resources/bulk`, admin.bulkUpdate);
     router.delete(`${prefix}admins/:resources/bulk`, admin.bulkDestroy);
     router.resources(`${prefix}admins/:resources`, admin);
+    // 标签和项目相关
+    router.post(
+        `${prefix}admins/projects/:projectId/systemTags`,
+        admin.createProjectTags
+    );
+    router.put(
+        `${prefix}admins/projects/:projectId/systemTags/:tagId`,
+        admin.updateProjectTag
+    );
+    router.delete(
+        `${prefix}admins/projects/:projectId/systemTags`,
+        admin.deleteProjectTags
+    );
 
     const order = controller.order;
     router.post(`${prefix}orders/charge`, order.charge);
@@ -218,7 +253,7 @@ module.exports = app => {
     router.resources(`${prefix}discounts`, discount);
 
     const goods = controller.goods;
-    //router.all(`${prefix}goods/importOldData`, goods.importOldData);
+    // router.all(`${prefix}goods/importOldData`, goods.importOldData);
     router.post(`${prefix}goods/search`, goods.search);
     router.resources(`${prefix}goods`, goods);
 
@@ -229,7 +264,7 @@ module.exports = app => {
     router.resources(`${prefix}worlds`, world);
 
     const sensitiveWord = controller.sensitiveWord;
-    //router.get(`${prefix}sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
+    // router.get(`${prefix}sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
     router.get(`${prefix}sensitiveWords/trim`, sensitiveWord.trim);
     router.all(`${prefix}sensitiveWords/check`, sensitiveWord.check);
     router.post(`${prefix}sensitiveWords/import`, sensitiveWord.importWords);
@@ -238,29 +273,50 @@ module.exports = app => {
     // 探索APP
     const paracraftGameCoinKey = controller.paracraftGameCoinKey;
     const paracraftDevice = controller.paracraftDevice;
-    router.get(`${prefix}paracraftDevices/pwdVerify`, paracraftDevice.pwdVerify);
-    router.post(`${prefix}paracraftGameCoinKeys/active`, paracraftGameCoinKey.active);
+    router.get(
+        `${prefix}paracraftDevices/pwdVerify`,
+        paracraftDevice.pwdVerify
+    );
+    router.post(
+        `${prefix}paracraftGameCoinKeys/active`,
+        paracraftGameCoinKey.active
+    );
 
     // paracraft 官网
     const paracraftVisitor = controller.paracraftVisitor;
     router.post(`${prefix}paracraftVisitors/upsert`, paracraftVisitor.upsert);
 
-    const paracraftNews = controller.paracrafNews;
-    router.get(`${prefix}paracraftNews`, paracraftVisitor.index);
+    const paracraftNews = controller.paracraftNews;
+    router.get(`${prefix}paracraftNews`, paracraftNews.index);
 
     // 反馈 投诉 举报
     const feedback = controller.feedback;
     router.resources(`${prefix}feedbacks`, feedback);
 
     // wikicraft proxy
-    router.all("/api/wiki/models/user/login", controller.proxyUser.login);
-    router.all("/api/wiki/models/user/register", controller.proxyUser.register);
-    router.all("/api/wiki/models/user/getProfile", controller.proxyUser.profile);
-    router.all("/api/wiki/models/user/changepw", controller.proxyUser.changepw);
-    router.all("/api/wiki/models/user/batchChangePwd", controller.proxyUser.batchChangePwd);
-    router.all("/api/wiki/models/user/getBaseInfoByName", controller.proxyUser.getBaseInfoByName);
-    router.all("/api/wiki/models/oauth_app/agreeOauth", controller.proxyOauthApp.agreeOauth);
-    router.all("/api/wiki/models/oauth_app/getTokenByCode", controller.proxyOauthApp.getTokenByCode);
+    router.all('/api/wiki/models/user/login', controller.proxyUser.login);
+    router.all('/api/wiki/models/user/register', controller.proxyUser.register);
+    router.all(
+        '/api/wiki/models/user/getProfile',
+        controller.proxyUser.profile
+    );
+    router.all('/api/wiki/models/user/changepw', controller.proxyUser.changepw);
+    router.all(
+        '/api/wiki/models/user/batchChangePwd',
+        controller.proxyUser.batchChangePwd
+    );
+    router.all(
+        '/api/wiki/models/user/getBaseInfoByName',
+        controller.proxyUser.getBaseInfoByName
+    );
+    router.all(
+        '/api/wiki/models/oauth_app/agreeOauth',
+        controller.proxyOauthApp.agreeOauth
+    );
+    router.all(
+        '/api/wiki/models/oauth_app/getTokenByCode',
+        controller.proxyOauthApp.getTokenByCode
+    );
 
     // NPL 大赛
     const game = controller.game;
@@ -275,57 +331,137 @@ module.exports = app => {
     router.post(`${prefix}gameWorks/snapshoot`, gameWorks.snapshoot);
     router.resources(`${prefix}gameWorks`, gameWorks);
 
-    // LESSON three 
+    // LESSON three
     const lessonOrganization = controller.lessonOrganization;
     router.get(`${prefix}lessonOrganizations/token`, lessonOrganization.token);
-    router.get(`${prefix}lessonOrganizations/packages`, lessonOrganization.packages);
-    router.get(`${prefix}lessonOrganizations/packageDetail`, lessonOrganization.packageDetail);
-    router.get(`${prefix}lessonOrganizations/getByName`, lessonOrganization.getByName);
-    router.get(`${prefix}lessonOrganizations/getByUrl`, lessonOrganization.getByUrl);
+    router.get(
+        `${prefix}lessonOrganizations/packages`,
+        lessonOrganization.packages
+    );
+    router.get(
+        `${prefix}lessonOrganizations/packageDetail`,
+        lessonOrganization.packageDetail
+    );
+    router.get(
+        `${prefix}lessonOrganizations/getByName`,
+        lessonOrganization.getByName
+    );
+    router.get(
+        `${prefix}lessonOrganizations/getByUrl`,
+        lessonOrganization.getByUrl
+    );
     router.post(`${prefix}lessonOrganizations/login`, lessonOrganization.login);
-    router.post(`${prefix}lessonOrganizations/search`, lessonOrganization.search);
+    router.post(
+        `${prefix}lessonOrganizations/search`,
+        lessonOrganization.search
+    );
     router.resources(`${prefix}lessonOrganizations`, lessonOrganization);
-    //router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
-    //router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
-    //router.put(`${prefix}lessonOrganizations/:id`, lessonOrganization.update);
+    // router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
+    // router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
+    // router.put(`${prefix}lessonOrganizations/:id`, lessonOrganization.update);
 
     // organization class
     const lessonOrganizationClass = controller.lessonOrganizationClass;
-    router.get(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.index);
-    router.get(`${prefix}lessonOrganizationClasses/history`, lessonOrganizationClass.history);
-    router.post(`${prefix}lessonOrganizationClasses`, lessonOrganizationClass.create);
-    router.get(`${prefix}lessonOrganizationClasses/:id/project`, lessonOrganizationClass.latestProject);
-    router.put(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.update);
-    router.delete(`${prefix}lessonOrganizationClasses/:id`, lessonOrganizationClass.destroy);
+    router.get(
+        `${prefix}lessonOrganizationClasses`,
+        lessonOrganizationClass.index
+    );
+    router.get(
+        `${prefix}lessonOrganizationClasses/history`,
+        lessonOrganizationClass.history
+    );
+    router.post(
+        `${prefix}lessonOrganizationClasses`,
+        lessonOrganizationClass.create
+    );
+    router.get(
+        `${prefix}lessonOrganizationClasses/:id/project`,
+        lessonOrganizationClass.latestProject
+    );
+    router.put(
+        `${prefix}lessonOrganizationClasses/:id`,
+        lessonOrganizationClass.update
+    );
+    router.delete(
+        `${prefix}lessonOrganizationClasses/:id`,
+        lessonOrganizationClass.destroy
+    );
 
-    // organization class member 
-    const lessonOrganizationClassMember = controller.lessonOrganizationClassMember;
-    router.get(`${prefix}lessonOrganizationClassMembers/student`, lessonOrganizationClassMember.student);
-    router.get(`${prefix}lessonOrganizationClassMembers/teacher`, lessonOrganizationClassMember.teacher);
-    router.post(`${prefix}lessonOrganizationClassMembers/bulk`, lessonOrganizationClassMember.bulkCreate);
-    router.resources(`${prefix}lessonOrganizationClassMembers`, lessonOrganizationClassMember);
+    // organization class member
+    const lessonOrganizationClassMember =
+        controller.lessonOrganizationClassMember;
+    router.get(
+        `${prefix}lessonOrganizationClassMembers/student`,
+        lessonOrganizationClassMember.student
+    );
+    router.get(
+        `${prefix}lessonOrganizationClassMembers/teacher`,
+        lessonOrganizationClassMember.teacher
+    );
+    router.post(
+        `${prefix}lessonOrganizationClassMembers/bulk`,
+        lessonOrganizationClassMember.bulkCreate
+    );
+    router.resources(
+        `${prefix}lessonOrganizationClassMembers`,
+        lessonOrganizationClassMember
+    );
 
     // organization activate code
-    const lessonOrganizationActivateCode = controller.lessonOrganizationActivateCode;
-    router.post(`${prefix}lessonOrganizationActivateCodes/activate`, lessonOrganizationActivateCode.activate);
-    router.post(`${prefix}lessonOrganizationActivateCodes/search`, lessonOrganizationActivateCode.index);
-    router.resources(`${prefix}lessonOrganizationActivateCodes`, lessonOrganizationActivateCode);
+    const lessonOrganizationActivateCode =
+        controller.lessonOrganizationActivateCode;
+    router.post(
+        `${prefix}lessonOrganizationActivateCodes/activate`,
+        lessonOrganizationActivateCode.activate
+    );
+    router.post(
+        `${prefix}lessonOrganizationActivateCodes/search`,
+        lessonOrganizationActivateCode.index
+    );
+    router.resources(
+        `${prefix}lessonOrganizationActivateCodes`,
+        lessonOrganizationActivateCode
+    );
 
-    // organization user 
+    // organization user
     const lessonOrganizationUser = controller.lessonOrganizationUser;
-    router.post(`${prefix}lessonOrganizationUsers/batch`, lessonOrganizationUser.batchCreateUser);
-    router.post(`${prefix}lessonOrganizationUsers/unbind`, lessonOrganizationUser.unbind);
-    router.post(`${prefix}lessonOrganizationUsers/setpwd`, lessonOrganizationUser.setpwd);
+    router.post(
+        `${prefix}lessonOrganizationUsers/batch`,
+        lessonOrganizationUser.batchCreateUser
+    );
+    router.post(
+        `${prefix}lessonOrganizationUsers/unbind`,
+        lessonOrganizationUser.unbind
+    );
+    router.post(
+        `${prefix}lessonOrganizationUsers/setpwd`,
+        lessonOrganizationUser.setpwd
+    );
 
     // organization form
     const lessonOrganizationForm = controller.lessonOrganizationForm;
-    router.get(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.getSubmit);
-    router.post(`${prefix}lessonOrganizationForms/:id/submit`, lessonOrganizationForm.postSubmit);
-    router.put(`${prefix}lessonOrganizationForms/:id/submit/:submitId`, lessonOrganizationForm.updateSubmit);
-    router.post(`${prefix}lessonOrganizationForms/search`, lessonOrganizationForm.search);
-    router.resources(`${prefix}lessonOrganizationForms`, lessonOrganizationForm);
+    router.get(
+        `${prefix}lessonOrganizationForms/:id/submit`,
+        lessonOrganizationForm.getSubmit
+    );
+    router.post(
+        `${prefix}lessonOrganizationForms/:id/submit`,
+        lessonOrganizationForm.postSubmit
+    );
+    router.put(
+        `${prefix}lessonOrganizationForms/:id/submit/:submitId`,
+        lessonOrganizationForm.updateSubmit
+    );
+    router.post(
+        `${prefix}lessonOrganizationForms/search`,
+        lessonOrganizationForm.search
+    );
+    router.resources(
+        `${prefix}lessonOrganizationForms`,
+        lessonOrganizationForm
+    );
 
-    // organization 
+    // organization
     const organization = controller.organization.index;
     router.post(`${prefix}organizations/log`, organization.log);
     router.post(`${prefix}organizations/changepwd`, organization.changepwd);
@@ -342,5 +478,4 @@ module.exports = app => {
     router.get(`${prefix}pBlocks/system`, pBlock.system);
     router.post(`${prefix}pBlocks/:id/use`, pBlock.use);
     router.resources(`${prefix}pBlocks`, pBlock);
-
-}
+};
