@@ -26,7 +26,7 @@ module.exports = {
                     const tags = await queryInterface.sequelize.query(
                         'SELECT id FROM systemTags where classify=1 and tagname in (?);',
                         {
-                            replacements: [ classifyTags ],
+                            replacements: [classifyTags],
                             type: Sequelize.QueryTypes.SELECT,
                             transaction,
                         }
