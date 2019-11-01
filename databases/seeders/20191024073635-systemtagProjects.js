@@ -5,13 +5,13 @@ module.exports = {
         const transaction = await queryInterface.sequelize.transaction();
         try {
             // 查询出来所有的项目
-            let projects = await queryInterface.sequelize.query(
+            const projects = await queryInterface.sequelize.query(
                 'SELECT id, classifyTags FROM projects;',
                 { type: Sequelize.QueryTypes.SELECT, transaction }
             );
-            let systemTagProjects = [];
+            const systemTagProjects = [];
             for (let i = 0; i < projects.length; i++) {
-                let project = projects[i];
+                const project = projects[i];
                 let classifyTags =
                     project.classifyTags && project.classifyTags.split('|');
                 classifyTags =
@@ -19,12 +19,11 @@ module.exports = {
                     classifyTags.filter(tag => {
                         if (tag) {
                             return true;
-                        } else {
-                            return false;
                         }
+                        return false;
                     });
                 if (classifyTags && classifyTags.length) {
-                    let tags = await queryInterface.sequelize.query(
+                    const tags = await queryInterface.sequelize.query(
                         'SELECT id FROM systemTags where classify=1 and tagname in (?);',
                         {
                             replacements: [classifyTags],
@@ -68,7 +67,7 @@ module.exports = {
             await transaction.commit();
         } catch (error) {
             await transaction.rollback();
-            throw err;
+            throw error;
         }
     },
 };
