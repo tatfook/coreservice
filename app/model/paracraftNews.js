@@ -1,54 +1,52 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, STRING, TEXT, JSON, DATE } = app.Sequelize;
 
-	const model = app.model.define("paracraftNews", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		title: {                       // 标题
-			type:STRING,
-			defaultValue:"",
-		},
+    const model = app.model.define(
+        'paracraftNews',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		description: {                 // 描述
-			type: TEXT,
-		},
+            title: {
+                // 标题
+                type: STRING,
+                defaultValue: '',
+            },
 
-		date: {                        // 发布日期
-			type:DATE,
-		},
+            description: {
+                // 描述
+                type: TEXT,
+            },
 
-		url: {                         // 地址
-			type: STRING,
-		},
+            date: {
+                // 发布日期
+                type: DATE,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+            url: {
+                // 地址
+                type: STRING,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	//model.sync({force:true});
-	
-	app.model.paracraftNews = model;
+    // model.sync({force:true});
 
-	return model;
+    app.model.paracraftNews = model;
+
+    return model;
 };
-

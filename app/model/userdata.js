@@ -1,81 +1,44 @@
-
-const _ = require("lodash");
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, JSON } = app.Sequelize;
 
-	const model = app.model.define("userdatas", {
-		userId: {
-			type: BIGINT,
-			primaryKey: true,
-		},
+    const model = app.model.define(
+        'userdatas',
+        {
+            userId: {
+                type: BIGINT,
+                primaryKey: true,
+            },
 
-		data: {
-			type: JSON,
-			defaultValue: {},
-		},
+            data: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+    model.get = async function(userId) {
+        const data =
+            (await app.model.userdatas
+                .findOne({ where: { userId } })
+                .then(o => o && o.toJSON())) || {};
 
-	model.get = async function(userId) {
-		const data = await app.model.userdatas.findOne({where:{userId}}).then(o => o && o.toJSON()) || {};
+        return data.data || {};
+    };
 
-		return data.data || {};
-	}
+    model.set = async function(userId, data) {
+        return await app.model.userdatas.upsert({ userId, data });
+    };
 
-	model.set =  async function(userId, data) {
-		return await app.model.userdatas.upsert({userId, data});
-	}
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.userdatas = model;
-	return model;
+    app.model.userdatas = model;
+    return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

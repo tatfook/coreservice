@@ -1,70 +1,66 @@
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, STRING, TEXT, JSON } = app.Sequelize;
 
-	const model = app.model.define("oauthApps", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {  // 文件所属者
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'oauthApps',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		appName: {
-			type: STRING,
-			defaultValue:"",
-			allowNull: false,
-		},
+            userId: {
+                // 文件所属者
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		clientId: {
-			type: STRING,
-			unique: true,
-			defaultValue:"",
-		},
+            appName: {
+                type: STRING,
+                defaultValue: '',
+                allowNull: false,
+            },
 
-		clientSecret: {
-			type: STRING,
-			defaultValue:"",
-		},
+            clientId: {
+                type: STRING,
+                unique: true,
+                defaultValue: '',
+            },
 
-		description: {
-			type: TEXT,
-		},
+            clientSecret: {
+                type: STRING,
+                defaultValue: '',
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+            description: {
+                type: TEXT,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "appName"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'userId', 'appName' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true}).then(() => {
-		//console.log("create table successfully");
-	//});
-	
-	app.model.oauthApps = model;
+    // model.sync({force:true}).then(() => {
+    // console.log("create table successfully");
+    // });
 
-	return model;
+    app.model.oauthApps = model;
+
+    return model;
 };
-
-

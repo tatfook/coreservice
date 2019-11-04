@@ -1,275 +1,255 @@
-const _ = require("lodash");
-const consts = require("../core/consts.js");
+/* eslint-disable no-magic-numbers */
+'use strict';
+const _ = require('lodash');
+const consts = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const {
-		ENTITY_TYPE_USER,
-		ENTITY_TYPE_SITE,
-		ENTITY_TYPE_PAGE,
-		ENTITY_TYPE_GROUP,
+    const {
+        ENTITY_TYPE_SITE,
 
-		ENTITY_VISIBILITY_PUBLIC,
-		ENTITY_VISIBILITY_PRIVATE,
+        ENTITY_TYPE_GROUP,
 
-		USER_ACCESS_LEVEL_NONE,
-		USER_ACCESS_LEVEL_READ,
-		USER_ACCESS_LEVEL_WRITE,
-	} = consts;
+        ENTITY_VISIBILITY_PRIVATE,
 
-	const attrs = {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+        USER_ACCESS_LEVEL_NONE,
+        USER_ACCESS_LEVEL_READ,
+        USER_ACCESS_LEVEL_WRITE,
+    } = consts;
 
-		username: {
-			type: STRING(64),
-		},
+    const attrs = {
+        id: {
+            type: BIGINT,
+            autoIncrement: true,
+            primaryKey: true,
+        },
 
-		sitename: {
-			type: STRING(256),
-			allowNull: false,
-		},
+        userId: {
+            type: BIGINT,
+            allowNull: false,
+        },
 
-		displayName: {
-			type: STRING(64),
-		},
+        username: {
+            type: STRING(64),
+        },
 
-		visibility: {
-			type: INTEGER, // public private
-			defaultValue: 0,
-		},
+        sitename: {
+            type: STRING(256),
+            allowNull: false,
+        },
 
-		description: {
-			type: STRING(1024),
-		},
+        displayName: {
+            type: STRING(64),
+        },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	};
+        visibility: {
+            type: INTEGER, // public private
+            defaultValue: 0,
+        },
 
-	const opts = {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "sitename"],
-		},
-		],
-	}
-	app.model.illegalSites = app.model.define("illegalSites", attrs, opts);
+        description: {
+            type: STRING(1024),
+        },
 
-	const model = app.model.define("sites", attrs, opts);
+        extra: {
+            type: JSON,
+            defaultValue: {},
+        },
+    };
 
-	//model.sync({force:true});
-	model.__hook__ = async function(data, oper) {
-		//if (oper == "update") return;
+    const opts = {
+        underscored: false,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_bin',
+        indexes: [
+            {
+                unique: true,
+                fields: [ 'userId', 'sitename' ],
+            },
+        ],
+    };
+    app.model.illegalSites = app.model.define('illegalSites', attrs, opts);
 
-		const {userId} = data;
+    const model = app.model.define('sites', attrs, opts);
 
-		const count = await app.model.sites.count({where:{userId}});
-		await app.model.userRanks.update({site:count}, {where:{userId}});
-		//await app.model.userRanks.increment({project:1})
-	}
+    // model.sync({force:true});
+    model.__hook__ = async function(data) {
+        // if (oper == "update") return;
 
-	model.get = async function(userId) {
-		const list = await app.model.sites.findAll({where:{userId}});
+        const { userId } = data;
 
-		return list;
-	}
+        const count = await app.model.sites.count({ where: { userId } });
+        await app.model.userRanks.update(
+            { site: count },
+            { where: { userId } }
+        );
+        // await app.model.userRanks.increment({project:1})
+    };
 
-	model.getById = async function(id, userId) {
-		const where = {id};
+    model.get = async function(userId) {
+        const list = await app.model.sites.findAll({ where: { userId } });
 
-		if (userId) where.userId = userId;
+        return list;
+    };
 
-		const data = await app.model.sites.findOne({where: where});
+    model.getById = async function(id, userId) {
+        const where = { id };
 
-		return data && data.get({plain:true});
-	}
+        if (userId) where.userId = userId;
 
-	model.getByName = async function(username, sitename) {
-		const sql = `select sites.*, users.username
+        const data = await app.model.sites.findOne({ where });
+
+        return data && data.get({ plain: true });
+    };
+
+    model.getByName = async function(username, sitename) {
+        const sql = `select sites.*, users.username
 			from users, sites
 			where users.id = sites.userId 
 			and users.username = :username and sites.sitename = :sitename`;
 
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				username,
-				sitename,
-			},
-		});
-		
-		if (list.length == 1) {
-			return list[0];
-		}
+        const list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                username,
+                sitename,
+            },
+        });
 
-		return;
-	}
+        if (list.length === 1) {
+            return list[0];
+        }
 
-	model.isEditableByMemberId = async function(siteId, memberId) {
-		const level = await this.getMemberLevel(siteId, memberId);
+        return;
+    };
 
-		if (level >= USER_ACCESS_LEVEL_WRITE && level < USER_ACCESS_LEVEL_NONE) return true;
+    model.isEditableByMemberId = async function(siteId, memberId) {
+        const level = await this.getMemberLevel(siteId, memberId);
 
-		return false;
-	}
+        if (
+            level >= USER_ACCESS_LEVEL_WRITE &&
+            level < USER_ACCESS_LEVEL_NONE
+        ) {
+            return true;
+        }
 
-	model.isReadableByMemberId = async function(siteId, memberId) {
-		const level = await this.getMemberLevel(siteId, memberId);
+        return false;
+    };
 
-		if (level >= USER_ACCESS_LEVEL_READ && level < USER_ACCESS_LEVEL_NONE) return true;
+    model.isReadableByMemberId = async function(siteId, memberId) {
+        const level = await this.getMemberLevel(siteId, memberId);
 
-		return false;
-	}
+        if (level >= USER_ACCESS_LEVEL_READ && level < USER_ACCESS_LEVEL_NONE) {
+            return true;
+        }
 
-	model.getMemberLevel = async function(siteId, memberId) {
-		let site = await app.model.sites.findOne({where:{id:siteId}});
-		if (!site) return USER_ACCESS_LEVEL_NONE;
-		site = site.get({plain: true});
+        return false;
+    };
 
-		if (!memberId) return site.visibility == ENTITY_VISIBILITY_PRIVATE ? USER_ACCESS_LEVEL_NONE : USER_ACCESS_LEVEL_READ;
+    model.getMemberLevel = async function(siteId, memberId) {
+        let site = await app.model.sites.findOne({ where: { id: siteId } });
+        if (!site) return USER_ACCESS_LEVEL_NONE;
+        site = site.get({ plain: true });
 
-		if (site.userId == memberId) return USER_ACCESS_LEVEL_WRITE;
+        if (!memberId) {
+            return site.visibility === ENTITY_VISIBILITY_PRIVATE
+                ? USER_ACCESS_LEVEL_NONE
+                : USER_ACCESS_LEVEL_READ;
+        }
 
-		let level = 0;
+        if (site.userId === memberId) return USER_ACCESS_LEVEL_WRITE;
 
-		let sql = `select level 
+        let level = 0;
+
+        let sql = `select level 
 			from members
 			where objectId = :objectId and objectType = :objectType and memberId = :memberId`;
-		let list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				objectId:siteId,
-				objectType: ENTITY_TYPE_SITE,
-				memberId,
-			}
-		});
-		
-		_.each(list, val => level = level < val.level ? val.level : level);
+        let list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                objectId: siteId,
+                objectType: ENTITY_TYPE_SITE,
+                memberId,
+            },
+        });
 
-		sql = `select siteGroups.level 
+        _.each(list, val => (level = level < val.level ? val.level : level));
+
+        sql = `select siteGroups.level 
 			from siteGroups, members 
 			where siteGroups.groupId = members.objectId  and members.objectType = :objectType 
 			and siteGroups.siteId = :siteId and members.memberId = :memberId`;
 
-		list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				objectType: ENTITY_TYPE_GROUP,
-				siteId: siteId,
-				memberId: memberId,
-			}
-		});
+        list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                objectType: ENTITY_TYPE_GROUP,
+                siteId,
+                memberId,
+            },
+        });
 
-		_.each(list, val => level = level < val.level ? val.level : level);
+        _.each(list, val => (level = level < val.level ? val.level : level));
 
-		level = level ? level : (site.visibility == ENTITY_VISIBILITY_PRIVATE ? USER_ACCESS_LEVEL_NONE : USER_ACCESS_LEVEL_READ);
+        level = level
+            ? level
+            : site.visibility === ENTITY_VISIBILITY_PRIVATE
+                ? USER_ACCESS_LEVEL_NONE
+                : USER_ACCESS_LEVEL_READ;
 
-		return level;
-	}
+        return level;
+    };
 
-	model.getJoinSites = async function(userId, level) {
-		level = level || USER_ACCESS_LEVEL_WRITE;
+    model.getJoinSites = async function(userId, level) {
+        level = level || USER_ACCESS_LEVEL_WRITE;
 
-		const sql = `select sites.*, users.username, siteGroups.level 
+        const sql = `select sites.*, users.username, siteGroups.level 
 			from sites, siteGroups, members, users 
 			where sites.id = siteGroups.siteId and siteGroups.groupId = members.objectId and members.objectType = :objectType and sites.userId = users.id
 			and members.memberId = :memberId and siteGroups.level >= :level`;
 
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements: {
-				objectType: ENTITY_TYPE_GROUP,
-				memberId: userId,
-				level: level,
-			}
-		});
+        const list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                objectType: ENTITY_TYPE_GROUP,
+                memberId: userId,
+                level,
+            },
+        });
 
-		const refuseSiteId = [];
-		_.each(list, site => {if (site.level == USER_ACCESS_LEVEL_NONE) refuseSiteId.push(site.id)});
-		_.remove(list, o => refuseSiteId.indexOf(o.id) >= 0);
+        const refuseSiteId = [];
+        _.each(list, site => {
+            if (site.level === USER_ACCESS_LEVEL_NONE) {
+                refuseSiteId.push(site.id);
+            }
+        });
+        _.remove(list, o => refuseSiteId.indexOf(o.id) >= 0);
 
-		return _.uniqBy(list, "id");
+        return _.uniqBy(list, 'id');
+    };
 
-	}
-
-	model.getSiteGroups = async function(userId, siteId) {
-		const sql = `select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname 
+    model.getSiteGroups = async function(userId, siteId) {
+        const sql = `select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname 
 			from siteGroups, groups
 		   	where siteGroups.groupId = groups.id 
 			and siteGroups.userId = :userId and siteGroups.siteId = :siteId`;
 
-		const list = await app.model.query(sql, {
-			type: app.model.QueryTypes.SELECT,
-			replacements:{
-				userId,
-				siteId,
-			}
-		});
+        const list = await app.model.query(sql, {
+            type: app.model.QueryTypes.SELECT,
+            replacements: {
+                userId,
+                siteId,
+            },
+        });
 
-		return list;
-	}
+        return list;
+    };
 
-	model.getCountByUserId = async function(userId) {
-		return await app.model.sites.count({where:{userId}});
-	}
+    model.getCountByUserId = async function(userId) {
+        return await app.model.sites.count({ where: { userId } });
+    };
 
-	app.model.sites = model;
-	return model;
+    app.model.sites = model;
+    return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

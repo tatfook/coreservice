@@ -1,63 +1,57 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, JSON } = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationPackages", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		organizationId: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'lessonOrganizationPackages',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		classId: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            organizationId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		packageId: {
-			type: BIGINT,
-			defaultValue:0,
-		},
-		
-		lessons: {
-			type: JSON,
-		},
+            classId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+            packageId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+            lessons: {
+                type: JSON,
+            },
 
-		indexes: [
-		{
-			unique: true,
-			fields: ["organizationId", "classId", "packageId"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
 
-	//model.sync({force:true});
-	
-	app.model.lessonOrganizationPackages = model;
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'organizationId', 'classId', 'packageId' ],
+                },
+            ],
+        }
+    );
 
-	return model;
+    // model.sync({force:true});
+
+    app.model.lessonOrganizationPackages = model;
+
+    return model;
 };
-

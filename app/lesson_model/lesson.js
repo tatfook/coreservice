@@ -1,64 +1,61 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		STRING,
-		INTEGER,
-		DATE,
-		JSON,
-		TEXT,
-	} = app.Sequelize;
-	
-	const model = app.lessonModel.define("lessons", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+    const { BIGINT, STRING, JSON, TEXT } = app.Sequelize;
 
-		userId: {
-			type: BIGINT,
-			allowNull: false,
-		},
+    const model = app.lessonModel.define(
+        'lessons',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		lessonName: {
-			type: STRING,
-			allowNull: false,
-		},
+            userId: {
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		subjectId: {
-			type: BIGINT,
-		},
+            lessonName: {
+                type: STRING,
+                allowNull: false,
+            },
 
-		url: {
-			type: STRING,
-			unique: true,
-			//allowNull: false,
-		},
+            subjectId: {
+                type: BIGINT,
+            },
 
-		coursewareUrl: {            // 课程URL 允许为空
-			type: STRING,
-		},
+            url: {
+                type: STRING,
+                unique: true,
+                // allowNull: false,
+            },
 
-		goals: {
-			type: TEXT,
-		},
+            coursewareUrl: {
+                // 课程URL 允许为空
+                type: STRING,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {
-				coverUrl: "",
-				vedioUrl: "",
-			},
-		},
+            goals: {
+                type: TEXT,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {
+                    coverUrl: '',
+                    vedioUrl: '',
+                },
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	app.lessonModel.lessons = model;
+    app.lessonModel.lessons = model;
 
-	return model;
-}
+    return model;
+};

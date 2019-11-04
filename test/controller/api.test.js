@@ -1,10 +1,7 @@
+const { app, mock, assert } = require('egg-mock/bootstrap');
 
-const { app, mock, assert  } = require('egg-mock/bootstrap');
+describe('/api', () => {
+    before(async () => {});
 
-describe("/api", () => {
-	before(async () => {
-	});
-
-	it("api", async()=> {
-	});
+    it('api', async () => {});
 });

@@ -1,75 +1,72 @@
-
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON, DATE } = app.Sequelize;
 
-	const model = app.model.define("lessonOrganizationActivateCodes", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+    const model = app.model.define(
+        'lessonOrganizationActivateCodes',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		organizationId: {
-			type: BIGINT,
-			defaultValue:0,
-		},
-		
-		classId: {                // 班级Id
-			type: BIGINT,
-			defaultValue:0,
-		},
+            organizationId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		key: {                    // 激活码
-			type: STRING,
-			unique: true,
-			allowNull: false,
-		},
+            classId: {
+                // 班级Id
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		state: {                  // 0 - 未激活 1 - 已激活
-			type: INTEGER,
-			defaultValue: 0,
-		},
+            key: {
+                // 激活码
+                type: STRING,
+                unique: true,
+                allowNull: false,
+            },
 
-		activateUserId: {
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            state: {
+                // 0 - 未激活 1 - 已激活
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		activateTime: {
-			type: DATE,
-		},
+            activateUserId: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		username: {
-			type: STRING,
-		},
+            activateTime: {
+                type: DATE,
+            },
 
-		realname: {
-			type: STRING,
-		},
+            username: {
+                type: STRING,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
+            realname: {
+                type: STRING,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	//model.sync({force:true});
-	
-	app.model.lessonOrganizationActivateCodes = model;
+    // model.sync({force:true});
 
-	return model;
+    app.model.lessonOrganizationActivateCodes = model;
+
+    return model;
 };
-

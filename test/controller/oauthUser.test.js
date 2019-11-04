@@ -1,10 +1,7 @@
+const { app, mock, assert } = require('egg-mock/bootstrap');
 
-const { app, mock, assert  } = require('egg-mock/bootstrap');
+describe('oauth user', () => {
+    before(async () => {});
 
-describe("oauth user", () => {
-	before(async ()=>{
-	});
-
-	it("github oauth", async ()=> {
-	});
+    it('github oauth', async () => {});
 });

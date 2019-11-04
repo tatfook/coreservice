@@ -1,188 +1,168 @@
-
-const _ = require("lodash");
+/* eslint-disable no-magic-numbers */
+'use strict';
+const _ = require('lodash');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
-	const attrs = {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		username: {
-			type: STRING(48),
-			unique: true,
-			allowNull: false,
-		},
+    const attrs = {
+        id: {
+            type: BIGINT,
+            autoIncrement: true,
+            primaryKey: true,
+        },
 
-		password: {
-			type: STRING(48),
-			allowNull: false,
-		},
+        username: {
+            type: STRING(48),
+            unique: true,
+            allowNull: false,
+        },
 
-		roleId: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+        password: {
+            type: STRING(48),
+            allowNull: false,
+        },
 
-		channel: {    // 注册渠道 0 -- keepwork 1 -- haqi 2 -- haqi2 3 -- paracraft  4 -- qq hall 
-			type: INTEGER,
-			defaultValue: 0,
-		},
+        roleId: {
+            type: INTEGER,
+            defaultValue: 0,
+        },
 
-		email: {      // 邮箱
-			type: STRING(64),
-			unique: true,
-		},
+        channel: {
+            // 注册渠道 0 -- keepwork 1 -- haqi 2 -- haqi2 3 -- paracraft  4 -- qq hall
+            type: INTEGER,
+            defaultValue: 0,
+        },
 
-		cellphone: {  // 绑定手机号
-			type: STRING(24),
-			unique: true,
-		},
+        email: {
+            // 邮箱
+            type: STRING(64),
+            unique: true,
+        },
 
-		realname: {    // 实名手机号
-			type: STRING(24),
-		},
+        cellphone: {
+            // 绑定手机号
+            type: STRING(24),
+            unique: true,
+        },
 
-		nickname: {    // 昵称
-			type: STRING(48),
-		},
+        realname: {
+            // 实名手机号
+            type: STRING(24),
+        },
 
-		portrait: {
-			type: STRING(1024),
-		},
+        nickname: {
+            // 昵称
+            type: STRING(48),
+        },
 
-		sex: {
-			type: STRING(4),
-		},
+        portrait: {
+            type: STRING(1024),
+        },
 
-		description: {
-			type: STRING(512),
-		},
+        sex: {
+            type: STRING(4),
+        },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		},
-	};
+        description: {
+            type: STRING(512),
+        },
 
-	const opts = {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	}
+        extra: {
+            type: JSON,
+            defaultValue: {},
+        },
+    };
 
-	app.model.illegalUsers = app.model.define("illegalUsers", attrs, opts);
+    const opts = {
+        underscored: false,
+        charset: 'utf8mb4',
+        collate: 'utf8mb4_bin',
+    };
 
-	const model = app.model.define("users", attrs, opts);
+    app.model.illegalUsers = app.model.define('illegalUsers', attrs, opts);
 
-	//model.sync({force:true});
+    const model = app.model.define('users', attrs, opts);
 
-	model.get = async function(id) {
-		if (_.toNumber(id)) {
-			return await this.getById(_.toNumber(id));
-		}
-		
-		return await this.getByName(id);
-	}
+    // model.sync({force:true});
 
-	model.getByName = async function(username) {
-		const data = await app.model.users.findOne({
-			where: {username},
-			attributes: {
-				exclude: ["password"],
-			},
-		});
+    model.get = async function(id) {
+        if (_.toNumber(id)) {
+            return await this.getById(_.toNumber(id));
+        }
 
-		return data && data.get({plain:true});
-	}
+        return await this.getByName(id);
+    };
 
-	model.getBaseInfoById = async function(userId) {
-		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
+    model.getByName = async function(username) {
+        const data = await app.model.users.findOne({
+            where: { username },
+            attributes: {
+                exclude: [ 'password' ],
+            },
+        });
 
-		const data = await app.model.users.findOne({where:{id:userId}, attributes});
-		if (!data) return {};
+        return data && data.get({ plain: true });
+    };
 
-		const user =  data.get({plain:true});
-		user.id = user.userId;
+    model.getBaseInfoById = async function(userId) {
+        const attributes = [
+            [ 'id', 'userId' ],
+            'username',
+            'nickname',
+            'portrait',
+            'description',
+        ];
 
-		return user;
-	}
+        const data = await app.model.users.findOne({
+            where: { id: userId },
+            attributes,
+        });
+        if (!data) return {};
 
-	model.getById = async function(userId) {
-		const data = await app.model.users.findOne({
-			where: {id:userId},
-			attributes: {
-				exclude: ["password"],
-			},
-		});
+        const user = data.get({ plain: true });
+        user.id = user.userId;
 
-		return data && data.get({plain:true});
-	}
+        return user;
+    };
 
-	model.getUsers = async function(userIds = []) {
-		const attributes = [["id", "userId"], "username", "nickname", "portrait", "description"];
-		const list = await app.model.users.findAll({
-			attributes,
-			where: {
-				id: {
-					[app.Sequelize.Op.in]: userIds,
-				}
-			}
-		});
+    model.getById = async function(userId) {
+        const data = await app.model.users.findOne({
+            where: { id: userId },
+            attributes: {
+                exclude: [ 'password' ],
+            },
+        });
 
-		const users = {};
-		_.each(list, o => {
-			o = o.get ? o.get({plain:true}) : o;
-			users[o.userId] = o;
-		});
+        return data && data.get({ plain: true });
+    };
 
-		return users;
-	}
+    model.getUsers = async function(userIds = []) {
+        const attributes = [
+            [ 'id', 'userId' ],
+            'username',
+            'nickname',
+            'portrait',
+            'description',
+        ];
+        const list = await app.model.users.findAll({
+            attributes,
+            where: {
+                id: {
+                    [app.Sequelize.Op.in]: userIds,
+                },
+            },
+        });
 
-	app.model.users = model;
-	return model;
+        const users = {};
+        _.each(list, o => {
+            o = o.get ? o.get({ plain: true }) : o;
+            users[o.userId] = o;
+        });
+
+        return users;
+    };
+
+    app.model.users = model;
+    return model;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

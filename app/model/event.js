@@ -1,51 +1,42 @@
-
-const _ = require("lodash");
+'use strict';
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, JSON } = app.Sequelize;
 
-	const model = app.model.define("events", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		eventId: {
-			type: INTEGER,
-			defaultValue: 0,
-		},
+    const model = app.model.define(
+        'events',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		value: {
-			type:JSON,
-			defaultValue:{},
-		},
+            eventId: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
+            value: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
 
-		indexes: [
-		{
-			fields: ["eventId"],
-		},
-		],
-	});
+            indexes: [
+                {
+                    fields: [ 'eventId' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true});
-	
-	app.model.events = model;
-	return model;
+    // model.sync({force:true});
+
+    app.model.events = model;
+    return model;
 };
-
-
-

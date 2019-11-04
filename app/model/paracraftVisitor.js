@@ -1,77 +1,77 @@
-
+/* eslint-disable no-magic-numbers */
+'use strict';
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
 
-	const model = app.model.define("paracraftVisitors", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
+    const model = app.model.define(
+        'paracraftVisitors',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		handler: {
-			type: BIGINT,
-			defaultValue:0,
-		},
-		
-		realname: {                    // 姓名
-			type:STRING(64),
-			defaultValue:"",
-		},
+            handler: {
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		cellphone: {                   // 电话
-			type:STRING(24),
-			defaultValue:"",
-			unique: true,
-		},
+            realname: {
+                // 姓名
+                type: STRING(64),
+                defaultValue: '',
+            },
 
-		email: {                       // 邮箱
-			type: STRING,
-		},
+            cellphone: {
+                // 电话
+                type: STRING(24),
+                defaultValue: '',
+                unique: true,
+            },
 
-		organization: {                // 组织 机构
-			type: STRING,
-			defaultValue:"",
-		},
+            email: {
+                // 邮箱
+                type: STRING,
+            },
 
-		description: {                 // 描述
-			type: STRING,
-			defaultValue:"",
-		},
+            organization: {
+                // 组织 机构
+                type: STRING,
+                defaultValue: '',
+            },
 
-		state: {
-			type: INTEGER,
-			defaultValue:0,
-		},
+            description: {
+                // 描述
+                type: STRING,
+                defaultValue: '',
+            },
 
-		remark: {
-			type: TEXT,
-			defaultValue:"",
-		},
+            state: {
+                type: INTEGER,
+                defaultValue: 0,
+            },
 
-		extra: {
-			type: JSON,
-			defaultValue: {},
-		}
+            remark: {
+                type: TEXT,
+                defaultValue: '',
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+        }
+    );
 
-	//model.sync({force:true});
-	
-	app.model.paracraftVisitors = model;
+    // model.sync({force:true});
 
-	return model;
+    app.model.paracraftVisitors = model;
+
+    return model;
 };
-

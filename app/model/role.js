@@ -1,110 +1,116 @@
-const _ = require("lodash");
+'use strict';
+const _ = require('lodash');
 const {
-	//USER_ROLE_EXCEPTION,
-	//USER_ROLE_NORMAL,
-	//USER_ROLE_VIP,
-	//USER_ROLE_MANAGER,
-	//USER_ROLE_ADMIN,
-	USER_ROLE_ALLIANCE_MEMBER,
-	USER_ROLE_TUTOR,
-} = require("../core/consts.js");
+    // USER_ROLE_EXCEPTION,
+    // USER_ROLE_NORMAL,
+    // USER_ROLE_VIP,
+    // USER_ROLE_MANAGER,
+    // USER_ROLE_ADMIN,
+    USER_ROLE_ALLIANCE_MEMBER,
+    USER_ROLE_TUTOR,
+} = require('../core/consts.js');
 
 module.exports = app => {
-	const {
-		BIGINT,
-		INTEGER,
-		STRING,
-		TEXT,
-		BOOLEAN,
-		JSON,
-		DATE,
-	} = app.Sequelize;
+    const { BIGINT, INTEGER, JSON } = app.Sequelize;
 
-	const model = app.model.define("roles", {
-		id: {
-			type: BIGINT,
-			autoIncrement: true,
-			primaryKey: true,
-		},
-		
-		userId: {                      // 用户ID
-			type: BIGINT,
-			allowNull: false,
-		},
+    const model = app.model.define(
+        'roles',
+        {
+            id: {
+                type: BIGINT,
+                autoIncrement: true,
+                primaryKey: true,
+            },
 
-		roleId: {
-			type: INTEGER,
-			allowNull: false,
-			defaultValue: 0,
-		},
+            userId: {
+                // 用户ID
+                type: BIGINT,
+                allowNull: false,
+            },
 
-		startTime: {                   // 开始时间
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            roleId: {
+                type: INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+            },
 
-		endTime: {                     // 结束时间
-			type: BIGINT,
-			defaultValue: 0,
-		},
+            startTime: {
+                // 开始时间
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-		extra: {
-			type:JSON,
-			defaultValue:{},
-		},
+            endTime: {
+                // 结束时间
+                type: BIGINT,
+                defaultValue: 0,
+            },
 
-	}, {
-		underscored: false,
-		charset: "utf8mb4",
-		collate: 'utf8mb4_bin',
-		indexes: [
-		{
-			unique: true,
-			fields: ["userId", "roleId"],
-		},
-		],
-	});
+            extra: {
+                type: JSON,
+                defaultValue: {},
+            },
+        },
+        {
+            underscored: false,
+            charset: 'utf8mb4',
+            collate: 'utf8mb4_bin',
+            indexes: [
+                {
+                    unique: true,
+                    fields: [ 'userId', 'roleId' ],
+                },
+            ],
+        }
+    );
 
-	//model.sync({force:true});
-	
-	model.getByUserId = async function(userId) {
-		return await app.keepworkModel.roles.findAll({where:{userId}}).then(list => _.map(list, o => o && o.toJSON()));
-	}
+    // model.sync({force:true});
 
-	model.getRoleIdByUserId = async function(userId) {
-		const roles = await this.getByUserId(userId);
-		let roleId = 0;
-		_.each(roles, role => roleId = roleId | role.roleId);
+    model.getByUserId = async function(userId) {
+        return await app.keepworkModel.roles
+            .findAll({ where: { userId } })
+            .then(list => _.map(list, o => o && o.toJSON()));
+    };
 
-		return roleId;
-	}
+    model.getRoleIdByUserId = async function(userId) {
+        const roles = await this.getByUserId(userId);
+        let roleId = 0;
+        _.each(roles, role => (roleId = roleId | role.roleId));
 
-	model.getAllianceMemberByUserId = async function(userId) {
-		return await app.keepworkModel.roles.findOne({where:{
-			userId,
-			roleId: USER_ROLE_ALLIANCE_MEMBER,
-		}}).then(o => o && o.toJSON());
-	}
+        return roleId;
+    };
 
-	model.getTutorByUserId = async function(userId) {
-		return await app.keepworkModel.roles.findOne({where:{
-			userId,
-			roleId: USER_ROLE_TUTOR,
-		}}).then(o => o && o.toJSON());
-	}
-	//model.isExceptionRole = function(roleId = USER_ROLE_NORMAL) {
-		//return roleId & USER_ROLE_EXCEPTION;
-	//}
+    model.getAllianceMemberByUserId = async function(userId) {
+        return await app.keepworkModel.roles
+            .findOne({
+                where: {
+                    userId,
+                    roleId: USER_ROLE_ALLIANCE_MEMBER,
+                },
+            })
+            .then(o => o && o.toJSON());
+    };
 
-	//model.isExceptionUser = async function(userId) {
-		//const roleId = await this.getRoleIdByUserId(userId);
-		
-		//return this.isExceptionRole(roleId);
-	//}
-	
-	app.model.roles = model;
-	return model;
+    model.getTutorByUserId = async function(userId) {
+        return await app.keepworkModel.roles
+            .findOne({
+                where: {
+                    userId,
+                    roleId: USER_ROLE_TUTOR,
+                },
+            })
+            .then(o => o && o.toJSON());
+    };
+    // model.isExceptionRole = function(roleId = USER_ROLE_NORMAL) {
+    // return roleId & USER_ROLE_EXCEPTION;
+    // }
+
+    // model.isExceptionUser = async function(userId) {
+    // const roleId = await this.getRoleIdByUserId(userId);
+
+    // return this.isExceptionRole(roleId);
+    // }
+
+    app.model.roles = model;
+    return model;
 };
-
-
-
