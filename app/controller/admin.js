@@ -204,34 +204,41 @@ const Admin = class extends Controller {
         this.adminAuthenticated();
 
         const { data, query, datas = [] } = this.parseParams();
-
-        await this.resource.update(data, { where: query });
+        let updateNum = 0;
+        if (!_.isEmpty(data) && !_.isEmpty(query)) {
+            updateNum = (await this.resource.update(data, { where: query }))[0];
+        }
         for (let i = 0; i < datas.length; i++) {
             if (!datas[i].id) continue;
-            await this.resource.update(datas[i], {
+            const result = await this.resource.update(datas[i], {
                 where: { id: datas[i].id },
             });
+            updateNum += result[0];
         }
 
         this.action();
 
-        return this.success(data);
+        return this.success(updateNum);
     }
 
     async bulkDestroy() {
         this.adminAuthenticated();
 
         const { query, datas = [] } = this.parseParams();
-
-        const data = await this.resource.destroy({ where: query });
+        let deleteNum = 0;
+        if (!_.isEmpty(query)) {
+            deleteNum = await this.resource.destroy({ where: query });
+        }
         for (let i = 0; i < datas.length; i++) {
             if (!datas[i].id) continue;
-            await this.resource.destroy({ where: { id: datas[i].id } });
+            deleteNum += await this.resource.destroy({
+                where: { id: datas[i].id },
+            });
         }
 
         this.action();
 
-        return this.success(data);
+        return this.success(deleteNum);
     }
 
     async create() {

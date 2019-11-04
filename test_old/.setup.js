@@ -3,13 +3,12 @@ const _ = require('lodash');
 const Chance = require('chance');
 const loader = require('./setup/loader.js');
 
-before(async () => {
+before(() => {
     loader(app);
     app.chance = new Chance();
-    await truncateAllTables();
 });
 
-async function truncateAllTables() {
+beforeEach(async () => {
     const keepworkTables = await app.model
         .query(`show tables`, { type: app.model.QueryTypes.SHOWTABLES })
         .then(list => _.filter(list, o => o != 'SequelizeMeta'));
@@ -28,6 +27,6 @@ async function truncateAllTables() {
         )
     );
     await Promise.all(list);
-}
+});
 
 afterEach(async () => {});

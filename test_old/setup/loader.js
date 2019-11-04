@@ -23,7 +23,7 @@ module.exports = app => {
                 username: user.username,
                 password: '123456',
             })
-            .expect(200)
+            .expect(res => assert(res.statusCode == 200))
             .then(res => res.body);
     };
 
@@ -39,7 +39,7 @@ module.exports = app => {
                 username: 'user001',
                 password: '123456',
             })
-            .expect(200)
+            .expect(res => assert(res.statusCode == 200))
             .then(res => res.body);
     };
 
