@@ -27,7 +27,10 @@ async function truncateAllTables() {
                 app.lessonModel[tableName].truncate(opts)
         )
     );
+    list.push(app.redis.flushdb());
     await Promise.all(list);
 }
 
-afterEach(async () => {});
+afterEach(async () => {
+    await truncateAllTables();
+});

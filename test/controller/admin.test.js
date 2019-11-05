@@ -4,7 +4,7 @@ const { app, mock, assert } = require('egg-mock/bootstrap');
 describe('test/controller/admin.test.js', () => {
     let token;
     let userId;
-    before(async () => {
+    beforeEach(async () => {
         // 创建测试数据
         await app.factory.createMany('users', 10);
         await app.model.admins
@@ -255,7 +255,7 @@ describe('test/controller/admin.test.js', () => {
                 .send({
                     where: {
                         id: {
-                            $gt: 1,
+                            $gt: 0,
                         },
                     },
                     include: [
@@ -304,7 +304,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('x-order', 'username-desc')
                 .send({
                     id: {
-                        $gt: 1,
+                        $gte: 1,
                     },
                 })
                 .expect(200)
@@ -323,7 +323,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('x-order', 'username-desc')
                 .send({
                     aaa: {
-                        $gt: 1,
+                        $gte: 1,
                     },
                 })
                 .expect(500)
@@ -386,6 +386,21 @@ describe('test/controller/admin.test.js', () => {
 
     describe('# PUT /admins/projects/:projectId/systemTags/:tagId', () => {
         it('## should success', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/admins/projects/1/systemTags')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    tags: [
+                        {
+                            tagId: 1,
+                        },
+                        {
+                            tagId: 2,
+                        },
+                    ],
+                })
+                .expect(200);
             let result = await app
                 .httpRequest()
                 .put('/api/v0/admins/projects/1/systemTags/1')
@@ -407,6 +422,21 @@ describe('test/controller/admin.test.js', () => {
     });
     describe('# DELETE /admins/projects/:projectId/systemTags', () => {
         it('## should success', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/admins/projects/1/systemTags')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    tags: [
+                        {
+                            tagId: 1,
+                        },
+                        {
+                            tagId: 2,
+                        },
+                    ],
+                })
+                .expect(200);
             let result = await app
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')

@@ -1,7 +1,6 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 
-const fs = require('fs');
 const _ = require('lodash');
 const moment = require('moment');
 const axios = require('axios');
@@ -135,7 +134,6 @@ class Keepwork extends Controller {
         const { url } = this.validate({ url: 'string' });
         const key = `${url}-page-visit-count`;
         const count = (await this.app.redis.get(key)) || 0;
-
         return this.success(count);
         // this.success(await this.app.redis.scard(ipsetkey));
     }
@@ -187,35 +185,6 @@ class Keepwork extends Controller {
         };
 
         return this.success(data);
-    }
-
-    async words() {
-        const self = this;
-
-        const wordstr = await new Promise(resolve => {
-            fs.readFile('./app/controller/sensitive_word.txt', function(
-                err,
-                data
-            ) {
-                if (err) {
-                    self.logger.warn('加载铭感词文件失败');
-                    self.logger.error(err);
-                    return resolve('');
-                }
-
-                return resolve(data.toString());
-            });
-        });
-
-        const words = wordstr.split(',');
-        for (let i = 0; i < words.length; i++) {
-            const word = words[i];
-            await this.model.sensitiveWords.upsert({ word });
-        }
-
-        // _.each(words, async (word) => await this.model.sensitiveWords.upsert({word}));
-
-        return this.success({ words, size: words.length });
     }
 
     async ip() {
@@ -272,22 +241,6 @@ class Keepwork extends Controller {
         }
 
         return this.success(ips);
-    }
-
-    async issue5270() {
-        const str =
-            'select * from projects where userId in (select id from users where realname is null)';
-        const projects = await this.model.query(str, {
-            type: this.model.QueryTypes.SELECT,
-        });
-        // console.log(projects.length);
-        for (let i = 0; i < projects.length; i++) {
-            const project = projects[i];
-            // console.log('project:', project.id);
-            await this.app.api.projectsUpsert(project);
-        }
-
-        return this.success('OK');
     }
 }
 

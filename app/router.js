@@ -10,12 +10,11 @@ module.exports = app => {
     router.resources(`${prefix}indexs`, index);
 
     const keepwork = controller.keepwork;
-    // router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
+
     router.post(`${prefix}keepworks/email`, keepwork.email);
     router.get(`${prefix}keepworks/captcha/:key`, keepwork.captcha);
     router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
     router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);
-    router.get(`${prefix}keepworks/words`, keepwork.words);
     router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
     router.get(`${prefix}keepworks/ip`, keepwork.ip);
     router.post(`${prefix}keepworks/page_visit`, keepwork.postPageVisit);
