@@ -246,7 +246,7 @@ const Project = class extends Controller {
         if (!project) return this.success('OK');
 
         if (project.type === PROJECT_TYPE_PARACRAFT) {
-            // const ok = await this.destroyWorld(project);
+            await this.destroyWorld(project);
             // if (!ok) return this.throw(500, "删除世界失败");
         }
 
