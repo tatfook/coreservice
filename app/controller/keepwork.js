@@ -133,7 +133,8 @@ class Keepwork extends Controller {
     async getPageVisit() {
         const { url } = this.validate({ url: 'string' });
         const key = `${url}-page-visit-count`;
-        const count = (await this.app.redis.get(key)) || 0;
+        let count = await this.app.redis.get(key);
+        count = parseInt(count) || 0;
         return this.success(count);
         // this.success(await this.app.redis.scard(ipsetkey));
     }
@@ -149,8 +150,8 @@ class Keepwork extends Controller {
     // 获取 paracraft 下载量
     async getParacraftDownloadCount() {
         const key = 'paracraft_download_count';
-        const count = (await this.app.redis.get(key)) || 0;
-
+        let count = await this.app.redis.get(key);
+        count = parseInt(count) || 0;
         return this.success(count);
     }
 
@@ -195,17 +196,6 @@ class Keepwork extends Controller {
             .then(res => res.data);
         // http://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest
         await this.model.ips.truncate({ restartIdentity: true, cascade: true });
-
-        // const ipstr = await new Promise((resolve, reject) => {
-        // fs.readFile("ip", function(err, data) {
-        // if (err) {
-        // console.log("加载铭感词文件失败");
-        // return resolve("");
-        // }
-
-        // return resolve(data.toString());
-        // });
-        // });
 
         const ips = ipstr
             .split('\n')

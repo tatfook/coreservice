@@ -1,5 +1,5 @@
 const md5 = require('blueimp-md5');
-const { app, mock, assert } = require('egg-mock/bootstrap');
+const { app, assert } = require('egg-mock/bootstrap');
 
 describe('test/controller/admin.test.js', () => {
     let token;
@@ -13,7 +13,7 @@ describe('test/controller/admin.test.js', () => {
     });
     describe('# POST /admins/login', () => {
         it('## admin login successfully', async () => {
-            let user = await app
+            const user = await app
                 .httpRequest()
                 .post('/api/v0/admins/login')
                 .send({ username: 'admin001', password: '123456' })
@@ -34,7 +34,7 @@ describe('test/controller/admin.test.js', () => {
         });
 
         it('## username or password error', async () => {
-            let resp = await app
+            const resp = await app
                 .httpRequest()
                 .post('/api/v0/admins/login')
                 .send({ username: 'admin001', password: '1234567' })
@@ -87,7 +87,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
-            assert(list1.length == list.length);
+            assert(list1.length === list.length);
         });
 
         it('## post query successfully', async () => {
@@ -102,7 +102,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
-            assert(list1.length == list.length);
+            assert(list1.length === list.length);
         });
 
         it('## query unauthorized return 500', async () => {
@@ -111,7 +111,7 @@ describe('test/controller/admin.test.js', () => {
                 .get(
                     '/api/v0/admins/query?sql=select * from users where id > 0'
                 )
-                .set('Authorization', `Bearer fake token`)
+                .set('Authorization', 'Bearer fake token')
                 .expect(500)
                 .then(res => res.body);
         });
@@ -185,18 +185,18 @@ describe('test/controller/admin.test.js', () => {
         });
 
         it('## create one user', async () => {
-            let resource = await app
+            const resource = await app
                 .httpRequest()
                 .post('/api/v0/admins/users')
                 .send({ username: 'user100', password: 'xiaoyao', sex: 'F' })
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
-            assert(resource.username == 'user100');
+            assert(resource.username === 'user100');
         });
 
         it('## create one user bad params', async () => {
-            let resource = await app
+            await app
                 .httpRequest()
                 .post('/api/v0/admins/users')
                 .send({ password: 'xiaoyao', sex: 'F' })
@@ -213,7 +213,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
-            let user = await app.model.users.findOne({ where: { id: 1 } });
+            const user = await app.model.users.findOne({ where: { id: 1 } });
             assert(user.sex === 'F');
         });
 
@@ -233,7 +233,7 @@ describe('test/controller/admin.test.js', () => {
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
-            let user = await app.model.users.findOne({ where: { id: 1 } });
+            const user = await app.model.users.findOne({ where: { id: 1 } });
             assert(!user);
         });
 
@@ -248,7 +248,7 @@ describe('test/controller/admin.test.js', () => {
 
     describe('# POST /admins/:resources/query', () => {
         it('## query users', async () => {
-            let users = await app
+            const users = await app
                 .httpRequest()
                 .post('/api/v0/admins/users/query')
                 .set('Authorization', `Bearer ${token}`)
@@ -296,7 +296,7 @@ describe('test/controller/admin.test.js', () => {
 
     describe('# POST /admins/:resources/search', () => {
         it('## search users', async () => {
-            let users = await app
+            const users = await app
                 .httpRequest()
                 .post('/api/v0/admins/users/search')
                 .set('Authorization', `Bearer ${token}`)
@@ -401,7 +401,7 @@ describe('test/controller/admin.test.js', () => {
                     ],
                 })
                 .expect(200);
-            let result = await app
+            const result = await app
                 .httpRequest()
                 .put('/api/v0/admins/projects/1/systemTags/1')
                 .set('Authorization', `Bearer ${token}`)
@@ -441,7 +441,7 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: [1, 2] })
+                .send({ tagIds: [ 1, 2 ] })
                 .expect(200)
                 .then(res => res.body);
             assert(result.length === 2 && result[0] === 1 && result[1] === 1);
@@ -449,7 +449,7 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: [1, 2] })
+                .send({ tagIds: [ 1, 2 ] })
                 .expect(200)
                 .then(res => res.body);
             assert(result.length === 2 && result[0] === 0 && result[1] === 0);
@@ -460,14 +460,14 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: ['aaa', 2] })
+                .send({ tagIds: [ 'aaa', 2 ] })
                 .expect(400);
         });
     });
 
     describe('# POST /admins/:resources/bulk', () => {
         it('## bulk create users successfully', async () => {
-            let users = [
+            const users = [
                 {
                     username: 'user200',
                     password: '12345678',
@@ -485,7 +485,7 @@ describe('test/controller/admin.test.js', () => {
 
     describe('# PUT /admins/:resources/bulk', () => {
         it('## bulk update users successfully', async () => {
-            let users = [
+            const users = [
                 {
                     id: 1,
                     username: 'user201',
