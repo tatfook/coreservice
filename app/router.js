@@ -1,4 +1,7 @@
 'use strict';
+/**
+ * @param {Egg.Application} app - egg application
+ */
 module.exports = app => {
     const { router, config, controller } = app;
     const selfConfig = config.self;
@@ -51,7 +54,6 @@ module.exports = app => {
     router.post(`${prefix}users/logout`, user.logout);
     router.get(`${prefix}users/account`, user.account);
     router.get(`${prefix}users/profile`, user.profile);
-    router.post(`${prefix}users/profile`, user.setProfile);
     router.post(`${prefix}users/info`, user.setInfo);
     router.put(`${prefix}users/pwd`, user.changepwd);
     router.get(`${prefix}users/email_captcha`, user.emailVerifyOne);

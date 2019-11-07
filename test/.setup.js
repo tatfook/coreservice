@@ -10,6 +10,7 @@ before(async () => {
 });
 
 async function truncateAllTables() {
+    app.factory.resetSequence();
     const keepworkTables = await app.model
         .query(`show tables`, { type: app.model.QueryTypes.SHOWTABLES })
         .then(list => _.filter(list, o => o != 'SequelizeMeta'));
