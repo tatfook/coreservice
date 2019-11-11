@@ -325,11 +325,25 @@ const Admin = class extends Controller {
             projectId,
             tags
         );
+        await this.updateEsProject(projectId);
         this.action();
 
         return this.success(result);
     }
-
+    async updateEsProject(projectId) {
+        // 更新es数据
+        const project = await this.model.projects.findOne({
+            where: { id: projectId },
+            include: [
+                {
+                    model: this.model.systemTags,
+                },
+            ],
+        });
+        if (project) {
+            await this.app.api.projectsUpsert(project);
+        }
+    }
     async updateProjectTag() {
         this.adminAuthenticated();
         const { tagId, projectId, sn } = this.validate({
@@ -382,7 +396,7 @@ const Admin = class extends Controller {
             tagIds
         );
         this.action();
-
+        await this.updateEsProject(projectId);
         return this.success(result);
     }
 };
