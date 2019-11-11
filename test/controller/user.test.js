@@ -750,7 +750,7 @@ describe('test/controller/user.test.js', () => {
 
     describe('# POST /users/email_captcha', () => {
         // 绑定、解绑邮箱
-        it.only('## bad request', async () => {
+        it('## bad request', async () => {
             const { token } = await app.login({ username: 'test' });
             await app
                 .httpRequest()
@@ -759,14 +759,14 @@ describe('test/controller/user.test.js', () => {
                 .expect(400);
         });
 
-        it.only('## unauthorized', async () => {
+        it('## unauthorized', async () => {
             await app
                 .httpRequest()
                 .post('/api/v0/users/email_captcha')
                 .expect(401);
         });
 
-        it.only('## password with email to unbind', async () => {
+        it('## password with email to unbind', async () => {
             const { token } = await app.login({
                 username: 'test',
                 email: '1111@qq.com',
@@ -800,10 +800,288 @@ describe('test/controller/user.test.js', () => {
             assert(result.message === '密码错误');
         });
 
-        // it.only('## captcha with email', async () => {
-        //     const { token } = await app.login({
-        //         username: 'test',
-        //     });
-        // });
+        it('## expired captcha with email', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/email_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    email: '2222@qq.com',
+                    isBind: false,
+                    captcha: '1234567',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('验证码过期') !== -1);
+        });
+
+        it('## wrong captcha with email', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            await app.model.caches.set('2222@qq.com', { captcha: '12345' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/email_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    email: '2222@qq.com',
+                    isBind: false,
+                    captcha: '1234567',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('验证码错误') !== -1);
+        });
+
+        it('## bind email successfully', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            await app.model.caches.set('2222@qq.com', { captcha: '12345' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/email_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    email: '2222@qq.com',
+                    isBind: true,
+                    captcha: '12345',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result);
+            const user = await app.model.users.findOne({
+                where: {
+                    id: 1,
+                },
+            });
+            assert(user.email === '2222@qq.com');
+        });
+    });
+
+    describe('# GET /users/cellphone_captcha', () => {
+        it('## send captcha bad request', async () => {
+            await app
+                .httpRequest()
+                .get('/api/v0/users/cellphone_captcha')
+                .expect(400);
+        });
+
+        it('## send captcha successfully', async () => {
+            await app
+                .httpRequest()
+                .get('/api/v0/users/cellphone_captcha')
+                .query({ cellphone: '13011201245' })
+                .expect(200);
+            const captcha = app.model.caches.findOne({
+                where: { key: '13011201245' },
+            });
+            assert(captcha);
+        });
+    });
+
+    describe('# POST /users/cellphone_captcha', () => {
+        // 绑定、解绑手机
+        it('## bad request', async () => {
+            const { token } = await app.login({ username: 'test' });
+            await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .expect(400);
+        });
+
+        it('## unauthorized', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .expect(401);
+        });
+
+        it('## password with cellphone to unbind', async () => {
+            const { token } = await app.login({
+                username: 'test',
+                cellphone: '1234567890',
+            });
+            let result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567891',
+                    isBind: false,
+                    password: '123456',
+                })
+                .expect(200)
+                .then(res => res.body);
+
+            assert(result[0] === 1);
+
+            result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567892',
+                    isBind: false,
+                    password: '1234567',
+                })
+                .expect(400)
+                .then(res => res.body);
+            assert(result.code === 11);
+            assert(result.message === '密码错误');
+        });
+
+        it('## expired captcha with cellphone', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567892',
+                    isBind: false,
+                    captcha: '1234567',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('验证码过期') !== -1);
+        });
+
+        it('## wrong captcha with cellphone', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            await app.model.caches.set('1234567892', { captcha: '12345' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567892',
+                    isBind: false,
+                    captcha: '1234567',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('验证码错误') !== -1);
+        });
+
+        it('## bind cellphone successfully', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            await app.model.caches.set('1234567892', { captcha: '12345' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567892',
+                    isBind: true,
+                    captcha: '12345',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result);
+            const user = await app.model.users.findOne({
+                where: {
+                    id: 1,
+                },
+            });
+            assert(user.cellphone === '1234567892');
+        });
+    });
+
+    describe('# POST /users/reset_password', () => {
+        it('## bad request', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/users/reset_password')
+                .expect(400);
+        });
+
+        it('## wrong captcha', async () => {
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/reset_password')
+                .send({
+                    key: 'string',
+                    password: 'string',
+                    captcha: 'string',
+                })
+                .expect(400)
+                .then(res => res.body);
+            assert(result.code === 5);
+        });
+
+        it('## reset successfully', async () => {
+            await app.model.caches.set('123@qq.com', { captcha: '1234' });
+            await app.factory.create('users', { email: '123@qq.com' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/reset_password')
+                .send({
+                    key: '123@qq.com',
+                    password: '123456',
+                    captcha: '1234',
+                })
+                .expect(200)
+                .then(res => res.text);
+            assert(result === 'OK');
+            await app
+                .httpRequest()
+                .post('/api/v0/users/login')
+                .send({
+                    username: '123@qq.com',
+                    password: '123456',
+                })
+                .expect(200);
+        });
+
+        it('## reset user not exist', async () => {
+            await app.model.caches.set('123@qq.com', { captcha: '1234' });
+            await app.factory.create('users', { email: '1234@qq.com' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/reset_password')
+                .send({
+                    key: '123@qq.com',
+                    password: '123456',
+                    captcha: '1234',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.code === 10);
+        });
+    });
+
+    describe('# RESOURCES /users', () => {
+        it('## show user', async () => {
+            let id = 'testteset';
+            await app
+                .httpRequest()
+                .get(`/api/v0/users/id${id}`)
+                .expect(400);
+            const user = { id: 1, username: 'test' };
+            id = Base64.encode(JSON.stringify(user));
+            await app
+                .httpRequest()
+                .get(`/api/v0/users/id${id}`)
+                .expect(404);
+            await app.factory.create('users', user);
+            const result = await app
+                .httpRequest()
+                .get(`/api/v0/users/id${id}`)
+                .expect(200)
+                .then(res => res.body);
+            assert(result.username === user.username);
+        });
     });
 });
