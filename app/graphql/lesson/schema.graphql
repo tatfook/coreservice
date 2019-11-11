@@ -12,7 +12,9 @@ type Package {                         # 课程包
 	coin: Int
 	auditAt: String
 	lastClassroomCount: Int
-	extra: Json
+	# extra: Json
+	coverUrl:String,
+	refuseMsg:String,
 
 	tags: Json                         # 课程包tags 
 	
@@ -30,7 +32,11 @@ type Lesson {                          # 课程
 	subjectId: Int
 	url: String
 	goals: String
-	extra: Json
+	# extra: Json
+	coverUrl:String
+	duration:String
+	teacherVideoUrl:String
+	studentVideoUrl:String
 	
 	packageId: Int
 
