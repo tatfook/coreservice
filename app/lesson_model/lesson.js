@@ -39,13 +39,21 @@ module.exports = app => {
             goals: {
                 type: TEXT,
             },
-
-            extra: {
-                type: JSON,
-                defaultValue: {
-                    coverUrl: '',
-                    vedioUrl: '',
-                },
+            coverUrl: {
+                // 封面url
+                type: STRING,
+            },
+            duration: {
+                // 时长，如：'90min'
+                type: STRING,
+            },
+            teacherVideoUrl: {
+                // 老师视频url
+                type: STRING,
+            },
+            studentVideoUrl: {
+                // 学生视频url
+                type: STRING,
             },
         },
         {

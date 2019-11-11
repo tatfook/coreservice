@@ -1,6 +1,6 @@
 'use strict';
 module.exports = app => {
-    const { BIGINT, JSON } = app.Sequelize;
+    const { BIGINT, INTEGER } = app.Sequelize;
 
     const model = app.lessonModel.define(
         'packageLessons',
@@ -26,9 +26,9 @@ module.exports = app => {
                 allowNull: false,
             },
 
-            extra: {
-                type: JSON,
-                defaultValue: {},
+            lessonNo: {
+                // 课程包内的序号
+                type: INTEGER,
             },
         },
         {
