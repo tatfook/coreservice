@@ -20,7 +20,7 @@ class Lesson extends Service {
                 id: userId,
             },
         });
-        return (result && result[0] === 1);
+        return result && result[0] === 1;
     }
 }
 
