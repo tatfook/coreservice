@@ -30,8 +30,149 @@ describe('test/controller/user.test.js', () => {
         });
     });
 
-    describe('# GET /users/platform_login', () => {
-        // TODO
+    describe('# POST /users/platform_login', () => {
+        beforeEach('mock service', () => {
+            mock(require('axios'), 'post', () => {
+                return {
+                    then: () => {
+                        return {
+                            data: {
+                                status: 0,
+                                user_info: {
+                                    nickname: 'helloqq',
+                                    figureurl: 'http://www.baidu.com',
+                                },
+                            },
+                        };
+                    },
+                };
+            });
+            mock(app.api, 'createGitUser', () => true);
+            mock(app.api, 'createGitProject', () => true);
+        });
+        // qq游戏大厅登录
+        it('## bad request', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .expect(400);
+        });
+
+        it('## bad platform', async () => {
+            await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '1123',
+                    token: 'token',
+                    platform: 'qq',
+                })
+                .expect(400);
+        });
+
+        it('## 平台登录网络请求失败', async () => {
+            mock(require('axios'), 'post', () => {
+                return {
+                    then: () => {
+                        throw new Error();
+                    },
+                };
+            });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '1123',
+                    token: 'token',
+                    platform: 'qqHall',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('平台登录失败') !== -1);
+        });
+
+        it('## 平台登录状态失败', async () => {
+            mock(require('axios'), 'post', () => {
+                return {
+                    then: () => {
+                        return {
+                            data: {
+                                status: 1,
+                                user_info: {
+                                    nickname: 'helloqq',
+                                    figureurl: 'http://www.baidu.com',
+                                },
+                            },
+                        };
+                    },
+                };
+            });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '1123',
+                    token: 'token',
+                    platform: 'qqHall',
+                })
+                .expect(400)
+                .then(res => res.text);
+            assert(result.indexOf('平台登录失败') !== -1);
+        });
+
+        it('## oauthUser and user exist', async () => {
+            await app.model.oauthUsers.create({
+                externalId: '123456',
+                type: 4,
+                userId: 1,
+            });
+            await app.factory.create('users');
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '123456',
+                    token: 'token',
+                    platform: 'qqHall',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result.kp.user.id === 1);
+        });
+
+        it('## oauthUser and user not exist', async () => {
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '123456',
+                    token: 'token',
+                    platform: 'qqHall',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result.kp.user.id === 1);
+            assert(result.kp.user.channel === 4);
+            const oauth = await app.model.oauthUsers.findOne();
+            assert(oauth);
+        });
+
+        it('## Git server error', async () => {
+            mock(app.api, 'createGitUser', () => false);
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/platform_login')
+                .send({
+                    uid: '123456',
+                    token: 'token',
+                    platform: 'qqHall',
+                })
+                .expect(400)
+                .then(res => res.body);
+            assert(result.code === 6);
+            const user = await app.model.users.findOne();
+            assert(!user);
+        });
     });
 
     describe('# POST /users/search', () => {
@@ -1082,6 +1223,43 @@ describe('test/controller/user.test.js', () => {
                 .expect(200)
                 .then(res => res.body);
             assert(result.username === user.username);
+        });
+
+        it('## index user', async () => {
+            const result = await app
+                .httpRequest()
+                .get('/api/v0/users')
+                .expect(200)
+                .then(res => res.body);
+            assert(Array.isArray(result));
+        });
+
+        it('## update user', async () => {
+            const { token } = await app.login({
+                username: 'test',
+            });
+            let result = await app
+                .httpRequest()
+                .put('/api/v0/users/1')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    realname: '1230123468',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result);
+
+            result = await app
+                .httpRequest()
+                .put('/api/v0/users/1')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    realname: '12301234689',
+                    info: { name: 'testtest' },
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result === true);
         });
     });
 });
