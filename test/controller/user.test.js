@@ -1057,7 +1057,7 @@ describe('test/controller/user.test.js', () => {
                     captcha: '1234',
                 })
                 .expect(400)
-                .then(res => res.text);
+                .then(res => res.body);
             assert(result.code === 10);
         });
     });
