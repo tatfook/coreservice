@@ -72,6 +72,18 @@ module.exports = app => {
             type: JSON,
             defaultValue: {},
         },
+
+        vip: {
+            type: INTEGER(2),
+            defaultValue: 0,
+            comments: '是否是VIP，0否，1是',
+        },
+
+        tLevel: {
+            type: INTEGER(2),
+            defaultValue: 0,
+            comments: '教师级别,0表示T0,1表示T1,依次类推',
+        },
     };
 
     const opts = {
