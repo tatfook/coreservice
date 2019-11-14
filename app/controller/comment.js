@@ -32,12 +32,13 @@ const Comment = class extends Controller {
 
         this.formatQuery(params);
 
-        // console.log(params);
-
         const list = await this.model.comments.findAndCount({
             ...this.queryOptions,
             where: params,
         });
+
+        await this.service.user.addUserAttrByUserIds(list.rows);
+
         return this.success(list);
     }
 

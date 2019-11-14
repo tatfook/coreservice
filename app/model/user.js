@@ -124,6 +124,8 @@ module.exports = app => {
             'nickname',
             'portrait',
             'description',
+            'vip',
+            'tLevel',
         ];
 
         const data = await app.model.users.findOne({
@@ -156,6 +158,8 @@ module.exports = app => {
             'nickname',
             'portrait',
             'description',
+            'vip',
+            'tLevel',
         ];
         const list = await app.model.users.findAll({
             attributes,
