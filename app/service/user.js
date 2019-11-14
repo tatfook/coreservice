@@ -113,7 +113,13 @@ class User extends Service {
      * @param {Array<{userId}>} list 列表
      */
     async addUserAttrByUserIds(list) {
-        const userIds = list.map(i => i.userId);
+        const userIds = [];
+
+        _.each(list, (o, i) => {
+            o = o.get ? o.get({ plain: true }) : o;
+            userIds.push(o.userId);
+            list[i] = o;
+        });
         const users = await this.app.model.users.getUsers(userIds);
 
         _.each(list, o => {
