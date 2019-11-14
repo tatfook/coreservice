@@ -158,6 +158,8 @@ module.exports = app => {
             'nickname',
             'portrait',
             'description',
+            'vip',
+            'tLevel',
         ];
         const users = await app.model.users.findAll({
             attributes,

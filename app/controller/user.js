@@ -9,7 +9,7 @@ const _ = require('lodash');
 
 const consts = require('../core/consts.js');
 const Controller = require('../core/controller.js');
-
+const userAttrs = [ 'id', 'username', 'nickname', 'portrait', 'vip', 'tLevel' ];
 const User = class extends Controller {
     get modelName() {
         return 'users';
@@ -67,10 +67,9 @@ const User = class extends Controller {
 
         this.formatQuery(query);
 
-        const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
         const data = await this.model.users.findAndCount({
             ...this.queryOptions,
-            attributes,
+            attributes: userAttrs,
             where: query,
         });
 
@@ -82,10 +81,9 @@ const User = class extends Controller {
 
         this.formatQuery(query);
 
-        const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
         const list = await this.model.users.findAll({
             ...this.queryOptions,
-            attributes,
+            attributes: userAttrs,
             where: query,
         });
 
