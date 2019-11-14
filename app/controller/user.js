@@ -720,29 +720,6 @@ const User = class extends Controller {
         user.info = info;
 
         return this.success(user);
-
-        // const data = await this.model.users.findOne({
-        // where:{id:userId},
-        // exclude: ["password"],
-        // include:[
-        // {
-        // model:this.model.profiles,
-        // as:"profile",
-        // }
-        // ],
-        // });
-
-        // return this.success(data);
-    }
-
-    async setProfile() {
-        const { userId } = this.authenticated();
-        const params = this.validate();
-        params.userId = userId;
-
-        await this.model.profiles.upsert(params);
-
-        return this.success('OK');
     }
 
     async detail() {

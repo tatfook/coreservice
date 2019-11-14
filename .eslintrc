@@ -20,9 +20,10 @@
     },
     "overrides": [
         {
-            "files": ["test/*/*.js"],
+            "files": ["test/**/*.js"],
             "rules": {
-                "no-magic-numbers": "off"
+                "no-magic-numbers": "off",
+                "strict": "off"
             }
         }
     ]

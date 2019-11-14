@@ -1,4 +1,7 @@
 'use strict';
+/**
+ * @param {Egg.Application} app - egg application
+ */
 module.exports = app => {
     const { router, config, controller } = app;
     const selfConfig = config.self;
@@ -9,17 +12,12 @@ module.exports = app => {
     router.all(`${prefix}indexs/test`, index.test);
     router.resources(`${prefix}indexs`, index);
 
-    const migration = controller.migration;
-    router.get(`${prefix}migrations/generate`, migration.generate);
-    router.get(`${prefix}migrations/generateAll`, migration.generateAll);
-
     const keepwork = controller.keepwork;
-    // router.get(`${prefix}keepworks/issue5270`, keepwork.issue5270);
+
     router.post(`${prefix}keepworks/email`, keepwork.email);
     router.get(`${prefix}keepworks/captcha/:key`, keepwork.captcha);
     router.get(`${prefix}keepworks/svg_captcha`, keepwork.getSvgCaptcha);
     router.post(`${prefix}keepworks/svg_captcha`, keepwork.postSvgCaptcha);
-    router.get(`${prefix}keepworks/words`, keepwork.words);
     router.get(`${prefix}keepworks/statistics`, keepwork.statistics);
     router.get(`${prefix}keepworks/ip`, keepwork.ip);
     router.post(`${prefix}keepworks/page_visit`, keepwork.postPageVisit);
@@ -56,7 +54,6 @@ module.exports = app => {
     router.post(`${prefix}users/logout`, user.logout);
     router.get(`${prefix}users/account`, user.account);
     router.get(`${prefix}users/profile`, user.profile);
-    router.post(`${prefix}users/profile`, user.setProfile);
     router.post(`${prefix}users/info`, user.setInfo);
     router.put(`${prefix}users/pwd`, user.changepwd);
     router.get(`${prefix}users/email_captcha`, user.emailVerifyOne);
@@ -332,136 +329,6 @@ module.exports = app => {
     router.post(`${prefix}gameWorks/search`, gameWorks.search);
     router.post(`${prefix}gameWorks/snapshoot`, gameWorks.snapshoot);
     router.resources(`${prefix}gameWorks`, gameWorks);
-
-    // LESSON three
-    const lessonOrganization = controller.lessonOrganization;
-    router.get(`${prefix}lessonOrganizations/token`, lessonOrganization.token);
-    router.get(
-        `${prefix}lessonOrganizations/packages`,
-        lessonOrganization.packages
-    );
-    router.get(
-        `${prefix}lessonOrganizations/packageDetail`,
-        lessonOrganization.packageDetail
-    );
-    router.get(
-        `${prefix}lessonOrganizations/getByName`,
-        lessonOrganization.getByName
-    );
-    router.get(
-        `${prefix}lessonOrganizations/getByUrl`,
-        lessonOrganization.getByUrl
-    );
-    router.post(`${prefix}lessonOrganizations/login`, lessonOrganization.login);
-    router.post(
-        `${prefix}lessonOrganizations/search`,
-        lessonOrganization.search
-    );
-    router.resources(`${prefix}lessonOrganizations`, lessonOrganization);
-    // router.post(`${prefix}lessonOrganizations`, lessonOrganization.create);
-    // router.get(`${prefix}lessonOrganizations/:id`, lessonOrganization.show);
-    // router.put(`${prefix}lessonOrganizations/:id`, lessonOrganization.update);
-
-    // organization class
-    const lessonOrganizationClass = controller.lessonOrganizationClass;
-    router.get(
-        `${prefix}lessonOrganizationClasses`,
-        lessonOrganizationClass.index
-    );
-    router.get(
-        `${prefix}lessonOrganizationClasses/history`,
-        lessonOrganizationClass.history
-    );
-    router.post(
-        `${prefix}lessonOrganizationClasses`,
-        lessonOrganizationClass.create
-    );
-    router.get(
-        `${prefix}lessonOrganizationClasses/:id/project`,
-        lessonOrganizationClass.latestProject
-    );
-    router.put(
-        `${prefix}lessonOrganizationClasses/:id`,
-        lessonOrganizationClass.update
-    );
-    router.delete(
-        `${prefix}lessonOrganizationClasses/:id`,
-        lessonOrganizationClass.destroy
-    );
-
-    // organization class member
-    const lessonOrganizationClassMember =
-        controller.lessonOrganizationClassMember;
-    router.get(
-        `${prefix}lessonOrganizationClassMembers/student`,
-        lessonOrganizationClassMember.student
-    );
-    router.get(
-        `${prefix}lessonOrganizationClassMembers/teacher`,
-        lessonOrganizationClassMember.teacher
-    );
-    router.post(
-        `${prefix}lessonOrganizationClassMembers/bulk`,
-        lessonOrganizationClassMember.bulkCreate
-    );
-    router.resources(
-        `${prefix}lessonOrganizationClassMembers`,
-        lessonOrganizationClassMember
-    );
-
-    // organization activate code
-    const lessonOrganizationActivateCode =
-        controller.lessonOrganizationActivateCode;
-    router.post(
-        `${prefix}lessonOrganizationActivateCodes/activate`,
-        lessonOrganizationActivateCode.activate
-    );
-    router.post(
-        `${prefix}lessonOrganizationActivateCodes/search`,
-        lessonOrganizationActivateCode.index
-    );
-    router.resources(
-        `${prefix}lessonOrganizationActivateCodes`,
-        lessonOrganizationActivateCode
-    );
-
-    // organization user
-    const lessonOrganizationUser = controller.lessonOrganizationUser;
-    router.post(
-        `${prefix}lessonOrganizationUsers/batch`,
-        lessonOrganizationUser.batchCreateUser
-    );
-    router.post(
-        `${prefix}lessonOrganizationUsers/unbind`,
-        lessonOrganizationUser.unbind
-    );
-    router.post(
-        `${prefix}lessonOrganizationUsers/setpwd`,
-        lessonOrganizationUser.setpwd
-    );
-
-    // organization form
-    const lessonOrganizationForm = controller.lessonOrganizationForm;
-    router.get(
-        `${prefix}lessonOrganizationForms/:id/submit`,
-        lessonOrganizationForm.getSubmit
-    );
-    router.post(
-        `${prefix}lessonOrganizationForms/:id/submit`,
-        lessonOrganizationForm.postSubmit
-    );
-    router.put(
-        `${prefix}lessonOrganizationForms/:id/submit/:submitId`,
-        lessonOrganizationForm.updateSubmit
-    );
-    router.post(
-        `${prefix}lessonOrganizationForms/search`,
-        lessonOrganizationForm.search
-    );
-    router.resources(
-        `${prefix}lessonOrganizationForms`,
-        lessonOrganizationForm
-    );
 
     // organization
     const organization = controller.organization.index;

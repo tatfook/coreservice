@@ -1,5 +1,5 @@
 const md5 = require('blueimp-md5');
-// const { app, mock, assert } = require('egg-mock/bootstrap');
+const { app, mock, assert } = require('egg-mock/bootstrap');
 const loadFactory = require('./factory.js');
 
 module.exports = app => {
@@ -18,12 +18,12 @@ module.exports = app => {
         user = await app.factory.create('users', user).then(o => o.toJSON());
         return await app
             .httpRequest()
-            .post('/api/v0/users/login')
+            .post(`/api/v0/users/login`)
             .send({
                 username: user.username,
                 password: '123456',
             })
-            .expect(200)
+            .expect(res => assert(res.statusCode == 200))
             .then(res => res.body);
     };
 
@@ -34,12 +34,12 @@ module.exports = app => {
         });
         return await app
             .httpRequest()
-            .post('/api/v0/admins/login')
+            .post(`/api/v0/admins/login`)
             .send({
                 username: 'user001',
                 password: '123456',
             })
-            .expect(200)
+            .expect(res => assert(res.statusCode == 200))
             .then(res => res.body);
     };
 
