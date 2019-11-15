@@ -67,6 +67,8 @@ const Favorite = class extends Controller {
                                 'nickname',
                                 'portrait',
                                 'description',
+                                'vip',
+                                'tLevel',
                             ],
                             as: 'users',
                             model: this.model.users,

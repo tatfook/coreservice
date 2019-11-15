@@ -100,6 +100,34 @@ const Lesson = class extends Controller {
         });
         return this.success(ret);
     }
+
+    async getUserById() {
+        const { id, apiKey } = this.validate({ id: 'int' });
+        if (apiKey !== lessonApiKey) return this.fail(-1);
+
+        const user = await this.service.lesson.getUserById(id);
+        if (!user) {
+            // eslint-disable-next-line no-magic-numbers
+            return this.fail(12);
+        }
+        return this.success(user);
+    }
+
+    async updateUserById() {
+        const { id, apiKey, params } = this.validate({ id: 'int' });
+        if (apiKey !== lessonApiKey) return this.fail(-1);
+        const user = await this.service.lesson.getUserById(id);
+        if (!user) {
+            // eslint-disable-next-line no-magic-numbers
+            return this.fail(12);
+        }
+        // 如果教师等级低于用户的教师等级则不更新
+        if (params.tLevel && params.tLevel < user.tLevel) {
+            delete params.tLevel;
+        }
+        const result = await this.service.lesson.updateUserById(id, params);
+        return this.success(result);
+    }
     // -----------api for lesson-api project--------------------
 };
 

@@ -108,6 +108,24 @@ class User extends Service {
     async register(user) {
         await this.createRegisterMsg(user);
     }
+    /**
+     * 往列表里面加user的属性
+     * @param {Array<{userId}>} list 列表
+     */
+    async addUserAttrByUserIds(list) {
+        const userIds = [];
+
+        _.each(list, (o, i) => {
+            o = o.get ? o.get({ plain: true }) : o;
+            userIds.push(o.userId);
+            list[i] = o;
+        });
+        const users = await this.app.model.users.getUsers(userIds);
+
+        _.each(list, o => {
+            o.user = users[o.userId];
+        });
+    }
 }
 
 module.exports = User;

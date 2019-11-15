@@ -193,7 +193,9 @@ class Api {
         if (inst.createdAt === inst.updatedAt) await this.usersUpsert(user);
 
         if (!user) return;
-
+        let systemTags = [];
+        inst.systemTags &&
+            (systemTags = inst.systemTags.map(tag => tag.tagname));
         return await this.curl(
             'post',
             `/projects/${inst.id}/upsert`,
@@ -222,7 +224,7 @@ class Api {
                 updated_at: inst.updatedAt,
                 video: (inst.extra || {}).videoUrl,
                 recommended: inst.choicenessNo > 0,
-                sys_tags: (inst.classifyTags || '').split('|').filter(o => o),
+                sys_tags: systemTags,
                 point: inst.rateCount < 8 ? undefined : inst.rate,
             },
             this.esConfig
