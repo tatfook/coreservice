@@ -1,6 +1,6 @@
 'use strict';
 const mock = require('egg-mock');
-moch.env('prod');
+mock.env('prod');
 const app = mock.app();
 module.exports = {
     up: async (queryInterface, Sequelize) => {
