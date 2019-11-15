@@ -46,6 +46,8 @@ const Member = class extends Controller {
             params.objectType
         );
 
+        await this.service.user.addUserAttrByUserIds(list);
+
         return this.success(list);
     }
 

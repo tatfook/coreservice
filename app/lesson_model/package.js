@@ -2,7 +2,7 @@
 'use strict';
 
 module.exports = app => {
-    const { BIGINT, STRING, INTEGER, DATE, JSON } = app.Sequelize;
+    const { BIGINT, STRING, INTEGER, DATE } = app.Sequelize;
 
     const model = app.lessonModel.define(
         'packages',
@@ -68,11 +68,13 @@ module.exports = app => {
                 defaultValue: 0,
             },
 
-            extra: {
-                type: JSON,
-                defaultValue: {
-                    coverUrl: '',
-                },
+            coverUrl: {
+                // 封面url
+                type: STRING,
+            },
+            refuseMsg: {
+                // 审核拒绝信息
+                type: STRING,
             },
         },
         {
