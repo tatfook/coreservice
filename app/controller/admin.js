@@ -406,6 +406,27 @@ const Admin = class extends Controller {
         await this.updateEsProject(projectId);
         return this.success(result);
     }
+
+    async esProjectTagUpdate() {
+        this.adminAuthenticated();
+        const relations = await this.app.model.systemTagProjects.findAll();
+        let projectIds = relations.map(relation => relation.projectId);
+        projectIds = Array.from(new Set(projectIds));
+        for (let i = 0; i < projectIds.length; i++) {
+            const project = await this.app.model.projects.findOne({
+                where: { id: projectIds[i] },
+                include: [
+                    {
+                        model: this.app.model.systemTags,
+                    },
+                ],
+            });
+            if (project) {
+                await this.app.api.projectsUpsert(project);
+            }
+        }
+        return this.success(projectIds.length);
+    }
 };
 
 module.exports = Admin;
