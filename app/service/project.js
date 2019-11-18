@@ -126,6 +126,7 @@ class Project extends Service {
                 {
                     model: this.model.systemTags,
                     nested: false,
+                    as: 'systemTags',
                     where: includeWhere,
                 },
             ],

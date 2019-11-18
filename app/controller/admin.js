@@ -129,7 +129,7 @@ const Admin = class extends Controller {
 
         this.formatQuery(query);
 
-        const list = await this.resource.findAndCount(query);
+        const list = await this.resource.findAndCountAll(query);
 
         // this.action();
 
@@ -344,6 +344,7 @@ const Admin = class extends Controller {
             include: [
                 {
                     model: this.model.systemTags,
+                    as: 'systemTags',
                 },
             ],
         });
@@ -418,6 +419,7 @@ const Admin = class extends Controller {
                 include: [
                     {
                         model: this.app.model.systemTags,
+                        as: 'systemTags',
                     },
                 ],
             });
