@@ -438,11 +438,11 @@ const User = class extends Controller {
                 await this.model.users.destroy({ where: { id: user.id } });
                 return this.fail(6);
             }
-            await this.app.api.createGitProject({
-                username: user.username,
-                sitename: '__keepwork__',
-                visibility: 'public',
-            });
+            // await this.app.api.createGitProject({
+            //     username: user.username,
+            //     sitename: '__keepwork__',
+            //     visibility: 'public',
+            // });
         }
 
         if (params.oauthToken) {
