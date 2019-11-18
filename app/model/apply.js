@@ -12,6 +12,7 @@ const {
     APPLY_STATE_AGREE,
     APPLY_STATE_REFUSE,
     APPLY_TYPE_MEMBER,
+    USER_ATTRS,
 } = require('../core/consts.js');
 
 module.exports = app => {
@@ -132,12 +133,7 @@ module.exports = app => {
 
         if (applyType === APPLY_TYPE_MEMBER) {
             const users = await app.model.users.findAll({
-                attributes: [
-                    [ 'id', 'userId' ],
-                    'username',
-                    'nickname',
-                    'portrait',
-                ],
+                attributes: USER_ATTRS,
                 where: {
                     id: {
                         [app.Sequelize.Op.in]: ids,
