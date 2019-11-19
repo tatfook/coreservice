@@ -203,7 +203,7 @@ class Api {
             inst.systemTags = await this.app.model.systemTags.findAll({
                 where: {
                     id: {
-                        [this.model.Op.in]: tagIds,
+                        [this.app.Sequelize.Op.in]: tagIds,
                     },
                 },
             });
