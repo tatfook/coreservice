@@ -196,37 +196,42 @@ class Api {
         let systemTags = [];
         inst.systemTags &&
             (systemTags = inst.systemTags.map(tag => tag.tagname));
+        const body = {
+            // return await this.curl('post', `/projects/${inst.id}/upsert`, {
+            id: inst.id,
+            name: inst.name,
+            username: user.username,
+            user_portrait: user.portrait,
+            visibility: user.realname
+                ? inst.visibility === 0
+                    ? 'public'
+                    : 'private'
+                : 'private',
+            recruiting: !!(inst.privilege & 1),
+            type: inst.type === 1 ? 'paracraft' : 'site',
+            created_at: inst.createdAt,
+            cover: (inst.extra || {}).imageUrl,
+            description: inst.description,
+            total_like: inst.star,
+            total_view: inst.visit,
+            total_mark: inst.favorite,
+            total_comment: inst.comment,
+            recent_like: inst.lastStar,
+            recent_view: inst.lastVisit,
+            updated_at: inst.updatedAt,
+            video: (inst.extra || {}).videoUrl,
+            recommended: inst.choicenessNo > 0,
+            sys_tags: systemTags,
+            point: inst.rateCount < 8 ? undefined : inst.rate,
+            world_tag_name: (inst.extra || {}).worldTagName,
+        };
+        if (!systemTags.length) {
+            delete body.sys_tags;
+        }
         return await this.curl(
             'post',
             `/projects/${inst.id}/upsert`,
-            {
-                // return await this.curl('post', `/projects/${inst.id}/upsert`, {
-                id: inst.id,
-                name: inst.name,
-                username: user.username,
-                user_portrait: user.portrait,
-                visibility: user.realname
-                    ? inst.visibility === 0
-                        ? 'public'
-                        : 'private'
-                    : 'private',
-                recruiting: !!(inst.privilege & 1),
-                type: inst.type === 1 ? 'paracraft' : 'site',
-                created_at: inst.createdAt,
-                cover: inst.extra.imageUrl,
-                description: inst.description,
-                total_like: inst.star,
-                total_view: inst.visit,
-                total_mark: inst.favorite,
-                total_comment: inst.comment,
-                recent_like: inst.lastStar,
-                recent_view: inst.lastVisit,
-                updated_at: inst.updatedAt,
-                video: (inst.extra || {}).videoUrl,
-                recommended: inst.choicenessNo > 0,
-                sys_tags: systemTags,
-                point: inst.rateCount < 8 ? undefined : inst.rate,
-            },
+            body,
             this.esConfig
         );
     }
