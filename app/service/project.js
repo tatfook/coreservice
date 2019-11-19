@@ -144,7 +144,8 @@ class Project extends Service {
     }
 
     async esProjectWorldTagNameUpdate() {
-        const projects = await this.app.model.query(`SELECT 
+        const projects = await this.app.model.query(
+            `SELECT 
         a.id
     FROM
         projects a,
@@ -152,7 +153,9 @@ class Project extends Service {
     WHERE
         a.id = b.projectId
             AND ISNULL(a.extra) = 0
-            AND LENGTH(TRIM(JSON_EXTRACT(a.extra, '$.worldTagName'))) != 0;`);
+            AND LENGTH(TRIM(JSON_EXTRACT(a.extra, '$.worldTagName'))) != 0;`,
+            { type: this.model.QueryTypes.SELECT }
+        );
         const promises = projects.map(project => {
             return async function() {
                 const _project = await this.app.model.projects.findOne({
@@ -165,7 +168,7 @@ class Project extends Service {
                     ],
                 });
                 if (_project) {
-                    await this.app.api.projectsUpsert(_project);
+                    return await this.app.api.projectsUpsert(_project);
                 }
             };
         });
