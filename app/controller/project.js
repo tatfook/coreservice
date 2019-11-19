@@ -286,7 +286,29 @@ const Project = class extends Controller {
         const data = await this.model.projects.update(params, {
             where: { id, userId },
         });
-
+        // 更新world的worldTagName
+        if (params.extra && params.extra.worldTagName) {
+            const world = await this.model.worlds.findOne({
+                where: {
+                    projectId: id,
+                    userId,
+                },
+            });
+            if (world) {
+                const extra = world.extra ? world.extra : {};
+                extra.worldTagName = params.extra.worldTagName;
+                await this.model.worlds.update(
+                    {
+                        extra,
+                    },
+                    {
+                        where: {
+                            id: world.id,
+                        },
+                    }
+                );
+            }
+        }
         return this.success(data);
     }
 

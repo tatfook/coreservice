@@ -142,6 +142,35 @@ class Project extends Service {
         });
         return result;
     }
+
+    async esProjectWorldTagNameUpdate() {
+        const projects = await this.app.model.query(`SELECT 
+        a.id
+    FROM
+        projects a,
+        worlds b
+    WHERE
+        a.id = b.projectId
+            AND ISNULL(a.extra) = 0
+            AND LENGTH(TRIM(JSON_EXTRACT(a.extra, '$.worldTagName'))) != 0;`);
+        const promises = projects.map(project => {
+            return async function() {
+                const _project = await this.app.model.projects.findOne({
+                    where: { id: project.id },
+                    include: [
+                        {
+                            model: this.app.model.systemTags,
+                            as: 'systemTags',
+                        },
+                    ],
+                });
+                if (_project) {
+                    await this.app.api.projectsUpsert(_project);
+                }
+            };
+        });
+        return await Promise.all(promises);
+    }
 }
 
 module.exports = Project;

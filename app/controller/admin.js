@@ -429,6 +429,12 @@ const Admin = class extends Controller {
         }
         return this.success(projectIds.length);
     }
+
+    async esProjectWorldTagNameUpdate() {
+        this.adminAuthenticated();
+        const result = await this.service.project.esProjectWorldTagNameUpdate();
+        return this.success(result);
+    }
 };
 
 module.exports = Admin;
