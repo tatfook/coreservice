@@ -193,6 +193,21 @@ class Api {
         if (inst.createdAt === inst.updatedAt) await this.usersUpsert(user);
 
         if (!user) return;
+        if (!inst.systemTags) {
+            const tags = await this.app.model.systemTagProjects.findAll({
+                where: {
+                    projectId: inst.id,
+                },
+            });
+            const tagIds = tags.map(tag => tag.systemTagId);
+            inst.systemTags = await this.app.model.systemTags.findAll({
+                where: {
+                    id: {
+                        [this.model.Op.in]: tagIds,
+                    },
+                },
+            });
+        }
         let systemTags = [];
         inst.systemTags &&
             (systemTags = inst.systemTags.map(tag => tag.tagname));
@@ -225,9 +240,6 @@ class Api {
             point: inst.rateCount < 8 ? undefined : inst.rate,
             world_tag_name: (inst.extra || {}).worldTagName,
         };
-        if (!systemTags.length) {
-            delete body.sys_tags;
-        }
         return await this.curl(
             'post',
             `/projects/${inst.id}/upsert`,
