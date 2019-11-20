@@ -305,7 +305,7 @@ const User = class extends Controller {
             });
             if (!ok) {
                 await this.model.users.destroy({ where: { id: user.id } });
-                return this.fail(6);
+                return this.fail(0);
             }
             await this.app.api.createGitProject({
                 username: user.username,
@@ -436,7 +436,7 @@ const User = class extends Controller {
             });
             if (!ok) {
                 await this.model.users.destroy({ where: { id: user.id } });
-                return this.fail(6);
+                return this.fail(0);
             }
             // await this.app.api.createGitProject({
             //     username: user.username,

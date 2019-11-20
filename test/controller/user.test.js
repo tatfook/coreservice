@@ -169,7 +169,7 @@ describe('test/controller/user.test.js', () => {
                 })
                 .expect(400)
                 .then(res => res.body);
-            assert(result.code === 6);
+            assert(result.code === 0);
             const user = await app.model.users.findOne();
             assert(!user);
         });
