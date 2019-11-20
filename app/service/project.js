@@ -126,6 +126,7 @@ class Project extends Service {
                 {
                     model: this.model.systemTags,
                     nested: false,
+                    as: 'systemTags',
                     where: includeWhere,
                 },
             ],
@@ -136,10 +137,43 @@ class Project extends Service {
                     'sn',
                     'desc',
                 ],
+                [ 'id', 'asc' ],
             ],
             distinct: true,
         });
         return result;
+    }
+
+    async esProjectWorldTagNameUpdate() {
+        const projects = await this.app.model.query(
+            `SELECT 
+        a.id
+    FROM
+        projects a,
+        worlds b
+    WHERE
+        a.id = b.projectId
+            AND ISNULL(a.extra) = 0
+            AND LENGTH(TRIM(JSON_EXTRACT(a.extra, '$.worldTagName'))) != 0;`,
+            { type: this.model.QueryTypes.SELECT }
+        );
+        const promises = projects.map(project => {
+            return async function() {
+                const _project = await this.app.model.projects.findOne({
+                    where: { id: project.id },
+                    include: [
+                        {
+                            model: this.app.model.systemTags,
+                            as: 'systemTags',
+                        },
+                    ],
+                });
+                if (_project) {
+                    return await this.app.api.projectsUpsert(_project);
+                }
+            };
+        });
+        return await Promise.all(promises);
     }
 }
 
