@@ -135,4 +135,14 @@ module.exports = {
     CLASS_MEMBER_ROLE_STUDENT: 1, // 学生
     CLASS_MEMBER_ROLE_TEACHER: 2, // 教师
     CLASS_MEMBER_ROLE_ADMIN: 64, // 管理员
+
+    USER_ATTRS: [
+        [ 'id', 'userId' ],
+        'username',
+        'nickname',
+        'portrait',
+        'description',
+        'vip',
+        'tLevel',
+    ], // 返回的用户的属性
 };
