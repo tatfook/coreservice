@@ -137,6 +137,7 @@ class Project extends Service {
                     'sn',
                     'desc',
                 ],
+                [ 'id', 'asc' ],
             ],
             distinct: true,
         });
