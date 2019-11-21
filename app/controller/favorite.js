@@ -9,6 +9,7 @@ const {
     ENTITY_TYPE_PAGE,
     ENTITY_TYPE_GROUP,
     ENTITY_TYPE_PROJECT,
+    USER_ATTRS,
 } = require('../core/consts.js');
 
 const ENTITYS = [
@@ -61,15 +62,7 @@ const Favorite = class extends Controller {
                     model: this.model.projects,
                     include: [
                         {
-                            attributes: [
-                                [ 'id', 'userId' ],
-                                'username',
-                                'nickname',
-                                'portrait',
-                                'description',
-                                'vip',
-                                'tLevel',
-                            ],
+                            attributes: USER_ATTRS,
                             as: 'users',
                             model: this.model.users,
                         },

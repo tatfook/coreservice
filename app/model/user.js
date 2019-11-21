@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 const _ = require('lodash');
-
+const { USER_ATTRS } = require('../core/consts');
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
@@ -118,19 +118,9 @@ module.exports = app => {
     };
 
     model.getBaseInfoById = async function(userId) {
-        const attributes = [
-            [ 'id', 'userId' ],
-            'username',
-            'nickname',
-            'portrait',
-            'description',
-            'vip',
-            'tLevel',
-        ];
-
         const data = await app.model.users.findOne({
             where: { id: userId },
-            attributes,
+            attributes: USER_ATTRS,
         });
         if (!data) return {};
 
@@ -152,17 +142,8 @@ module.exports = app => {
     };
 
     model.getUsers = async function(userIds = []) {
-        const attributes = [
-            [ 'id', 'userId' ],
-            'username',
-            'nickname',
-            'portrait',
-            'description',
-            'vip',
-            'tLevel',
-        ];
         const list = await app.model.users.findAll({
-            attributes,
+            attributes: USER_ATTRS,
             where: {
                 id: {
                     [app.Sequelize.Op.in]: userIds,

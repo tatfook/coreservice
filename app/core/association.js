@@ -162,6 +162,7 @@ module.exports = app => {
         through: {
             model: app.model.systemTagProjects,
         },
+        as: 'systemTags',
         foreignKey: 'projectId',
         constraints: false,
     });
@@ -171,6 +172,14 @@ module.exports = app => {
         },
         foreignKey: 'systemTagId',
         constraints: false,
+    });
+
+    app.model.projects.belongsToMany(app.model.systemTags, {
+        through: {
+            model: app.model.systemTagProjects,
+        },
+        as: 'filterTags',
+        foreignKey: 'projectId',
     });
 
     // 探索APP
