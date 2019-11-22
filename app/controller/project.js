@@ -98,7 +98,7 @@ const Project = class extends Controller {
     }
 
     async searchForParacraft() {
-        const { tagIds, sortTag, projectId } = this.validate({
+        const { tagIds, sortTag, projectId, projectIds } = this.validate({
             tagIds: joi
                 .array()
                 .items(joi.number().integer())
@@ -113,13 +113,19 @@ const Project = class extends Controller {
                 .number()
                 .integer()
                 .optional()
-                .description('要所有的项目ID'),
+                .description('要搜索的项目ID'),
+            projectIds: joi
+                .array()
+                .items(joi.number().integer())
+                .optional()
+                .description('要搜索的项目ID数组'),
         });
         const result = await this.service.project.searchForParacraft(
             this.queryOptions,
             tagIds,
             sortTag,
-            projectId
+            projectId,
+            projectIds
         );
         const rows = result.rows;
 
