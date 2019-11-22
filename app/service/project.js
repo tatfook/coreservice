@@ -97,10 +97,23 @@ class Project extends Service {
     }
 
     // paracraft项目搜索
-    async searchForParacraft(queryOptions, tagIds, sortTag, projectId) {
+    async searchForParacraft(
+        queryOptions,
+        tagIds,
+        sortTag,
+        projectId,
+        projectIds
+    ) {
         const whereClause = [];
         if (projectId) {
             whereClause.push({ id: projectId });
+        }
+        if (projectIds.length) {
+            whereClause.push({
+                id: {
+                    [this.app.Sequelize.Op.in]: projectIds,
+                },
+            });
         }
         const includeWhere = {};
         if (sortTag) {
