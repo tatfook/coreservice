@@ -140,6 +140,7 @@ class Project extends Service {
                 [ 'id', 'asc' ],
             ],
             distinct: true,
+            subQuery: false,
         });
         return result;
     }
