@@ -102,7 +102,7 @@ class Project extends Service {
         tagIds,
         sortTag,
         projectId,
-        projectIds
+        projectIds = []
     ) {
         const whereClause = [];
         if (projectId) {
