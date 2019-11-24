@@ -179,7 +179,10 @@ class RepoService extends Service {
             ctx.logger.error(repoPath, ' not exist. err: ', err.message);
         });
         if (porject) {
-            const result = await service.repo.createRepo(repo.username, repo.repoName);
+            const result = await service.repo.createRepo(
+                repo.username,
+                repo.repoName
+            );
             if (result) await repo.update({ synced: true });
         }
     }
@@ -197,7 +200,9 @@ class RepoService extends Service {
 
     async generateFromWorld(world, transaction) {
         const worldName = this.ctx.service.world.base32(world.worldName);
-        const user = await this.ctx.model.User.findOne({ where: { id: world.userId } });
+        const user = await this.ctx.model.User.findOne({
+            where: { id: world.userId },
+        });
         if (!user) this.ctx.logger.error('invalid world ', world.worldName);
         const attributes = {
             resourceType: 'World',
@@ -211,14 +216,18 @@ class RepoService extends Service {
 
     async canReadByUser(repo, userId) {
         const { ctx } = this;
-        const resource = await ctx.model[repo.resourceType].findOne({ where: { id: repo.resourceId } });
+        const resource = await ctx.model[repo.resourceType].findOne({
+            where: { id: repo.resourceId },
+        });
         if (!resource) ctx.throw('Resource does not exist.');
         return resource.canReadByUser(userId);
     }
 
     async canWriteByUser(repo, userId) {
         const { ctx } = this;
-        const resource = await ctx.model[repo.resourceType].findOne({ where: { id: repo.resourceId } });
+        const resource = await ctx.model[repo.resourceType].findOne({
+            where: { id: repo.resourceId },
+        });
         if (!resource) ctx.throw('Resource does not exist.');
         return resource.canWriteByUser(userId);
     }

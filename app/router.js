@@ -138,10 +138,7 @@ module.exports = app => {
     router.get('/projects/:id/game', project.game);
     router.get('/projects/join', project.join);
     router.post('/projects/search', project.search);
-    router.post(
-        'projects/searchForParacraft',
-        project.searchForParacraft
-    );
+    router.post('projects/searchForParacraft', project.searchForParacraft);
     router.get('/projects/:id/detail', project.detail);
     router.get('/projects/:id/visit', project.visit);
     router.get('/projects/:id/star', project.isStar);
@@ -198,10 +195,7 @@ module.exports = app => {
         admin.deleteProjectTags
     );
     // esProjectTag更新
-    router.get(
-        'admins/task/once/esProjectTagUpdate',
-        admin.esProjectTagUpdate
-    );
+    router.get('admins/task/once/esProjectTagUpdate', admin.esProjectTagUpdate);
     // esProjectWorldTagName更新
     router.get(
         'admins/task/once/esProjectWorldTagNameUpdate',
@@ -240,7 +234,10 @@ module.exports = app => {
     router.post('/repos/:repoPath/files/:filePath/rename', repo.renameFile);
     router.post('/repos/:repoPath/folders/:folderPath', repo.createFolder);
     router.delete('/repos/:repoPath/folders/:folderPath', repo.deleteFolder);
-    router.post('/repos/:repoPath/folders/:folderPath/rename', repo.renameFolder);
+    router.post(
+        '/repos/:repoPath/folders/:folderPath/rename',
+        repo.renameFolder
+    );
 
     const sensitiveWord = controller.sensitiveWord;
     // router.get(`sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
@@ -252,14 +249,8 @@ module.exports = app => {
     // 探索APP
     const paracraftGameCoinKey = controller.paracraftGameCoinKey;
     const paracraftDevice = controller.paracraftDevice;
-    router.get(
-        'paracraftDevices/pwdVerify',
-        paracraftDevice.pwdVerify
-    );
-    router.post(
-        'paracraftGameCoinKeys/active',
-        paracraftGameCoinKey.active
-    );
+    router.get('paracraftDevices/pwdVerify', paracraftDevice.pwdVerify);
+    router.post('paracraftGameCoinKeys/active', paracraftGameCoinKey.active);
 
     // paracraft 官网
     const paracraftVisitor = controller.paracraftVisitor;
@@ -302,7 +293,13 @@ module.exports = app => {
 
     // migration
     const migration = controller.admin.migration;
-    router.post('/admin/migration/generateSiteRepo', migration.generateSiteRepo);
-    router.post('/admin/migration/generateWorldRepo', migration.generateWorldRepo);
+    router.post(
+        '/admin/migration/generateSiteRepo',
+        migration.generateSiteRepo
+    );
+    router.post(
+        '/admin/migration/generateWorldRepo',
+        migration.generateWorldRepo
+    );
     router.post('/admin/migration/syncRepo', migration.syncRepo);
 };

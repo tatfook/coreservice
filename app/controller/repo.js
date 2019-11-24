@@ -6,7 +6,11 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
         const { folderPath, recursive } = ctx.params;
-        const result = await service.repo.getFolderFiles(repo.path, folderPath, recursive);
+        const result = await service.repo.getFolderFiles(
+            repo.path,
+            folderPath,
+            recursive
+        );
         return this.success(result);
     }
 
@@ -22,7 +26,11 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileInfo(repo.path, filePath, commitId);
+        const result = await service.repo.getFileInfo(
+            repo.path,
+            filePath,
+            commitId
+        );
         return this.success(result);
     }
 
@@ -30,7 +38,11 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileRaw(repo.path, filePath, commitId);
+        const result = await service.repo.getFileRaw(
+            repo.path,
+            filePath,
+            commitId
+        );
         return this.success(result);
     }
 
@@ -38,7 +50,11 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileHistory(repo.path, filePath, commitId);
+        const result = await service.repo.getFileHistory(
+            repo.path,
+            filePath,
+            commitId
+        );
         return this.success(result);
     }
 
@@ -47,7 +63,12 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, content } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.upsertFile(repo.path, filePath, content, committer);
+        const result = await service.repo.upsertFile(
+            repo.path,
+            filePath,
+            content,
+            committer
+        );
         return this.success(result);
     }
 
@@ -56,7 +77,11 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFile(repo.path, filePath, committer);
+        const result = await service.repo.deleteFile(
+            repo.path,
+            filePath,
+            committer
+        );
         return this.success(result);
     }
 
@@ -65,7 +90,12 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, newFilePath } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFile(repo.path, filePath, newFilePath, committer);
+        const result = await service.repo.deleteFile(
+            repo.path,
+            filePath,
+            newFilePath,
+            committer
+        );
         return this.success(result);
     }
 
@@ -74,7 +104,11 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.createFolder(repo.path, folderPath, committer);
+        const result = await service.repo.createFolder(
+            repo.path,
+            folderPath,
+            committer
+        );
         return this.success(result);
     }
 
@@ -83,7 +117,11 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFolder(repo.path, folderPath, committer);
+        const result = await service.repo.deleteFolder(
+            repo.path,
+            folderPath,
+            committer
+        );
         return this.success(result);
     }
 
@@ -92,7 +130,12 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath, newFolderPath } = ctx.params;
         const committer = this.getUser().username;
-        const result = await service.repo.moveFolder(repo.path, folderPath, newFolderPath, committer);
+        const result = await service.repo.moveFolder(
+            repo.path,
+            folderPath,
+            newFolderPath,
+            committer
+        );
         return this.success(result);
     }
 
@@ -100,8 +143,13 @@ const Repo = class extends Controller {
         this.authenticated();
         const { ctx, service } = this;
         const { repoPath } = ctx.params;
-        const repo = await ctx.model.Repo.findOne({ where: { path: repoPath } });
-        const canRead = await service.repo.canReadByUser(repo, this.getUser().userId);
+        const repo = await ctx.model.Repo.findOne({
+            where: { path: repoPath },
+        });
+        const canRead = await service.repo.canReadByUser(
+            repo,
+            this.getUser().userId
+        );
         if (!canRead) ctx.throw('no permission to view the repo data');
         return repo;
     }
@@ -110,8 +158,13 @@ const Repo = class extends Controller {
         this.authenticated();
         const { ctx, service } = this;
         const { repoPath } = ctx.params;
-        const repo = await ctx.model.Repo.findOne({ where: { path: repoPath } });
-        const canWrite = await service.repo.canWriteByUser(repo, this.getUser().userId);
+        const repo = await ctx.model.Repo.findOne({
+            where: { path: repoPath },
+        });
+        const canWrite = await service.repo.canWriteByUser(
+            repo,
+            this.getUser().userId
+        );
         if (!canWrite) ctx.throw('no permission to edit the repo');
         return repo;
     }

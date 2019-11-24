@@ -53,7 +53,7 @@ module.exports = {
 
         await queryInterface.addIndex('repos', {
             fields: ['resourceType', 'resourceId'],
-            name: 'indexOfResource'
+            name: 'indexOfResource',
         });
         await queryInterface.addIndex('repos', {
             fields: ['username', 'repoName'],
