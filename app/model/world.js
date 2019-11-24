@@ -122,6 +122,16 @@ module.exports = app => {
         return world && world.get({ plain: true });
     };
 
+    model.prototype.canReadByUser = async function(user) {
+        // TODO: currently, there's no permission logic for 'world' project
+        if (user) return true;
+    };
+
+    model.prototype.canWriteByUser = async function(user) {
+        // TODO: currently, there's no permission logic for 'world' project
+        return this.userId === user.id;
+    };
+
     app.model.worlds = model;
     return model;
 };

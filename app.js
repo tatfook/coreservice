@@ -1,5 +1,4 @@
 'use strict';
-require('newrelic');
 // const _ = require('lodash');
 const cache = require('memory-cache');
 const consts = require('./app/core/consts.js');
@@ -22,10 +21,6 @@ module.exports = app => {
     app.consts = consts;
     app.util = util;
     app.unittest = app.config.env === 'unittest';
-
-    if (app.config.env !== 'prod') {
-        process.env.NEW_RELIC_ENABLED = false;
-    }
 
     sms(app);
     email(app);
