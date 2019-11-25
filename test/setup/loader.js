@@ -44,4 +44,6 @@ module.exports = app => {
     };
 
     loadFactory(app);
+
+    app.authHttpclient = async () => {};
 };
