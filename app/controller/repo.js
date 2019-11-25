@@ -150,7 +150,7 @@ const Repo = class extends Controller {
             repo,
             this.getUser().userId
         );
-        if (!canRead) ctx.throw('no permission to view the repo data');
+        if (!canRead) ctx.throw('no permission to view the repo data', 403);
         return repo;
     }
 
@@ -165,7 +165,7 @@ const Repo = class extends Controller {
             repo,
             this.getUser().userId
         );
-        if (!canWrite) ctx.throw('no permission to edit the repo');
+        if (!canWrite) ctx.throw('no permission to edit the repo', 403);
         return repo;
     }
 };

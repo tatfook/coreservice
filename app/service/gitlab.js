@@ -6,7 +6,6 @@ const Axios = require('axios');
 let Client;
 
 class GitlabService extends Service {
-
     get client() {
         if (!Client) {
             Client = Axios.create({ baseURL: this.app.config.self.gitlabURL });

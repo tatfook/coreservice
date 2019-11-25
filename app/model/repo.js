@@ -51,5 +51,6 @@ module.exports = app => {
         }
     );
 
+    app.model.repos = model;
     return model;
 };

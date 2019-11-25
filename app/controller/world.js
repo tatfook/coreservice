@@ -32,26 +32,6 @@ const World = class extends Controller {
 
         return this.success('OK');
     }
-
-    async test() {
-        const params = this.validate({
-            worldName: 'string',
-        });
-
-        const ok = await this.ctx.service.world.generateDefaultWorld(
-            params.worldName
-        );
-        return this.success(ok);
-    }
-
-    async testDelete() {
-        const params = this.validate({
-            worldName: 'string',
-        });
-
-        const ok = await this.ctx.service.world.removeProject(params.worldName);
-        return this.success(ok);
-    }
 };
 
 module.exports = World;

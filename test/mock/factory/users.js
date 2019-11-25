@@ -4,8 +4,8 @@ module.exports = app => {
 
     factory.define(tableName, app.model[tableName], {
         username: factory.chance('word', { length: 10 }),
-        password: factory.chance('string', { length: 10 }),
-        nickname: factory.chance('string', { length: 10 }),
+        password: factory.chance('word', { length: 10 }),
+        nickname: factory.chance('word', { length: 10 }),
         portrait: factory.chance('string', { length: 10 }),
         description: factory.chance('string', { length: 10 }),
         email: factory.chance('email'),

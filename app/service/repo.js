@@ -183,7 +183,7 @@ class RepoService extends Service {
                 repo.username,
                 repo.repoName
             );
-            if (result) await repo.update({ synced: true });
+            if (result) return repo.update({ synced: true });
         }
     }
 
@@ -195,7 +195,7 @@ class RepoService extends Service {
             repoName: site.sitename,
             path: `${site.username}/${site.sitename}`,
         };
-        return this.ctx.model.Repo.create(attributes, transaction);
+        return this.ctx.model.Repo.create(attributes, { transaction });
     }
 
     async generateFromWorld(world, transaction) {
@@ -211,7 +211,7 @@ class RepoService extends Service {
             repoName: worldName,
             path: `${user.username}/${worldName}`,
         };
-        return this.ctx.model.Repo.create(attributes, transaction);
+        return this.ctx.model.Repo.create(attributes, { transaction });
     }
 
     async canReadByUser(repo, userId) {
