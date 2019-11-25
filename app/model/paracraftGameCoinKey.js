@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON, DATE } = app.Sequelize;
-    // del???
+    // paracraft嵌入设备
     const model = app.model.define(
         'paracraftGameCoinKeys',
         {
