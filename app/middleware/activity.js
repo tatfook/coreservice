@@ -1,6 +1,7 @@
 'use strict';
 
 module.exports = (options, app) => {
+    // del
     const activity = async ctx => {
         const userId = (ctx.state.user || {}).userId || 0;
         const path = ctx.path;

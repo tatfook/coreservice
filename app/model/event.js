@@ -2,7 +2,7 @@
 
 module.exports = app => {
     const { BIGINT, INTEGER, JSON } = app.Sequelize;
-
+    // del
     const model = app.model.define(
         'events',
         {

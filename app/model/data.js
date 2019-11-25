@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 module.exports = app => {
     const { BIGINT, JSON } = app.Sequelize;
-
+    // todo
     const model = app.model.define(
         'datas',
         {

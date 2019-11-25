@@ -3,7 +3,7 @@
 
 module.exports = app => {
     const { BIGINT, STRING, DATE, JSON } = app.Sequelize;
-
+    // ???
     const attrs = {
         id: {
             type: BIGINT,

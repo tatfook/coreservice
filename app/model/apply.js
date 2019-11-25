@@ -80,6 +80,7 @@ module.exports = app => {
 
             indexes: [
                 {
+                    name: '',
                     unique: true,
                     fields: [ 'objectId', 'objectType', 'applyId', 'applyType' ],
                 },

@@ -5,7 +5,7 @@ module.exports = app => {
 
         JSON,
     } = app.Sequelize;
-
+    // ???
     const model = app.model.define(
         'pBlockClassifies',
         {

@@ -3,7 +3,7 @@
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
-
+    // ???
     const model = app.model.define(
         'visitors',
         {

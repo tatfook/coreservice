@@ -2,7 +2,7 @@
 
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // todo
     const model = app.model.define(
         'caches',
         {
