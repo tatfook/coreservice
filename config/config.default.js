@@ -10,7 +10,6 @@ exports.middleware = [
     'pagination',
     'graphql',
     'organization',
-    'activity',
 ];
 
 exports.security = {

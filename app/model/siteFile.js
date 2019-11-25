@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT } = app.Sequelize;
-    // del
+    // del TODO 尚有在用
     const model = app.model.define(
         'siteFiles',
         {

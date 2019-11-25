@@ -87,11 +87,6 @@ module.exports = app => {
     router.get(`${prefix}sites/:id/groups`, site.getGroups);
     router.resources(`${prefix}sites`, site);
 
-    const page = controller.page;
-    router.post(`${prefix}pages/save`, page.save);
-    router.get(`${prefix}pages/visit`, page.visit);
-    router.resources(`${prefix}pages`, page);
-
     const group = controller.group;
     router.post(`${prefix}groups/:id/members`, group.postMembers);
     router.delete(`${prefix}groups/:id/members`, group.deleteMembers);
@@ -134,24 +129,6 @@ module.exports = app => {
     router.post(`${prefix}qinius/fop`, qiniu.fop);
     router.post(`${prefix}qinius/fopCallback`, qiniu.fopCallback);
     router.get(`${prefix}qinius/token`, qiniu.token);
-
-    const file = controller.file;
-    router.get(`${prefix}files/:id/rawurl`, file.rawurl);
-    router.get(`${prefix}files/:id/token`, file.token);
-    router.get(`${prefix}files/statistics`, file.statistics);
-    router.get(`${prefix}files/list`, file.list);
-    router.post(`${prefix}files/list`, file.list);
-    router.post(`${prefix}files/qiniu`, file.qiniu);
-    router.get(`${prefix}files/imageAudit`, file.imageAudit);
-    router.get(`${prefix}files/videoAudit`, file.videoAudit);
-    router.post(`${prefix}files/audit`, file.audit);
-    router.resources(`${prefix}files`, file);
-
-    const siteFile = controller.siteFile;
-    router.post(`${prefix}siteFiles/url`, siteFile.url);
-    router.get(`${prefix}siteFiles/:id/rawurl`, siteFile.rawurl);
-    router.get(`${prefix}siteFiles/:id/raw`, siteFile.raw);
-    router.resources(`${prefix}siteFiles`, siteFile);
 
     const tag = controller.tag;
     router.resources(`${prefix}tags`, tag);
@@ -201,20 +178,6 @@ module.exports = app => {
     const systemTag = controller.systemTag;
     router.post(`${prefix}systemTags/search`, systemTag.search);
     router.resources(`${prefix}systemTags`, systemTag);
-
-    const convert = controller.convert;
-    router.get(`${prefix}converts`, convert.convert);
-    router.get(
-        `${prefix}converts/siteVisibility`,
-        convert.convertSiteVisibility
-    );
-    router.get(`${prefix}converts/siteFile`, convert.convertSiteFile);
-    router.get(`${prefix}converts/userEmail`, convert.userEmail);
-    router.get(`${prefix}converts/users`, convert.users);
-    router.get(`${prefix}converts/sites`, convert.sites);
-    router.get(`${prefix}converts/groups`, convert.groups);
-    router.get(`${prefix}converts/group_members`, convert.groupMembers);
-    router.get(`${prefix}converts/site_groups`, convert.siteGroups);
 
     const admin = controller.admin;
     router.all(`${prefix}admins/query`, admin.query);
@@ -294,9 +257,6 @@ module.exports = app => {
     // paracraft 官网
     const paracraftVisitor = controller.paracraftVisitor;
     router.post(`${prefix}paracraftVisitors/upsert`, paracraftVisitor.upsert);
-
-    const paracraftNews = controller.paracraftNews;
-    router.get(`${prefix}paracraftNews`, paracraftNews.index);
 
     // 反馈 投诉 举报
     const feedback = controller.feedback;
