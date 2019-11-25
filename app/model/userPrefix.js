@@ -3,7 +3,7 @@
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
-
+    // ????
     const model = app.model.define(
         'userPrefixs',
         {

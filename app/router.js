@@ -239,6 +239,16 @@ module.exports = app => {
         `${prefix}admins/projects/:projectId/systemTags`,
         admin.deleteProjectTags
     );
+    // esProjectTag更新
+    router.get(
+        `${prefix}admins/task/once/esProjectTagUpdate`,
+        admin.esProjectTagUpdate
+    );
+    // esProjectWorldTagName更新
+    router.get(
+        `${prefix}admins/task/once/esProjectWorldTagNameUpdate`,
+        admin.esProjectWorldTagNameUpdate
+    );
 
     const order = controller.order;
     router.post(`${prefix}orders/charge`, order.charge);

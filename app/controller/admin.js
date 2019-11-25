@@ -52,7 +52,7 @@ const Admin = class extends Controller {
         user = user.get({ plain: true });
 
         // eslint-disable-next-line no-magic-numbers
-        const tokenExpire = 3600 * 24 * 1000;
+        const tokenExpire = 3600 * 24 * 2;
         const token = util.jwt_encode(
             {
                 userId: user.id,
@@ -129,7 +129,7 @@ const Admin = class extends Controller {
 
         this.formatQuery(query);
 
-        const list = await this.resource.findAndCount(query);
+        const list = await this.resource.findAndCountAll(query);
 
         // this.action();
 
@@ -344,6 +344,7 @@ const Admin = class extends Controller {
             include: [
                 {
                     model: this.model.systemTags,
+                    as: 'systemTags',
                 },
             ],
         });
@@ -404,6 +405,34 @@ const Admin = class extends Controller {
         );
         this.action();
         await this.updateEsProject(projectId);
+        return this.success(result);
+    }
+
+    async esProjectTagUpdate() {
+        this.adminAuthenticated();
+        const relations = await this.app.model.systemTagProjects.findAll();
+        let projectIds = relations.map(relation => relation.projectId);
+        projectIds = Array.from(new Set(projectIds));
+        for (let i = 0; i < projectIds.length; i++) {
+            const project = await this.app.model.projects.findOne({
+                where: { id: projectIds[i] },
+                include: [
+                    {
+                        model: this.app.model.systemTags,
+                        as: 'systemTags',
+                    },
+                ],
+            });
+            if (project) {
+                await this.app.api.projectsUpsert(project);
+            }
+        }
+        return this.success(projectIds.length);
+    }
+
+    async esProjectWorldTagNameUpdate() {
+        this.adminAuthenticated();
+        const result = await this.service.project.esProjectWorldTagNameUpdate();
         return this.success(result);
     }
 };

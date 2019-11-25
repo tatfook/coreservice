@@ -1,6 +1,6 @@
 'use strict';
 
-const tableName = 'lessonOrganizationUsers';
+const tableName = 'worlds';
 const indexes = [
     {
         primary: true,
@@ -12,6 +12,32 @@ const indexes = [
         ],
         unique: true,
         name: 'PRIMARY',
+    },
+    {
+        primary: false,
+        fields: [
+            {
+                attribute: 'userId',
+                order: 'ASC',
+            },
+            {
+                attribute: 'worldName',
+                order: 'ASC',
+            },
+        ],
+        unique: true,
+        name: 'worlds_user_id_world_name',
+    },
+    {
+        primary: false,
+        fields: [
+            {
+                attribute: 'projectId',
+                order: 'ASC',
+            },
+        ],
+        unique: true,
+        name: 'worlds_project_id',
     },
 ];
 
@@ -42,50 +68,69 @@ module.exports = {
 
                 userId: {
                     type: BIGINT,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                state: {
-                    type: INTEGER,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                organizationId: {
-                    type: BIGINT,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                classId: {
-                    type: BIGINT,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                handlerId: {
-                    type: BIGINT,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                cellphone: {
-                    type: STRING(24),
                     allowNull: false,
                     primaryKey: false,
                     autoIncrement: false,
+                },
+
+                worldName: {
+                    type: STRING(128),
+                    allowNull: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                },
+
+                revision: {
+                    type: STRING(32),
+                    allowNull: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                    defaultValue: '0',
+                },
+
+                projectId: {
+                    type: BIGINT,
+                    allowNull: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                },
+
+                commitId: {
+                    type: STRING(64),
+                    allowNull: true,
+                    primaryKey: false,
+                    autoIncrement: false,
+                    defaultValue: 'master',
+                },
+
+                archiveUrl: {
+                    type: STRING(255),
+                    allowNull: true,
+                    primaryKey: false,
+                    autoIncrement: false,
                     defaultValue: '',
+                },
+
+                fileSize: {
+                    type: BIGINT,
+                    allowNull: true,
+                    primaryKey: false,
+                    autoIncrement: false,
+                    defaultValue: '0',
+                },
+
+                giturl: {
+                    type: STRING(256),
+                    allowNull: true,
+                    primaryKey: false,
+                    autoIncrement: false,
+                },
+
+                download: {
+                    type: STRING(256),
+                    allowNull: true,
+                    primaryKey: false,
+                    autoIncrement: false,
                 },
 
                 extra: {

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, STRING, TEXT, JSON, DATE } = app.Sequelize;
-
+    // del???
     const model = app.model.define(
         'paracraftNews',
         {

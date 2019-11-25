@@ -10,7 +10,7 @@ const {
 
 module.exports = app => {
     const { BIGINT, INTEGER, TEXT, JSON } = app.Sequelize;
-
+    // del
     const model = app.model.define(
         'notifications',
         {

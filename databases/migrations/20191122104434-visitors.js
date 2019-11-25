@@ -1,6 +1,6 @@
 'use strict';
 
-const tableName = 'lessonOrganizationLogs';
+const tableName = 'visitors';
 const indexes = [
     {
         primary: true,
@@ -12,6 +12,21 @@ const indexes = [
         ],
         unique: true,
         name: 'PRIMARY',
+    },
+    {
+        primary: false,
+        fields: [
+            {
+                attribute: 'url',
+                order: 'ASC',
+            },
+            {
+                attribute: 'date',
+                order: 'ASC',
+            },
+        ],
+        unique: true,
+        name: 'visitors_url_date',
     },
 ];
 
@@ -40,43 +55,34 @@ module.exports = {
                     autoIncrement: true,
                 },
 
-                organizationId: {
-                    type: BIGINT,
+                url: {
+                    type: STRING(255),
+                    allowNull: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                },
+
+                date: {
+                    type: STRING(24),
+                    allowNull: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                    defaultValue: '',
+                },
+
+                count: {
+                    type: INTEGER,
                     allowNull: true,
                     primaryKey: false,
                     autoIncrement: false,
                     defaultValue: '0',
                 },
 
-                type: {
-                    type: STRING(255),
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '',
-                },
-
-                description: {
+                visitors: {
                     type: TEXT,
                     allowNull: true,
                     primaryKey: false,
                     autoIncrement: false,
-                },
-
-                handleId: {
-                    type: BIGINT,
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '0',
-                },
-
-                username: {
-                    type: STRING(255),
-                    allowNull: true,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    defaultValue: '',
                 },
 
                 extra: {

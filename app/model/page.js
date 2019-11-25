@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT } = app.Sequelize;
-
+    // del
     const model = app.model.define(
         'pages',
         {

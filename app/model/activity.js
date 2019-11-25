@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, STRING, TEXT, JSON } = app.Sequelize;
-
+    // del
     const model = app.model.define(
         'activities',
         {

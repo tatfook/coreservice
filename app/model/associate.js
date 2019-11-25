@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, JSON } = app.Sequelize;
-
+    // del
     // source 为资源本身   target为所属者  source属于target   如项目成员    sourceId: 为成员id   targetId: 为项目id
     const attrs = {
         id: {

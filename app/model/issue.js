@@ -2,11 +2,11 @@
 'use strict';
 const _ = require('lodash');
 
-const { ENTITY_TYPE_PROJECT } = require('../core/consts.js');
+const { ENTITY_TYPE_PROJECT, USER_ATTRS } = require('../core/consts.js');
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
-
+    // ???objectType
     const model = app.model.define(
         'issues',
         {
@@ -152,17 +152,8 @@ module.exports = app => {
             });
         });
 
-        const attributes = [
-            [ 'id', 'userId' ],
-            'username',
-            'nickname',
-            'portrait',
-            'description',
-            'vip',
-            'tLevel',
-        ];
         const users = await app.model.users.findAll({
-            attributes,
+            attributes: USER_ATTRS,
             where: { id: { [app.Sequelize.Op.in]: userIds } },
         });
 
@@ -191,15 +182,8 @@ module.exports = app => {
             if (_.indexOf(userIds, id) < 0) userIds.push(id);
         });
 
-        const attributes = [
-            [ 'id', 'userId' ],
-            'username',
-            'nickname',
-            'portrait',
-            'description',
-        ];
         const users = await app.model.users.findAll({
-            attributes,
+            attributes: USER_ATTRS,
             where: { id: { [app.Sequelize.Op.in]: userIds } },
         });
 

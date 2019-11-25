@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // ???
     const model = app.model.define(
         'pClassifies',
         {
