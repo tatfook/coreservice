@@ -89,8 +89,9 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, newFilePath } = ctx.params;
+        if (!newFilePath) ctx.throw('invalid new file path', 400);
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFile(
+        const result = await service.repo.moveFile(
             repo.path,
             filePath,
             newFilePath,
@@ -129,6 +130,7 @@ const Repo = class extends Controller {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath, newFolderPath } = ctx.params;
+        if (!newFolderPath) ctx.throw('invalid new folder path', 400);
         const committer = this.getUser().username;
         const result = await service.repo.moveFolder(
             repo.path,
@@ -146,6 +148,7 @@ const Repo = class extends Controller {
         const repo = await ctx.model.Repo.findOne({
             where: { path: repoPath },
         });
+        if (!repo) ctx.throw(`invalid repo ${repoPath}`, 404);
         const canRead = await service.repo.canReadByUser(
             repo,
             this.getUser().userId
@@ -161,6 +164,7 @@ const Repo = class extends Controller {
         const repo = await ctx.model.Repo.findOne({
             where: { path: repoPath },
         });
+        if (!repo) ctx.throw(`invalid repo ${repoPath}`, 404);
         const canWrite = await service.repo.canWriteByUser(
             repo,
             this.getUser().userId
