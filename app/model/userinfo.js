@@ -3,7 +3,7 @@
 
 module.exports = app => {
     const { BIGINT, STRING, DATE, JSON } = app.Sequelize;
-    // ???
+    // TODO 同User表有些字段重复
     const attrs = {
         id: {
             type: BIGINT,

@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT } = app.Sequelize;
-    // del TODO 尚有在用
+    // TODO 尚有在用 未来通过storage服务暴露接口替代此文件
     const model = app.model.define(
         'siteFiles',
         {
