@@ -5,7 +5,7 @@ module.exports = app => {
 
         JSON,
     } = app.Sequelize;
-
+    // paracraft客户端，用户封装的代码块分类
     const model = app.model.define(
         'pBlockClassifies',
         {

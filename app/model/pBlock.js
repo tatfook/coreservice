@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // paracraft客户端，用户封装的代码块
     const model = app.model.define(
         'pBlocks',
         {

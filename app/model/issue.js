@@ -6,7 +6,7 @@ const { ENTITY_TYPE_PROJECT, USER_ATTRS } = require('../core/consts.js');
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
-
+    // objectType未来表大时要考虑拆表 TODO
     const model = app.model.define(
         'issues',
         {

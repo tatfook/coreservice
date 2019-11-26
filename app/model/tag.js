@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING } = app.Sequelize;
-
+    // TODO 课程包tag有用到，同移除lessonModel时一起优化
     const model = app.model.define(
         'tags',
         {

@@ -2,7 +2,7 @@
 
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // TODO 使用redis替代其功能
     const model = app.model.define(
         'caches',
         {
