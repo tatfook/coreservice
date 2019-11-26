@@ -97,10 +97,23 @@ class Project extends Service {
     }
 
     // paracraft项目搜索
-    async searchForParacraft(queryOptions, tagIds, sortTag, projectId) {
+    async searchForParacraft(
+        queryOptions,
+        tagIds,
+        sortTag,
+        projectId,
+        projectIds = []
+    ) {
         const whereClause = [];
         if (projectId) {
             whereClause.push({ id: projectId });
+        }
+        if (projectIds.length) {
+            whereClause.push({
+                id: {
+                    [this.app.Sequelize.Op.in]: projectIds,
+                },
+            });
         }
         const includeWhere = {};
         if (sortTag) {
@@ -118,7 +131,6 @@ class Project extends Service {
             });
         });
         const result = await this.model.projects.findAndCountAll({
-            ...queryOptions,
             where: {
                 [this.app.Sequelize.Op.and]: whereClause,
             },
@@ -141,6 +153,11 @@ class Project extends Service {
             ],
             distinct: true,
         });
+        // 数据量不多，sequelize分页有问题，使用本地分页
+        result.rows = result.rows.slice(
+            queryOptions.offset,
+            queryOptions.limit + queryOptions.offset
+        );
         return result;
     }
 
