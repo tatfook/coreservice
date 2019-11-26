@@ -24,19 +24,19 @@ module.exports = app => {
     router.post('/keepworks/page_visit', keepwork.postPageVisit);
     router.get('/keepworks/page_visit', keepwork.getPageVisit);
     router.post(
-        'keepworks/paracraft_download_count',
+        '/keepworks/paracraft_download_count',
         keepwork.postParacraftDownloadCount
     );
     router.get(
-        'keepworks/paracraft_download_count',
+        '/keepworks/paracraft_download_count',
         keepwork.getParacraftDownloadCount
     );
     router.post(
-        'keepworks/paracraft_download_url',
+        '/keepworks/paracraft_download_url',
         keepwork.setParacraftDownloadUrl
     );
     router.get(
-        'keepworks/paracraft_download_url',
+        '/keepworks/paracraft_download_url',
         keepwork.getParacraftDownloadUrl
     );
 
@@ -183,22 +183,25 @@ module.exports = app => {
     router.resources('/admins/:resources', admin);
     // 标签和项目相关
     router.post(
-        'admins/projects/:projectId/systemTags',
+        '/admins/projects/:projectId/systemTags',
         admin.createProjectTags
     );
     router.put(
-        'admins/projects/:projectId/systemTags/:tagId',
+        '/admins/projects/:projectId/systemTags/:tagId',
         admin.updateProjectTag
     );
     router.delete(
-        'admins/projects/:projectId/systemTags',
+        '/admins/projects/:projectId/systemTags',
         admin.deleteProjectTags
     );
     // esProjectTag更新
-    router.get('admins/task/once/esProjectTagUpdate', admin.esProjectTagUpdate);
+    router.get(
+        '/admins/task/once/esProjectTagUpdate',
+        admin.esProjectTagUpdate
+    );
     // esProjectWorldTagName更新
     router.get(
-        'admins/task/once/esProjectWorldTagNameUpdate',
+        '/admins/task/once/esProjectWorldTagNameUpdate',
         admin.esProjectWorldTagNameUpdate
     );
 
@@ -249,8 +252,8 @@ module.exports = app => {
     // 探索APP
     const paracraftGameCoinKey = controller.paracraftGameCoinKey;
     const paracraftDevice = controller.paracraftDevice;
-    router.get('paracraftDevices/pwdVerify', paracraftDevice.pwdVerify);
-    router.post('paracraftGameCoinKeys/active', paracraftGameCoinKey.active);
+    router.get('/paracraftDevices/pwdVerify', paracraftDevice.pwdVerify);
+    router.post('/paracraftGameCoinKeys/active', paracraftGameCoinKey.active);
 
     // paracraft 官网
     const paracraftVisitor = controller.paracraftVisitor;

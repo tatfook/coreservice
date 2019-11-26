@@ -63,41 +63,46 @@ describe('test/controller/site.test.js', () => {
         });
 
         it("## private site don't have privilege", async () => {
-            await app.factory.create('sites');
+            const site = await app.factory.create('sites');
             const result = await app
                 .httpRequest()
-                .get('/api/v0/sites/1/privilege')
+                .get(`/api/v0/sites/${site.id}/privilege`)
                 .expect(200)
                 .then(res => res.body);
             assert(result === 128);
         });
 
         it("## private site don't have privilege", async () => {
-            await app.factory.create('sites');
+            const site = await app.factory.create('sites');
             const result = await app
                 .httpRequest()
-                .get('/api/v0/sites/1/privilege')
+                .get(`/api/v0/sites/${site.id}/privilege`)
                 .expect(200)
                 .then(res => res.body);
             assert(result === 128);
         });
 
         it('## public site have read-only privilege', async () => {
-            await app.factory.create('sites', { visibility: 0 });
+            const site = await app.factory.create('sites', { visibility: 0 });
             const result = await app
                 .httpRequest()
-                .get('/api/v0/sites/1/privilege')
+                .get(`/api/v0/sites/${site.id}/privilege`)
                 .expect(200)
                 .then(res => res.body);
             assert(result === 32);
         });
 
         it('## self-owned site have write privilege', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites', { visibility: 0 });
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create(
+                'sites',
+                { visibility: 0 },
+                { user }
+            );
             const result = await app
                 .httpRequest()
-                .get('/api/v0/sites/1/privilege')
+                .get(`/api/v0/sites/${site.id}/privilege`)
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
@@ -139,11 +144,12 @@ describe('test/controller/site.test.js', () => {
         });
 
         it('## group not exist', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites');
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create('sites', {}, { user });
             const result = await app
                 .httpRequest()
-                .post('/api/v0/sites/1/groups')
+                .post(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     groupId: 1,
@@ -155,15 +161,16 @@ describe('test/controller/site.test.js', () => {
         });
 
         it('## success', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites');
-            await app.factory.create('groups');
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create('sites', {}, { user });
+            const group = await app.factory.create('groups');
             const result = await app
                 .httpRequest()
-                .post('/api/v0/sites/1/groups')
+                .post(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    groupId: 1,
+                    groupId: group.id,
                     level: 128,
                 })
                 .expect(200)
@@ -194,12 +201,13 @@ describe('test/controller/site.test.js', () => {
         });
 
         it('## success', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites');
-            await app.factory.create('groups');
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create('sites', {}, { user });
+            const group = await app.factory.create('groups');
             await app
                 .httpRequest()
-                .post('/api/v0/sites/1/groups')
+                .post(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     groupId: 1,
@@ -208,10 +216,10 @@ describe('test/controller/site.test.js', () => {
                 .expect(200);
             const result2 = await app
                 .httpRequest()
-                .put('/api/v0/sites/1/groups')
+                .put(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    groupId: 1,
+                    groupId: group.id,
                     level: 64,
                 })
                 .expect(200)
@@ -242,24 +250,25 @@ describe('test/controller/site.test.js', () => {
         });
 
         it('## success', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites');
-            await app.factory.create('groups');
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create('sites', {}, { user });
+            const group = await app.factory.create('groups');
             await app
                 .httpRequest()
-                .post('/api/v0/sites/1/groups')
+                .post(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    groupId: 1,
+                    groupId: group.id,
                     level: 128,
                 })
                 .expect(200);
             const result2 = await app
                 .httpRequest()
-                .delete('/api/v0/sites/1/groups')
+                .delete(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    groupId: 1,
+                    groupId: group.id,
                 })
                 .expect(200)
                 .then(res => res.body);
@@ -287,21 +296,24 @@ describe('test/controller/site.test.js', () => {
         });
 
         it('## success', async () => {
-            const { token } = await app.login();
-            await app.factory.create('sites');
-            await app.factory.create('groups', { groupname: 'test' });
+            const user = await app.login();
+            const { token } = user;
+            const site = await app.factory.create('sites', {}, { user });
+            const group = await app.factory.create('groups', {
+                groupname: 'test',
+            });
             await app
                 .httpRequest()
-                .post('/api/v0/sites/1/groups')
+                .post(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    groupId: 1,
+                    groupId: group.id,
                     level: 128,
                 })
                 .expect(200);
             const result2 = await app
                 .httpRequest()
-                .get('/api/v0/sites/1/groups')
+                .get(`/api/v0/sites/${site.id}/groups`)
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200)
                 .then(res => res.body);
