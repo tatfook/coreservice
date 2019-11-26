@@ -345,12 +345,6 @@ module.exports = app => {
     router.post(`${prefix}organizations/log`, organization.log);
     router.post(`${prefix}organizations/changepwd`, organization.changepwd);
 
-    // Message
-    const userMessage = controller.userMessage;
-    router.post(`${prefix}userMessages/state`, userMessage.setState);
-    router.post(`${prefix}userMessages/allstate`, userMessage.allstate);
-    router.resources(`${prefix}userMessages`, userMessage);
-
     // paracraft
     const pBlock = controller.pBlock;
     router.get(`${prefix}pBlocks/systemClassifies`, pBlock.systemClassifies);
