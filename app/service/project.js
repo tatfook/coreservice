@@ -131,7 +131,6 @@ class Project extends Service {
             });
         });
         const result = await this.model.projects.findAndCountAll({
-            ...queryOptions,
             where: {
                 [this.app.Sequelize.Op.and]: whereClause,
             },
@@ -153,8 +152,12 @@ class Project extends Service {
                 [ 'id', 'asc' ],
             ],
             distinct: true,
-            subQuery: false,
         });
+        // 数据量不多，sequelize分页有问题，使用本地分页
+        result.rows = result.rows.slice(
+            queryOptions.offset,
+            queryOptions.limit + queryOptions.offset
+        );
         return result;
     }
 
