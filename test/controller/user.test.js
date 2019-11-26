@@ -644,9 +644,6 @@ describe('test/controller/user.test.js', () => {
                     result.username === 'test' &&
                     result.token
             );
-            // 注册的消息创建成功
-            const message = await app.model.messages.findOne();
-            assert(message);
             // lessonUser创建成功
             const lessonUser = await app.lessonModel.users.findOne();
             assert(lessonUser && lessonUser.username === 'test');

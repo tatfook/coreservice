@@ -85,24 +85,7 @@ class User extends Service {
     }
 
     async createRegisterMsg(user) {
-        const msg = await this.app.model.messages
-            .create({
-                sender: 0,
-                type: 0,
-                all: 0,
-                msg: {
-                    type: 1,
-                    user: {
-                        ...user,
-                        password: undefined,
-                    },
-                },
-                extra: {},
-            })
-            .then(o => o && o.toJSON());
-        return await this.app.model.userMessages
-            .create({ userId: user.id, messageId: msg.id, state: 0 })
-            .then(o => o && o.toJSON());
+        return this.app.api.createRegisterMsg(user);
     }
 
     async register(user) {
