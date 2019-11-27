@@ -26,7 +26,10 @@ describe('test/controller/user.test.js', () => {
             assert(result[0].nickname !== undefined);
             assert(result[0].portrait !== undefined);
             assert(result[0].description !== undefined);
-            assert(result[0].userId === 100);
+            const userRank = await app.model.userRanks.findOne({
+                where: { fans: 100 },
+            });
+            assert(result[0].userId === userRank.userId);
         });
     });
 
