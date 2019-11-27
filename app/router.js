@@ -134,12 +134,6 @@ module.exports = app => {
     router.resources(`${prefix}tags`, tag);
 
     const project = controller.project;
-    router.get(
-        `${prefix}projects/importProjectCover`,
-        project.importProjectCover
-    );
-    router.get(`${prefix}projects/import`, project.importProject);
-    router.get(`${prefix}projects/:id/status`, project.status);
     router.get(`${prefix}projects/:id/game`, project.game);
     router.get(`${prefix}projects/join`, project.join);
     router.post(`${prefix}projects/search`, project.search);
@@ -261,31 +255,6 @@ module.exports = app => {
     // 反馈 投诉 举报
     const feedback = controller.feedback;
     router.resources(`${prefix}feedbacks`, feedback);
-
-    // wikicraft proxy
-    router.all('/api/wiki/models/user/login', controller.proxyUser.login);
-    router.all('/api/wiki/models/user/register', controller.proxyUser.register);
-    router.all(
-        '/api/wiki/models/user/getProfile',
-        controller.proxyUser.profile
-    );
-    router.all('/api/wiki/models/user/changepw', controller.proxyUser.changepw);
-    router.all(
-        '/api/wiki/models/user/batchChangePwd',
-        controller.proxyUser.batchChangePwd
-    );
-    router.all(
-        '/api/wiki/models/user/getBaseInfoByName',
-        controller.proxyUser.getBaseInfoByName
-    );
-    router.all(
-        '/api/wiki/models/oauth_app/agreeOauth',
-        controller.proxyOauthApp.agreeOauth
-    );
-    router.all(
-        '/api/wiki/models/oauth_app/getTokenByCode',
-        controller.proxyOauthApp.getTokenByCode
-    );
 
     // NPL 大赛
     const game = controller.game;

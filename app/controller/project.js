@@ -54,16 +54,6 @@ const Project = class extends Controller {
         return true;
     }
 
-    async status() {
-        // const {id} = this.validate({id:"int"});
-
-        // let project = await this.model.projects.findOne({where:{id}});
-        // if (!project) return this.success(0);
-        // project = project.get({plain:true});
-
-        return this.success(2);
-    }
-
     async setProjectUser(list) {
         const userIds = [];
 
@@ -79,14 +69,14 @@ const Project = class extends Controller {
             o.user = users[o.userId];
         });
     }
-
+    // TODO 该接口会将所有库中所有项目返回
     async search() {
         const model = this.model[this.modelName];
         const query = this.validate();
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -220,10 +210,11 @@ const Project = class extends Controller {
         delete params.classifyTags;
 
         const data = await this.model.projects.create(params);
-        if (!data) return this.throw(500, '记录创建失败');
+
         const project = data.get({ plain: true });
 
         // 将创建者加到自己项目的成员列表中
+        // TODO 创建失败时member应该也删除
         await this.model.members.create({
             userId,
             memberId: userId,
@@ -317,7 +308,7 @@ const Project = class extends Controller {
         }
         return this.success(data);
     }
-
+    // TODO 存在刷访问量的风险
     async visit() {
         const { id } = this.validate({ id: 'int' });
 
@@ -407,97 +398,12 @@ const Project = class extends Controller {
         return this.success(project);
     }
 
-    async world() {
-        // const {id} = this.validate()
-    }
-
-    async importProject() {
-        const worlds = [];
-        for (let i = 0; i < worlds.length; i++) {
-            const world = worlds[i];
-            const { userid, worldsName } = world;
-            let project = null;
-            try {
-                project = await this.model.projects.create({
-                    userId: userid,
-                    name: worldsName,
-                    type: PROJECT_TYPE_PARACRAFT,
-                    privilege: 165,
-                });
-                project = project.get({ plain: true });
-            } catch (e) {
-                this.logger.error(e);
-                continue;
-            }
-
-            try {
-                await this.model.worlds.create({
-                    // id: _id,
-                    userId: userid,
-                    worldName: worldsName,
-                    projectId: project.id,
-                    fileSize: world.filesTotals,
-                    giturl: world.giturl,
-                    commitId: world.commitId,
-                    download: world.download,
-                    revision: world.revision,
-                    archiveUrl: world.giturl
-                        ? world.giturl +
-                          '/repository/archive.zip?ref=' +
-                          world.commitId
-                        : '',
-                });
-            } catch (e) {
-                this.logger.error(e);
-            }
-        }
-        // console.log(worlds.length);
-        return this.success(worlds);
-    }
-
-    async importProjectCover() {
-        // const worlds = await this.model.worlds.findAll({limit:100000});
-        // for (let i = 0; i < worlds.length; i++) {
-        //     // const world = worlds[i].get({plain:true});
-        //     const world = worlds[i];
-        //     const { userid, worldsName, _id, commitId = 'master' } = world;
-        //     if (!world.preview) continue;
-        //     let previewUrl = world.preview;
-        //     try {
-        //         previewUrl = JSON.parse(world.preview)[0].previewUrl;
-        //     } catch (e) {
-        //         previewUrl = world.preview;
-        //     }
-        //     let project = await this.model.projects.findOne({
-        //         where: { userId: userid, name: worldsName },
-        //     });
-        //     if (!project) continue;
-        //     project = project.get({ plain: true });
-        //     const extra = project.extra;
-        //     previewUrl = previewUrl.replace(/http:/, 'https:');
-        //     const archiveUrl =
-        //         previewUrl.replace(/\/raw\/.*$/, '') +
-        //         '/repository/archive.zip?ref=' +
-        //         commitId;
-        //     await this.model.worlds.update(
-        //         { extra: { coverUrl: previewUrl }, archiveUrl },
-        //         { where: { userId: userid, worldName: worldsName } }
-        //     );
-        //     extra.imageUrl = previewUrl;
-        //     await this.model.projects.update(
-        //         { extra },
-        //         { where: { id: project.id } }
-        //     );
-        // }
-        // // console.log(worlds.length);
-        // return this.success('OK');
-    }
-
     // 获取项目参加的赛事
     async game() {
         const { id } = this.validate({ id: 'int' });
         const curdate = new Date();
         const Op = this.app.Sequelize.Op;
+        // TODO startDate 字符串类型？？
         const game = await this.model.games
             .findOne({
                 include: [
