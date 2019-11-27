@@ -6,6 +6,7 @@ module.exports = app => {
         const username = await factory.chance('word', { length: 10 });
         const repoName = await factory.chance('word', { length: 10 });
         const path = username + '/' + repoName;
+
         return {
             username,
             repoName,

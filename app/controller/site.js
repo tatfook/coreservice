@@ -85,19 +85,11 @@ const Site = class extends Controller {
     }
 
     async destroy() {
-        const model = this.model;
         const userId = this.authenticated().userId;
         const params = this.validate({ id: 'int' });
-        const id = params.id;
 
-        const site = await model.sites.getById(id, userId);
-        const user = await model.users.getById(userId);
-        if (!user || !site) this.throw(400);
-
-        await this.model.siteGroups.destroy({ where: { userId, siteId: id } });
-        await this.model.siteFiles.destroy({ where: { userId, siteId: id } });
-        const data = await model.sites.destroy({ where: { id, userId } });
-        return this.success(data);
+        await this.ctx.service.site.destroySite(params.id, userId);
+        return this.success();
     }
 
     async getJoinSites() {

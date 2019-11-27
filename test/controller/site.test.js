@@ -414,13 +414,15 @@ describe('test/controller/site.test.js', () => {
                 .delete('/api/v0/sites/1')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(400);
-            await app.factory.create('sites', { userId: 1, id: 2 });
+            let site = await app.factory.create('sites', { userId: 1, id: 2 });
+            const ctx = app.mockContext();
+            await ctx.service.repo.generateFromSite(site);
             await app
                 .httpRequest()
                 .delete('/api/v0/sites/2')
                 .set('Authorization', `Bearer ${token}`)
                 .expect(200);
-            const site = await app.model.sites.findOne({
+            site = await app.model.sites.findOne({
                 where: {
                     id: 2,
                     userId: 1,

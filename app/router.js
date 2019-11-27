@@ -138,7 +138,7 @@ module.exports = app => {
     router.get('/projects/:id/game', project.game);
     router.get('/projects/join', project.join);
     router.post('/projects/search', project.search);
-    router.post('projects/searchForParacraft', project.searchForParacraft);
+    router.post('/projects/searchForParacraft', project.searchForParacraft);
     router.get('/projects/:id/detail', project.detail);
     router.get('/projects/:id/visit', project.visit);
     router.get('/projects/:id/star', project.isStar);

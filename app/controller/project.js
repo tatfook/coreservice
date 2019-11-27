@@ -17,43 +17,6 @@ const Project = class extends Controller {
         return 'projects';
     }
 
-    // 创建3D 实现3D世界相关的文件的创建
-    // project 对象项目记录对象
-    async createWorld(project) {
-        const worldName = project.name; // 世界名
-        const projectId = project.id; // 项目ID
-        const userId = project.userId; // 用户ID
-
-        const data = await this.ctx.service.world.generateDefaultWorld(
-            worldName
-        );
-        // console.log(
-        //     data ? `创建世界成功:${worldName}` : `创建世界失败:${worldName}`
-        // );
-        if (!data) {
-            await this.model.projects.destroy({ where: { id: projectId } });
-            return false;
-        }
-        try {
-            await this.model.worlds.create({ worldName, projectId, userId });
-            // await this.model.projects.update({status:2}, {where:{id:projectId}});
-        } catch (e) {}
-
-        return true;
-    }
-
-    async destroyWorld(project) {
-        const worldName = project.name; // 世界名
-        const projectId = project.id; // 项目ID
-        const userId = project.userId; // 用户ID
-
-        await this.model.worlds.destroy({ where: { projectId, userId } });
-
-        await this.ctx.service.world.removeProject(worldName);
-
-        return true;
-    }
-
     async setProjectUser(list) {
         const userIds = [];
 
@@ -195,6 +158,7 @@ const Project = class extends Controller {
     }
 
     async create() {
+        const { ctx, service } = this;
         const userId = this.authenticated().userId;
         const params = this.validate({ type: 'int' });
 
@@ -208,61 +172,70 @@ const Project = class extends Controller {
         delete params.rate;
         delete params.rateCount;
         delete params.classifyTags;
-
-        const data = await this.model.projects.create(params);
-
-        const project = data.get({ plain: true });
-
-        // 将创建者加到自己项目的成员列表中
-        // TODO 创建失败时member应该也删除
-        await this.model.members.create({
-            userId,
-            memberId: userId,
-            objectType: ENTITY_TYPE_PROJECT,
-            objectId: project.id,
-        });
-
-        if (params.type === PROJECT_TYPE_PARACRAFT) {
-            const ok = await this.createWorld(project);
-            if (!ok) return this.fail(9);
-            // const ok = await this.createWorld(project);
-            // if (!ok) {
-            // await this.model.projects.destroy({where:{id:project.id}});
-            // return this.throw(500, "创建世界失败");
-            // }
+        const transaction = await ctx.model.transaction();
+        try {
+            const project = await ctx.model.projects.create(params, {
+                transaction,
+            });
+            // 将创建者加到自己项目的成员列表中
+            await this.model.members.create(
+                {
+                    userId,
+                    memberId: userId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                    objectId: project.id,
+                },
+                { transaction }
+            );
+            if (params.type === PROJECT_TYPE_PARACRAFT) {
+                await service.world.createWorldByProject(project, transaction);
+            }
+            await transaction.commit();
+            return this.success(project);
+        } catch (e) {
+            ctx.logger.error(e.message);
+            await transaction.rollback();
+            return this.fail(9);
         }
-
-        return this.success(project);
     }
 
     async destroy() {
+        const { ctx, service } = this;
         const { userId } = this.authenticated();
         const { id } = this.validate({ id: 'int' });
 
         const project = await this.model.projects.getById(id, userId);
         if (!project) return this.success('OK');
 
-        if (project.type === PROJECT_TYPE_PARACRAFT) {
-            await this.destroyWorld(project);
-            // if (!ok) return this.throw(500, "删除世界失败");
+        const transaction = await ctx.model.transaction();
+        try {
+            if (project.type === PROJECT_TYPE_PARACRAFT) {
+                await service.world.destroyWorldByProject(project, transaction);
+            }
+            // 前面已确保项目是属于自己的
+            await this.model.favorites.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.comments.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.issues.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.projects.destroy({
+                where: { id: project.id },
+                transaction,
+            });
+            await transaction.commit();
+            return this.success();
+        } catch (e) {
+            ctx.logger.error(e.message);
+            await transaction.rollback();
+            return this.fail(9);
         }
-
-        const data = await this.model.projects.destroy({
-            where: { id, userId },
-        });
-
-        // 前面已确保项目是属于自己的
-        await this.model.favorites.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-        await this.model.comments.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-        await this.model.issues.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-
-        return this.success(data);
     }
 
     async update() {

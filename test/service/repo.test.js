@@ -127,15 +127,137 @@ describe('test/service/repo.test.js', () => {
             assert(repo.synced === true);
         });
 
-        it('should sync if project was exist', async () => {
+        it('should do nothing if repo was already synced', async () => {
+            await repo.update({ synced: true });
+            await repo.reload();
+            const result = await ctx.service.repo.syncIfExist(repo);
+            assert(!result);
+        });
+
+        it('should failed if project was exist', async () => {
             app.mockService('gitlab', 'getProject', () => {
-                return;
+                ctx.throw('not exist');
             });
             assert(repo.synced === false);
             const result = await ctx.service.repo.syncIfExist(repo);
             assert(!result);
             await repo.reload();
             assert(repo.synced === false);
+        });
+    });
+
+    describe('#syncRepo', () => {
+        let repo;
+        beforeEach(async () => {
+            repo = await app.factory.create('repos');
+        });
+
+        it('should sync if project was exist', async () => {
+            assert(repo.synced === false);
+            const result = await ctx.service.repo.syncRepo(repo);
+            assert(result);
+            await repo.reload();
+            assert(repo.synced === true);
+        });
+
+        it('should do nothing if repo was already synced', async () => {
+            await repo.update({ synced: true });
+            await repo.reload();
+            assert(repo.synced === true);
+            const result = await ctx.service.repo.syncRepo(repo);
+            assert(!result);
+        });
+
+        it('should failed if create git repo failed', async () => {
+            app.mockService('git', 'createRepo', () => {
+                ctx.throw('failed');
+            });
+            const errMessage = 'should failed to sync repo';
+            try {
+                await ctx.service.repo.syncRepo(repo);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.message !== errMessage);
+            }
+            await repo.reload();
+            assert(repo.synced === false);
+        });
+    });
+
+    describe('#destroyRepo', () => {
+        let repo;
+        beforeEach(async () => {
+            repo = await app.factory.create('repos', { synced: true });
+        });
+
+        it('should destroy repo', async () => {
+            const result = await ctx.service.repo.destroyRepo(
+                repo.resourceType,
+                repo.resourceId
+            );
+            assert(result);
+            const repoCount = await ctx.model.Repo.count();
+            assert(repoCount === 0);
+        });
+
+        it('should destroy repo if repo was not synced', async () => {
+            await repo.update({ synced: false });
+            const result = await ctx.service.repo.destroyRepo(
+                repo.resourceType,
+                repo.resourceId
+            );
+            assert(result);
+            const repoCount = await ctx.model.Repo.count();
+            assert(repoCount === 0);
+        });
+
+        it('should failed if repo not exist', async () => {
+            const errMessage = 'should failed to destroy invalid repo';
+            try {
+                await ctx.service.repo.destroyRepo(
+                    repo.resourceType,
+                    repo.resourceId + 10
+                );
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.message !== errMessage);
+            }
+            const repoCount = await ctx.model.Repo.count();
+            assert(repoCount === 1);
+        });
+
+        it('should failed if delete git repo failed', async () => {
+            app.mockService('git', 'deleteRepo', () => {
+                ctx.throw('failed');
+            });
+            const errMessage = 'should failed to destroy invalid repo';
+            try {
+                await ctx.service.repo.destroyRepo(
+                    repo.resourceType,
+                    repo.resourceId
+                );
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.message !== errMessage);
+            }
+            const repoCount = await ctx.model.Repo.count();
+            assert(repoCount === 1);
+        });
+
+        describe('#with transaction', () => {
+            it('should destroy repo', async () => {
+                const transaction = await ctx.model.transaction();
+                await ctx.service.repo.destroyRepo(
+                    repo.resourceType,
+                    repo.resourceId,
+                    transaction
+                );
+                let repoCount = await ctx.model.Repo.count();
+                assert(repoCount === 1);
+                await transaction.commit();
+                repoCount = await ctx.model.Repo.count();
+                assert(repoCount === 0);
+            });
         });
     });
 

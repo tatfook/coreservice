@@ -317,9 +317,6 @@ describe('/test/controller/project.test.js', () => {
             });
 
             it('### create world projects successfully', async () => {
-                app.mockService('world', 'generateDefaultWorld', function() {
-                    return true;
-                });
                 const user = await app.login();
                 await app
                     .httpRequest()
@@ -337,8 +334,8 @@ describe('/test/controller/project.test.js', () => {
             });
 
             it('### create world projects failed', async () => {
-                app.mockService('world', 'generateDefaultWorld', function() {
-                    return false;
+                app.mockService('world', 'createWorldByProject', function() {
+                    throw Error('failed');
                 });
                 const user = await app.login();
                 const result = await app
@@ -409,35 +406,42 @@ describe('/test/controller/project.test.js', () => {
 
         describe('## destroy projects', () => {
             it('### delete successfully', async () => {
-                app.mockService('world', 'generateDefaultWorld', function() {
-                    return true;
-                });
                 const user = await app.login();
-                await app
-                    .httpRequest()
-                    .post('/api/v0/projects')
-                    .set('Authorization', `Bearer ${user.token}`)
-                    .send({
-                        name: 'test',
-                        type: 1,
-                    })
-                    .expect(200);
-                app.mockService('world', 'removeProject', function() {
+                let project = await app.factory.create(
+                    'projects',
+                    {},
+                    { user }
+                );
+                app.mockService('world', 'destroyWorldByProject', function() {
                     return true;
                 });
                 await app
                     .httpRequest()
-                    .delete('/api/v0/projects/1')
+                    .delete(`/api/v0/projects/${project.id}`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .expect(200);
                 await app
                     .httpRequest()
-                    .delete('/api/v0/projects/2')
+                    .delete(`/api/v0/projects/${project.id + 1}`)
                     .set('Authorization', `Bearer ${user.token}`)
                     .expect(200);
+                project = await app.model.projects.findOne();
+                assert(!project);
+            });
+            it('### delete failed', async () => {
+                const user = await app.login();
+                let world = await app.factory.create('worlds', {}, { user });
+                app.mockService('world', 'destroyWorldByProject', function() {
+                    throw Error('failed');
+                });
+                await app
+                    .httpRequest()
+                    .delete(`/api/v0/projects/${world.projectId}`)
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .expect(400);
                 const project = await app.model.projects.findOne();
-                const world = await app.model.worlds.findOne();
-                assert(!project && !world);
+                world = await app.model.worlds.findOne();
+                assert(project && world);
             });
         });
 
