@@ -3,10 +3,9 @@ const Controller = require('../core/controller.js');
 
 const Repo = class extends Controller {
     async getTree() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
-        const { folderPath, recursive } = ctx.params;
-        const result = await service.repo.getFolderFiles(
+        const { folderPath, recursive } = this.getParams();
+        const result = await this.service.repo.getFolderFiles(
             repo.path,
             folderPath,
             recursive
@@ -15,18 +14,16 @@ const Repo = class extends Controller {
     }
 
     async download() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
-        const { ref } = ctx.params;
-        const result = await service.repo.downloadRepo(repo.path, ref);
+        const { ref } = this.getParams();
+        const result = await this.service.repo.downloadRepo(repo.path, ref);
         return this.success(result);
     }
 
     async getFileInfo() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
-        const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileInfo(
+        const { filePath, commitId } = this.getParams();
+        const result = await this.service.repo.getFileInfo(
             repo.path,
             filePath,
             commitId
@@ -35,10 +32,9 @@ const Repo = class extends Controller {
     }
 
     async getFileRaw() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureReadable();
-        const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileRaw(
+        const { filePath, commitId } = this.getParams();
+        const result = await this.service.repo.getFileRaw(
             repo.path,
             filePath,
             commitId
@@ -47,10 +43,9 @@ const Repo = class extends Controller {
     }
 
     async getFileHistory() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath, commitId } = ctx.params;
-        const result = await service.repo.getFileHistory(
+        const { filePath, commitId } = this.getParams();
+        const result = await this.service.repo.getFileHistory(
             repo.path,
             filePath,
             commitId
@@ -59,11 +54,10 @@ const Repo = class extends Controller {
     }
 
     async upsertFile() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath, content } = ctx.params;
+        const { filePath, content } = this.getParams();
         const committer = this.getUser().username;
-        const result = await service.repo.upsertFile(
+        const result = await this.service.repo.upsertFile(
             repo.path,
             filePath,
             content,
@@ -73,11 +67,10 @@ const Repo = class extends Controller {
     }
 
     async deleteFile() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath } = ctx.params;
+        const { filePath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFile(
+        const result = await this.service.repo.deleteFile(
             repo.path,
             filePath,
             committer
@@ -88,7 +81,7 @@ const Repo = class extends Controller {
     async renameFile() {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath, newFilePath } = ctx.params;
+        const { filePath, newFilePath } = this.getParams();
         if (!newFilePath) ctx.throw('invalid new file path', 400);
         const committer = this.getUser().username;
         const result = await service.repo.moveFile(
@@ -101,11 +94,10 @@ const Repo = class extends Controller {
     }
 
     async createFolder() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { folderPath } = ctx.params;
+        const { folderPath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await service.repo.createFolder(
+        const result = await this.service.repo.createFolder(
             repo.path,
             folderPath,
             committer
@@ -114,11 +106,10 @@ const Repo = class extends Controller {
     }
 
     async deleteFolder() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { folderPath } = ctx.params;
+        const { folderPath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await service.repo.deleteFolder(
+        const result = await this.service.repo.deleteFolder(
             repo.path,
             folderPath,
             committer
@@ -129,7 +120,7 @@ const Repo = class extends Controller {
     async renameFolder() {
         const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
-        const { folderPath, newFolderPath } = ctx.params;
+        const { folderPath, newFolderPath } = this.getParams();
         if (!newFolderPath) ctx.throw('invalid new folder path', 400);
         const committer = this.getUser().username;
         const result = await service.repo.moveFolder(
@@ -144,7 +135,7 @@ const Repo = class extends Controller {
     async getRepoAndEnsureReadable() {
         this.authenticated();
         const { ctx, service } = this;
-        const { repoPath } = ctx.params;
+        const { repoPath } = this.getParams();
         const repo = await ctx.model.Repo.findOne({
             where: { path: repoPath },
         });
@@ -160,7 +151,7 @@ const Repo = class extends Controller {
     async getRepoAndEnsureWritable() {
         this.authenticated();
         const { ctx, service } = this;
-        const { repoPath } = ctx.params;
+        const { repoPath } = this.getParams();
         const repo = await ctx.model.Repo.findOne({
             where: { path: repoPath },
         });

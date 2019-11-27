@@ -380,8 +380,10 @@ describe('test/controller/user.test.js', () => {
         });
 
         it("## get users' sites by username successfully", async () => {
-            await app.factory.create('sites', { userId: 1 });
-            await app.factory.create('users', { username: 'test' });
+            const user = await app.factory.create('users', {
+                username: 'test',
+            });
+            await app.factory.create('sites', {}, { user });
             const result = await app
                 .httpRequest()
                 .get('/api/v0/users/test/sites')

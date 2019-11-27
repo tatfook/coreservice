@@ -347,16 +347,14 @@ describe('test/controller/site.test.js', () => {
                 .expect(200)
                 .then(res => res.body);
             assert(result.sitename === 'my');
-            const result2 = await app
+            await app
                 .httpRequest()
                 .post('/api/v0/sites')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     sitename: 'my',
                 })
-                .expect(400)
-                .then(res => res.text);
-            assert(result2.indexOf('站点已存在') !== -1);
+                .expect(409);
         });
 
         it('## show one site', async () => {

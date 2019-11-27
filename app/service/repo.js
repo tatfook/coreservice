@@ -172,6 +172,7 @@ class RepoService extends Service {
         return result.data;
     }
 
+    // TODO: 在gitlab数据迁移完成之后可以移除
     async syncIfExist(repo) {
         const { ctx, service } = this;
         const repoPath = `${repo.username}/${repo.repoName}`;
@@ -179,12 +180,17 @@ class RepoService extends Service {
             ctx.logger.error(repoPath, ' not exist. err: ', err.message);
         });
         if (porject) {
-            const result = await service.repo.createRepo(
-                repo.username,
-                repo.repoName
-            );
-            if (result) return repo.update({ synced: true });
+            return service.repo.syncRepo(repo);
         }
+    }
+
+    async syncRepo(repo) {
+        const { service } = this;
+        const result = await service.repo.createRepo(
+            repo.username,
+            repo.repoName
+        );
+        if (result) return repo.update({ synced: true });
     }
 
     async generateFromSite(site, transaction) {
