@@ -4,7 +4,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const pathToRegexp = require('path-to-regexp');
 
-const { ENTITY_TYPE_USER } = require('../core/consts.js');
+const { ENTITY_TYPE_USER, LESSON_API_KEY } = require('../core/consts.js');
 
 class Api {
     constructor(config, app) {
@@ -71,6 +71,13 @@ class Api {
 
     get esConfig() {
         return this.curlConfig(this.config.adminToken, this.config.esBaseURL);
+    }
+
+    get lessonConfig() {
+        return this.curlConfig(
+            this.config.adminToken,
+            this.config.lessonBaseURL
+        );
     }
 
     async createGitUser(data) {
@@ -285,6 +292,18 @@ class Api {
 
     async packagesDestroy({ id }) {
         return await this.curl('delete', `/packages/${id}`, {}, this.esConfig);
+    }
+
+    async createRegisterMsg(user) {
+        return await this.curl(
+            'post',
+            '/coreApi/registerMsg',
+            {
+                user,
+                apiKey: LESSON_API_KEY,
+            },
+            this.lessonConfig
+        );
     }
 }
 

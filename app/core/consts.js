@@ -145,4 +145,6 @@ module.exports = {
         'vip',
         'tLevel',
     ], // 返回的用户的属性
+
+    LESSON_API_KEY: '9435c6503642d25c3f3bd66a4af7b56c',
 };
