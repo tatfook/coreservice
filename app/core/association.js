@@ -254,47 +254,6 @@ module.exports = app => {
         constraints: false,
     });
 
-    // app.model.testUsers.hasMany(app.model.testProjects, {
-    // as: "testProjects",
-    // foreignKey:"userId",
-    // sourceKey:"id",
-    // onDelete: 'cascade', hooks: true ,
-    // });
-
-    // app.model.testProjects.belongsTo(app.model.testUsers, {
-    // as: "testUsers",
-    // foreignKey:"userId",
-    // targetKey:"id",
-    // });
-
-    app.model.users.hasMany(app.model.userMessages, {
-        as: 'userMessages',
-        foreignKey: 'userId',
-        sourceKey: 'id',
-        constraints: false,
-    });
-
-    app.model.userMessages.belongsTo(app.model.users, {
-        as: 'users',
-        foreignKey: 'userId',
-        targetKey: 'id',
-        constraints: false,
-    });
-
-    app.model.messages.hasMany(app.model.userMessages, {
-        as: 'userMessages',
-        foreignKey: 'messageId',
-        sourceKey: 'id',
-        constraints: false,
-    });
-
-    app.model.userMessages.belongsTo(app.model.messages, {
-        as: 'messages',
-        foreignKey: 'messageId',
-        targetKey: 'id',
-        constraints: false,
-    });
-
     app.model.pBlocks.hasMany(app.model.pBlockClassifies, {
         as: 'pBlockClassifies',
         foreignKey: 'blockId',
