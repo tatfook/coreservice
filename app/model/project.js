@@ -173,11 +173,14 @@ module.exports = app => {
         opts
     );
 
+    app.model.illegalProjects.associate = () => {
+        app.model.illegalProjects.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
     const model = app.model.define('projects', attrs, opts);
-
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
 
     model.__hook__ = async function(data) {
         // if (oper == "update") return;
@@ -273,23 +276,52 @@ module.exports = app => {
         await this.statistics(id, 0, 0, -1);
     };
 
-    // model.statistics = async function() {
-    // const paracraftCount = await app.model.projects.count({where:{type:PROJECT_TYPE_PARACRAFT}});
-    // const siteCount = await app.model.projects.count({where:{type:PROJECT_TYPE_SITE}});
-    // const projectCount = paracraftCount + siteCount;
-
-    // const sql = `select count(*) count from projects where privilege & :recuritValue`;
-    // const list = await app.model.query(sql, {
-    // replacements: {
-    // recuritValue: PROJECT_PRIVILEGE_RECRUIT_ENABLE,
-    // }
-    // });
-    // const recuritCount = list[0] ? list[0].count : 0;
-    // const userCount = await app.model.users.count({});
-
-    // return {paracraftCount, siteCount, recuritCount, userCount, projectCount}
-    // }
-
     app.model.projects = model;
+
+    model.associate = () => {
+        app.model.projects.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+
+        app.model.projects.hasMany(app.model.favorites, {
+            as: 'favorites',
+            foreignKey: 'objectId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.projects.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.projects.belongsToMany(app.model.systemTags, {
+            through: {
+                model: app.model.systemTagProjects,
+            },
+            as: 'systemTags',
+            foreignKey: 'projectId',
+            constraints: false,
+        });
+
+        app.model.projects.belongsToMany(app.model.systemTags, {
+            through: {
+                model: app.model.systemTagProjects,
+            },
+            as: 'filterTags',
+            foreignKey: 'projectId',
+        });
+
+        app.model.projects.hasOne(app.model.gameWorks, {
+            as: 'gameWorks',
+            foreignKey: 'projectId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

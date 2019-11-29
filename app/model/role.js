@@ -1,11 +1,6 @@
 'use strict';
 const _ = require('lodash');
 const {
-    // USER_ROLE_EXCEPTION,
-    // USER_ROLE_NORMAL,
-    // USER_ROLE_VIP,
-    // USER_ROLE_MANAGER,
-    // USER_ROLE_ADMIN,
     USER_ROLE_ALLIANCE_MEMBER,
     USER_ROLE_TUTOR,
 } = require('../core/consts.js');
@@ -64,8 +59,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     model.getByUserId = async function(userId) {
         return await app.keepworkModel.roles
             .findAll({ where: { userId } })
@@ -101,16 +94,16 @@ module.exports = app => {
             })
             .then(o => o && o.toJSON());
     };
-    // model.isExceptionRole = function(roleId = USER_ROLE_NORMAL) {
-    // return roleId & USER_ROLE_EXCEPTION;
-    // }
-
-    // model.isExceptionUser = async function(userId) {
-    // const roleId = await this.getRoleIdByUserId(userId);
-
-    // return this.isExceptionRole(roleId);
-    // }
 
     app.model.roles = model;
+
+    model.associate = () => {
+        app.model.roles.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

@@ -71,9 +71,16 @@ module.exports = app => {
     };
     app.model.illegalSites = app.model.define('illegalSites', attrs, opts);
 
+    app.model.illegalSites.associate = () => {
+        app.model.illegalSites.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
+
     const model = app.model.define('sites', attrs, opts);
 
-    // model.sync({force:true});
     model.__hook__ = async function(data) {
         // if (oper == "update") return;
 
@@ -259,5 +266,14 @@ module.exports = app => {
     };
 
     app.model.sites = model;
+
+    model.associate = () => {
+        app.model.sites.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
+
     return model;
 };

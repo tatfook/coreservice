@@ -47,10 +47,16 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.tags = model;
+
+    model.associate = () => {
+        app.model.tags.belongsTo(app.model.systemTags, {
+            as: 'systemTags',
+            foreignKey: 'tagId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
+
     return model;
 };

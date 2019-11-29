@@ -96,8 +96,6 @@ module.exports = app => {
 
     const model = app.model.define('users', attrs, opts);
 
-    // model.sync({force:true});
-
     model.get = async function(id) {
         if (_.toNumber(id)) {
             return await this.getById(_.toNumber(id));
@@ -161,5 +159,54 @@ module.exports = app => {
     };
 
     app.model.users = model;
+
+    model.associate = () => {
+        app.model.users.hasOne(app.model.userinfos, {
+            as: 'userinfos',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.accounts, {
+            as: 'accounts',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.roles, {
+            as: 'roles',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.issues, {
+            as: 'issues',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.gameWorks, {
+            as: 'gameWorks',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
+
     return model;
 };

@@ -91,10 +91,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     model.__hook__ = async function(data, oper) {
         if (oper === 'create' && data.objectType === ENTITY_TYPE_PROJECT) {
             // ISSUE创建  活跃度加1
@@ -196,5 +192,14 @@ module.exports = app => {
     };
 
     app.model.issues = model;
+
+    model.associate = () => {
+        app.model.issues.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

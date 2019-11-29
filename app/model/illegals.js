@@ -62,8 +62,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     model.__hook__ = async function(data, oper) {
         const objectId = data.objectId;
         if (oper === 'destroy') {
@@ -117,5 +115,48 @@ module.exports = app => {
 
     app.model.illegals = model;
 
+    model.associate = () => {
+        app.model.illegals.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.sites, {
+            as: 'sites',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalUsers, {
+            as: 'illegalUsers',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalProjects, {
+            as: 'illegalProjects',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalSites, {
+            as: 'illegalSites',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

@@ -224,5 +224,14 @@ module.exports = app => {
     };
 
     app.model.favorites = model;
+
+    model.associate = () => {
+        app.model.favorites.belongsTo(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

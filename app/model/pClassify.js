@@ -33,10 +33,15 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.pClassifies = model;
+
+    model.associate = () => {
+        app.model.pClassifies.hasMany(app.model.pBlockClassifies, {
+            as: 'pBlockClassifies',
+            foreignKey: 'classifyId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };
