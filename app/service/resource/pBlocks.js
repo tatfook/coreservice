@@ -48,7 +48,14 @@ class PBlocks extends Model {
         await this.setBlockAccess(data);
     }
 
-    async afterDelete() {}
+    async afterDelete(id) {
+        await this.app.model.pBlockAccesses.destroy({
+            where: { pBlockId: id },
+        });
+        await this.app.model.pBlockAccesses.destroy({
+            where: { pBlockId: id },
+        });
+    }
 }
 
 module.exports = PBlocks;

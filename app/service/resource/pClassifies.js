@@ -28,7 +28,11 @@ class PBlocks extends Model {
         await this.setClassifyAccess(data);
     }
 
-    async afterDelete() {}
+    async afterDelete(id) {
+        await this.app.model.pClassifyAccesses.destroy({
+            where: { pClassifyId: id },
+        });
+    }
 }
 
 module.exports = PBlocks;
