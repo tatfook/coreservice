@@ -76,5 +76,14 @@ module.exports = app => {
     // });
 
     app.model.pBlocks = model;
+
+    model.associate = () => {
+        app.model.pBlocks.hasOne(app.model.pBlockAccesses, {
+            as: 'pBlockAccesses',
+            foreignKey: 'pBlockId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

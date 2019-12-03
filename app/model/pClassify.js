@@ -38,5 +38,13 @@ module.exports = app => {
     // });
 
     app.model.pClassifies = model;
+    model.associate = () => {
+        app.model.pClassifies.hasOne(app.model.pClassifyAccesses, {
+            as: 'pClassifyAccesses',
+            foreignKey: 'pClassifyId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };
