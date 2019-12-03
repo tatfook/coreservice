@@ -1,6 +1,6 @@
 'use strict';
 const Model = require('./model.js');
-
+const _ = require('lodash');
 class PBlocks extends Model {
     // constructor(app) {
     //     super(app);
@@ -21,19 +21,41 @@ class PBlocks extends Model {
         await this.app.model.pBlockClassifies.bulkCreate(bcs);
     }
 
+    async setBlockAccess(data) {
+        if (!data.id || !data.pBlockAccesses) return;
+
+        await this.app.model.pBlockAccesses.destroy({
+            where: { pBlockId: data.id },
+        });
+        const opts = _.pick(
+            data.pBlockAccesses,
+            ...[ 'vip', 'commonUser', 't1', 't2', 't3', 't4', 't5' ]
+        );
+        opts.pBlockId = data.id;
+        await this.app.model.pBlockAccesses.create(opts);
+    }
     async buildList() {}
 
     async build() {}
 
     async afterCreate(data) {
         await this.setBlockClassifies(data);
+        await this.setBlockAccess(data);
     }
 
     async afterUpdate(data) {
         await this.setBlockClassifies(data);
+        await this.setBlockAccess(data);
     }
 
-    async afterDelete() {}
+    async afterDelete(id) {
+        await this.app.model.pBlockAccesses.destroy({
+            where: { pBlockId: id },
+        });
+        await this.app.model.pBlockAccesses.destroy({
+            where: { pBlockId: id },
+        });
+    }
 }
 
 module.exports = PBlocks;
