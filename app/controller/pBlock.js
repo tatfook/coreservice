@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 'use strict';
 const Controller = require('../core/controller.js');
 
@@ -55,9 +56,10 @@ const PBlock = class extends Controller {
         };
         if (keyword) {
             query[this.model.Op.or] = [
-                {
-                    id: { [this.model.Op.like]: `%${keyword}%` },
-                },
+                // 搜索ID加1000前面再加E
+                this.model.Sequelize.literal(
+                    `concat('E', \`pBlocks\`.id+1000) like '%${keyword}%'`
+                ),
                 {
                     name: { [this.model.Op.like]: `%${keyword}%` },
                 },
@@ -90,6 +92,8 @@ const PBlock = class extends Controller {
         });
         list.rows = list.rows.map(item => {
             item = item.toJSON();
+            // 显示的要求
+            item._id = 'E' + (item.id + 1000);
             const canUse =
                 item.pBlockAccesses.commonUser > 1 ||
                 (user.vip && item.pBlockAccesses.vip > 1) ||
