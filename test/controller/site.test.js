@@ -354,7 +354,7 @@ describe('test/controller/site.test.js', () => {
                 .send({
                     sitename: 'my',
                 })
-                .expect(409);
+                .expect(400);
         });
 
         it('## show one site', async () => {

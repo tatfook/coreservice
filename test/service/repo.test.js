@@ -169,7 +169,7 @@ describe('test/service/repo.test.js', () => {
         });
 
         it('should failed if create git repo failed', async () => {
-            app.mockService('git', 'createRepo', () => {
+            app.mockService('repo', 'createRepo', () => {
                 ctx.throw('failed');
             });
             const errMessage = 'should failed to sync repo';
@@ -227,7 +227,7 @@ describe('test/service/repo.test.js', () => {
         });
 
         it('should failed if delete git repo failed', async () => {
-            app.mockService('git', 'deleteRepo', () => {
+            app.mockService('repo', 'deleteRepo', () => {
                 ctx.throw('failed');
             });
             const errMessage = 'should failed to destroy invalid repo';

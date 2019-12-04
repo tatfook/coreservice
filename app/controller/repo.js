@@ -5,7 +5,7 @@ const Repo = class extends Controller {
     async getTree() {
         const repo = await this.getRepoAndEnsureReadable();
         const { folderPath, recursive } = this.getParams();
-        const result = await this.service.git.getFolderFiles(
+        const result = await this.service.repo.getFolderFiles(
             repo.path,
             folderPath,
             recursive
@@ -16,14 +16,14 @@ const Repo = class extends Controller {
     async download() {
         const repo = await this.getRepoAndEnsureReadable();
         const { ref } = this.getParams();
-        const result = await this.service.git.downloadRepo(repo.path, ref);
+        const result = await this.service.repo.downloadRepo(repo.path, ref);
         return this.success(result);
     }
 
     async getFileInfo() {
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = this.getParams();
-        const result = await this.service.git.getFileInfo(
+        const result = await this.service.repo.getFileInfo(
             repo.path,
             filePath,
             commitId
@@ -34,7 +34,7 @@ const Repo = class extends Controller {
     async getFileRaw() {
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = this.getParams();
-        const result = await this.service.git.getFileRaw(
+        const result = await this.service.repo.getFileRaw(
             repo.path,
             filePath,
             commitId
@@ -45,7 +45,7 @@ const Repo = class extends Controller {
     async getFileHistory() {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, commitId } = this.getParams();
-        const result = await this.service.git.getFileHistory(
+        const result = await this.service.repo.getFileHistory(
             repo.path,
             filePath,
             commitId
@@ -53,12 +53,25 @@ const Repo = class extends Controller {
         return this.success(result);
     }
 
-    async upsertFile() {
+    async createFile() {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, content } = this.getParams();
         const committer = this.getUser().username;
-        const result = await this.service.git.upsertFile(
-            repo.path,
+        const result = await this.service.repo.createFile(
+            repo,
+            filePath,
+            content,
+            committer
+        );
+        return this.success(result);
+    }
+
+    async updateFile() {
+        const repo = await this.getRepoAndEnsureWritable();
+        const { filePath, content } = this.getParams();
+        const committer = this.getUser().username;
+        const result = await this.service.repo.updateFile(
+            repo,
             filePath,
             content,
             committer
@@ -70,8 +83,8 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await this.service.git.deleteFile(
-            repo.path,
+        const result = await this.service.repo.deleteFile(
+            repo,
             filePath,
             committer
         );
@@ -79,13 +92,11 @@ const Repo = class extends Controller {
     }
 
     async renameFile() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, newFilePath } = this.getParams();
-        if (!newFilePath) ctx.throw('invalid new file path', 400);
         const committer = this.getUser().username;
-        const result = await service.git.moveFile(
-            repo.path,
+        const result = await this.service.repo.moveFile(
+            repo,
             filePath,
             newFilePath,
             committer
@@ -97,7 +108,7 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await this.service.git.createFolder(
+        const result = await this.service.repo.createFolder(
             repo.path,
             folderPath,
             committer
@@ -109,7 +120,7 @@ const Repo = class extends Controller {
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath } = this.getParams();
         const committer = this.getUser().username;
-        const result = await this.service.git.deleteFolder(
+        const result = await this.service.repo.deleteFolder(
             repo.path,
             folderPath,
             committer
@@ -118,12 +129,10 @@ const Repo = class extends Controller {
     }
 
     async renameFolder() {
-        const { ctx, service } = this;
         const repo = await this.getRepoAndEnsureWritable();
         const { folderPath, newFolderPath } = this.getParams();
-        if (!newFolderPath) ctx.throw('invalid new folder path', 400);
         const committer = this.getUser().username;
-        const result = await service.git.moveFolder(
+        const result = await this.service.repo.moveFolder(
             repo.path,
             folderPath,
             newFolderPath,

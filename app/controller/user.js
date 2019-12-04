@@ -289,14 +289,6 @@ const User = class extends Controller {
             // 创建用户账号记录
             await this.model.accounts.upsert({ userId: user.id });
 
-            // 同步用户到wikicraft
-            // const data = await axios.post(config.keepworkBaseURL + "user/register",
-            // {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
-            // if (!data || data.error.id != 0) {
-            // await this.model.users.destroy({where:{id:user.id}});
-            // console.log("创建wikicraft用户失败", data);
-            // return this.fail(-1, 400, data);
-            // }
             const ok = await this.app.api.createGitUser({
                 id: user.id,
                 username,
@@ -391,17 +383,6 @@ const User = class extends Controller {
             const value = await this.model.caches.get(key);
             if (value !== captcha) return this.fail(5);
         }
-
-        // 同步用户到wikicraft
-        // if (this.app.config.env != "unittest") {
-        // const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
-        // console.log("创建wikicraft用户失败", e);
-        // });
-        // if (!data || data.error.id != 0) {
-        // console.log("创建wikicraft用户失败", data);
-        // return this.fail(-1, 400, data);
-        // }
-        // }
 
         user = await model.users.create({
             // cellphone: params.cellphone || null,

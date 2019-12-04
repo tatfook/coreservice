@@ -83,7 +83,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileInfo', () => {
                 it('should return file info for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -98,7 +98,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -109,7 +109,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file info for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -122,7 +122,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileRaw', () => {
                 it('should return file raw data for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -136,7 +136,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -147,7 +147,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -160,7 +160,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileHistory', () => {
                 it('should return file history for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -175,7 +175,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -186,7 +186,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file history for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -196,10 +196,10 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
-            describe('#upsertFile', () => {
-                it('should upsert successfully for owner', async () => {
+            describe('#createFile', () => {
+                it('should create successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .post(
@@ -214,7 +214,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
@@ -226,10 +226,51 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .send({ content: 'test' })
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
+            describe('#updateFile', () => {
+                it('should update successfully for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .put(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .send({ content: 'test' })
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should failed for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .put(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .send({ content: 'test' })
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(403);
+                });
+                it('should failed for invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .put(
                             `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
                         )
                         .send({ content: 'test' })
@@ -240,7 +281,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#deleteFile', () => {
                 it('should delete successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .delete(
@@ -254,7 +295,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .delete(
@@ -265,7 +306,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .delete(
@@ -278,8 +319,8 @@ describe('test/controller/repo.test.js', () => {
             describe('#renameFile', () => {
                 it('should rename successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     const result = await app
                         .httpRequest()
                         .post(
@@ -292,7 +333,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed without newFilePath', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
@@ -305,8 +346,8 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     await app
                         .httpRequest()
                         .post(
@@ -318,8 +359,8 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     await app
                         .httpRequest()
                         .post(
@@ -549,7 +590,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileInfo', () => {
                 it('should return file info for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -564,7 +605,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -577,7 +618,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file info for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -590,7 +631,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileRaw', () => {
                 it('should return file raw data for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -604,7 +645,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -616,7 +657,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -629,7 +670,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#getFileHistory', () => {
                 it('should return file history for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -644,7 +685,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -655,7 +696,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file history for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .get(
@@ -668,7 +709,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#upsertFile', () => {
                 it('should upsert successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .post(
@@ -683,7 +724,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
@@ -695,7 +736,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
@@ -709,7 +750,7 @@ describe('test/controller/repo.test.js', () => {
             describe('#deleteFile', () => {
                 it('should delete successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     const result = await app
                         .httpRequest()
                         .delete(
@@ -723,7 +764,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .delete(
@@ -734,7 +775,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .delete(
@@ -747,8 +788,8 @@ describe('test/controller/repo.test.js', () => {
             describe('#renameFile', () => {
                 it('should rename successfully for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     const result = await app
                         .httpRequest()
                         .post(
@@ -761,7 +802,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed without newFilePath', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
                     await app
                         .httpRequest()
                         .post(
@@ -774,8 +815,8 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     await app
                         .httpRequest()
                         .post(
@@ -787,8 +828,8 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should failed for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
-                    const newFilePath = 'test2/abc.jpg';
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const newFilePath = 'test2/abc.md';
                     await app
                         .httpRequest()
                         .post(

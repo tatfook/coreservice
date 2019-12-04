@@ -51,6 +51,14 @@ module.exports = app => {
         }
     );
 
+    model.prototype.isSite = function() {
+        return this.resourceType === 'Site';
+    };
+
+    model.prototype.isWorld = function() {
+        return this.resourceType === 'World';
+    };
+
     app.model.repos = model;
     return model;
 };

@@ -232,7 +232,8 @@ module.exports = app => {
     router.get('/repos/:repoPath/files/:filePath/info', repo.getFileInfo);
     router.get('/repos/:repoPath/files/:filePath/raw', repo.getFileRaw);
     router.get('/repos/:repoPath/files/:filePath/history', repo.getFileHistory);
-    router.post('/repos/:repoPath/files/:filePath', repo.upsertFile);
+    router.post('/repos/:repoPath/files/:filePath', repo.createFile);
+    router.put('/repos/:repoPath/files/:filePath', repo.updateFile);
     router.delete('/repos/:repoPath/files/:filePath', repo.deleteFile);
     router.post('/repos/:repoPath/files/:filePath/rename', repo.renameFile);
     router.post('/repos/:repoPath/folders/:folderPath', repo.createFolder);
