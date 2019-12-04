@@ -85,7 +85,7 @@ class User extends Service {
     }
 
     async createRegisterMsg(user) {
-        return this.app.api.createRegisterMsg(user);
+        return this.app.api.lesson.createRegisterMsg(user);
     }
 
     async register(user) {

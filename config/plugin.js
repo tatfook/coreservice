@@ -4,11 +4,6 @@ exports.sequelize = {
     package: 'egg-sequelize',
 };
 
-exports.parameters = {
-    enable: true,
-    package: 'egg-parameters',
-};
-
 exports.cors = {
     enable: true,
     package: 'egg-cors',

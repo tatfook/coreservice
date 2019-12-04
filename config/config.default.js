@@ -32,9 +32,3 @@ exports.onerror = {
         }
     },
 };
-
-exports.parameters = {
-    logParameters: true,
-    // param names that you want filter in log.
-    filterParameters: [ 'password' ],
-};
