@@ -1,3 +1,4 @@
+/* eslint-disable no-magic-numbers */
 'use strict';
 const Controller = require('../core/controller.js');
 
@@ -15,19 +16,129 @@ const PBlock = class extends Controller {
     }
 
     async system() {
-        const query = this.validate();
-        query.userId = 0;
-        const list = await this.model.pBlocks.findAll({ where: query });
-
+        const { pClassifyId, keyword } = this.validate({
+            pClassifyId: 'number_optional',
+            keyword: 'string_optional',
+        });
+        const { userId } = this.getUser();
+        const whereConditions = [];
+        const $gt = this.model.Op.gt;
+        whereConditions.push({
+            commonUser: {
+                [$gt]: 0,
+            },
+        });
+        let user = {};
+        if (userId) {
+            user =
+                (await this.model.users.findOne({
+                    where: {
+                        id: userId,
+                    },
+                })) || {};
+            if (user.vip) {
+                whereConditions.push({
+                    vip: {
+                        [$gt]: 0,
+                    },
+                });
+            }
+            if (user.tLevel) {
+                whereConditions.push({
+                    [`t${user.tLevel}`]: {
+                        [$gt]: 0,
+                    },
+                });
+            }
+        }
+        const query = {
+            userId: 0,
+        };
+        if (keyword) {
+            query[this.model.Op.or] = [
+                // 搜索ID加1000前面再加E
+                this.model.Sequelize.literal(
+                    `concat('E', \`pBlocks\`.id+1000) like '%${keyword}%'`
+                ),
+                {
+                    name: { [this.model.Op.like]: `%${keyword}%` },
+                },
+            ];
+        }
+        const pClassifyWhere = {};
+        const include = [
+            {
+                model: this.model.pBlockAccesses,
+                as: 'pBlockAccesses',
+                where: {
+                    [this.model.Op.or]: whereConditions,
+                },
+            },
+        ];
+        if (pClassifyId) {
+            pClassifyWhere.classifyId = pClassifyId;
+            include.push({
+                model: this.model.pBlockClassifies,
+                as: 'pBlockClassifies',
+                attributes: [],
+                where: pClassifyWhere,
+            });
+        }
+        const list = await this.model.pBlocks.findAndCountAll({
+            where: query,
+            include,
+            ...this.queryOptions,
+            distinct: true,
+        });
+        list.rows = list.rows.map(item => {
+            item = item.toJSON();
+            // 显示的要求
+            item._id = 'E' + (item.id + 1000);
+            const canUse =
+                item.pBlockAccesses.commonUser > 1 ||
+                (user.vip && item.pBlockAccesses.vip > 1) ||
+                (user.tLevel && item.pBlockAccesses[`t${user.tLevel}`] > 1);
+            item.canUse = !!canUse;
+            delete item.pBlockAccesses;
+            return item;
+        });
         return this.success(list);
     }
 
     async systemClassifies() {
+        const { userId } = this.getUser();
+        const whereConditions = [];
+        whereConditions.push({
+            commonUser: 1,
+        });
+        if (userId) {
+            const user =
+                (await this.model.users.findOne({
+                    where: {
+                        id: userId,
+                    },
+                })) || {};
+            if (user.vip) {
+                whereConditions.push({
+                    vip: 1,
+                });
+            }
+            if (user.tLevel) {
+                whereConditions.push({
+                    [`t${user.tLevel}`]: 1,
+                });
+            }
+        }
+
         const list = await this.model.pClassifies.findAll({
             include: [
                 {
-                    as: 'pBlockClassifies',
-                    model: this.model.pBlockClassifies,
+                    model: this.model.pClassifyAccesses,
+                    as: 'pClassifyAccesses',
+                    attributes: [],
+                    where: {
+                        [this.model.Op.or]: whereConditions,
+                    },
                 },
             ],
         });
