@@ -35,7 +35,7 @@ module.exports = app => {
                 id: user.id,
                 username: user.username,
                 portrait: user.portrait,
-                description: user.description,
+                description: user.description || '',
                 total_projects: userRank.project,
                 total_follows: userRank.follow,
                 total_fans: userRank.fans,
