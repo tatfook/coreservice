@@ -51,7 +51,7 @@ module.exports = app => {
                 where: { id: project.userId },
             });
 
-            if (!user.realname) return; // 未实名用户的项目不能被查看，因此也不需被检索
+            if (user && !user.realname) return; // 未实名用户的项目不能被查看，因此也不需被检索
 
             if (!project.systemTags) {
                 const tags = await app.model.systemTagProjects.findAll({
