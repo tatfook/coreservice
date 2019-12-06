@@ -72,7 +72,7 @@ const Migration = class extends Controller {
         this.adminAuthenticated();
 
         const { ctx, service } = this;
-        const pace = 20;
+        const pace = 10;
         let step = 0;
         const total = await ctx.model.Repo.count();
         ctx.logger.info('Begin to sync repos, total amount is ', total);
@@ -89,6 +89,7 @@ const Migration = class extends Controller {
             step = step + pace;
         }
         ctx.logger.info('Finish to sync repos!');
+        ctx.body = 'success';
     }
 };
 

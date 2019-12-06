@@ -5,14 +5,15 @@ const Service = require('egg').Service;
 class RepoService extends Service {
     // TODO: 在gitlab数据迁移完成之后可以移除
     async syncIfExist(repo) {
-        if (repo.synced) return;
         const { ctx, service } = this;
-        const repoPath = `${repo.username}/${repo.repoName}`;
-        const porject = await service.gitlab.getProject(repoPath).catch(err => {
-            ctx.logger.error(repoPath, ' not exist. err: ', err.message);
-        });
-        if (porject) {
-            return service.repo.syncRepo(repo);
+        const repoPath = repo.path;
+        try {
+            const porject = await service.gitlab.getProject(repoPath);
+            await service.repo.syncRepo(repo);
+            await this.app.api.git.syncRepo(repoPath, porject.http_url_to_repo);
+            return true;
+        } catch (e) {
+            ctx.logger.error(repoPath, ' not exist. err: ', e.message);
         }
     }
 

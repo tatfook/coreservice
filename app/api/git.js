@@ -50,6 +50,14 @@ module.exports = app => {
 
             return result.data;
         },
+        async syncRepo(repoPath, gitlabRepoUrl) {
+            const result = await Client.post('/repos/sync', {
+                repoPath,
+                gitlabRepoUrl,
+            });
+
+            return result.data;
+        },
         async createFolder(repoPath, folderPath = '', committer) {
             const result = await Client.get('/folders', {
                 params: {
