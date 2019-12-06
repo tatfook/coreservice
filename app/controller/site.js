@@ -54,7 +54,7 @@ const Site = class extends Controller {
     }
 
     async create() {
-        const { ctx, model } = this;
+        const { ctx } = this;
         const { userId, username } = this.authenticated();
         const params = this.validate({
             sitename: 'string',
@@ -62,29 +62,7 @@ const Site = class extends Controller {
 
         params.userId = userId;
         params.username = username;
-        let data = await model.sites.findOne({
-            where: {
-                userId,
-                sitename: params.sitename,
-            },
-        });
-
-        if (data) return ctx.throw(400, '站点已存在');
-
-        data = await model.sites.create(params);
-        if (!data) return ctx.throw(500);
-        data = data.get({ plain: true });
-
-        if (!this.app.unittest) {
-            const ok = await this.app.api.createGitProject({
-                username,
-                sitename: params.sitename,
-                visibility: data.visibility === 0 ? 'public' : 'private',
-                site_id: data.id,
-            });
-            if (!ok) this.throw(500, '创建git仓库失败');
-        }
-        // this.addNotification(userId, data.id, "create");
+        const data = await ctx.service.site.createSite(params);
 
         return this.success(data);
     }
@@ -99,13 +77,6 @@ const Site = class extends Controller {
         const user = await model.users.getById(userId);
         if (!user || !site) this.throw(400);
         site.username = user.username;
-        if (params.visibility !== undefined) {
-            this.app.api.setGitProjectVisibility({
-                username: user.username,
-                sitename: site.sitename,
-                visibility: params.visibility === 0 ? 'public' : 'private',
-            });
-        }
 
         const data = await model.sites.update(params, {
             where: { id, userId },
@@ -114,26 +85,11 @@ const Site = class extends Controller {
     }
 
     async destroy() {
-        const model = this.model;
         const userId = this.authenticated().userId;
         const params = this.validate({ id: 'int' });
-        const id = params.id;
 
-        const site = await model.sites.getById(id, userId);
-        const user = await model.users.getById(userId);
-        if (!user || !site) this.throw(400);
-
-        if (!this.app.unittest) {
-            this.app.api.deleteGitProject({
-                username: user.username,
-                sitename: site.sitename,
-            });
-        }
-
-        await this.model.siteGroups.destroy({ where: { userId, siteId: id } });
-        await this.model.siteFiles.destroy({ where: { userId, siteId: id } });
-        const data = await model.sites.destroy({ where: { id, userId } });
-        return this.success(data);
+        await this.ctx.service.site.destroySite(params.id, userId);
+        return this.success();
     }
 
     async getJoinSites() {

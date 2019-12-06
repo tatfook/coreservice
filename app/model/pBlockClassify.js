@@ -43,10 +43,22 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.pBlockClassifies = model;
+
+    model.associate = () => {
+        app.model.pBlockClassifies.belongsTo(app.model.pBlocks, {
+            as: 'pBlocks',
+            foreignKey: 'blockId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.pBlockClassifies.belongsTo(app.model.pClassifies, {
+            as: 'pClassifies',
+            foreignKey: 'classifyId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

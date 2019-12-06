@@ -18,14 +18,6 @@ const rules = {
 };
 
 class BaseController extends Controller {
-    // constructor() {
-    // super();
-    // }
-
-    get cache() {
-        return this.app.cache;
-    }
-
     get model() {
         return this.app.model;
     }

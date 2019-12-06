@@ -36,8 +36,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.adminActions = model;
     return model;
 };

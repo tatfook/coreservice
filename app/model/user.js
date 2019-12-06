@@ -96,8 +96,6 @@ module.exports = app => {
 
     const model = app.model.define('users', attrs, opts);
 
-    // model.sync({force:true});
-
     model.get = async function(id) {
         if (_.toNumber(id)) {
             return await this.getById(_.toNumber(id));
@@ -130,12 +128,13 @@ module.exports = app => {
         return user;
     };
 
-    model.getById = async function(userId) {
+    model.getById = async function(userId, transaction = null) {
         const data = await app.model.users.findOne({
             where: { id: userId },
             attributes: {
                 exclude: [ 'password' ],
             },
+            transaction,
         });
 
         return data && data.get({ plain: true });
@@ -161,5 +160,70 @@ module.exports = app => {
     };
 
     app.model.users = model;
+
+    model.associate = () => {
+        app.model.users.hasOne(app.model.userinfos, {
+            as: 'userinfos',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.accounts, {
+            as: 'accounts',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.roles, {
+            as: 'roles',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.issues, {
+            as: 'issues',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.gameWorks, {
+            as: 'gameWorks',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
+
+    async function __hook__(inst, options) {
+        await app.api.es.upsertUser(inst, options.transaction);
+    }
+
+    model.afterCreate(__hook__);
+
+    model.afterUpdate(__hook__);
+
+    model.afterDestroy(async (inst, options) => {
+        const transaction = options.transaction;
+        await app.model.userRanks.destroy({
+            where: { userId: inst.id },
+            transaction,
+        });
+        await app.api.es.deleteUser(inst.id);
+    });
     return model;
 };

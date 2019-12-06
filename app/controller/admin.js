@@ -187,7 +187,7 @@ const Admin = class extends Controller {
 
         return this.success(data);
     }
-
+    // TODO 暂时没用
     async bulkCreate() {
         this.adminAuthenticated();
 
@@ -199,7 +199,7 @@ const Admin = class extends Controller {
 
         return this.success(data);
     }
-
+    // TODO 暂时没用
     async bulkUpdate() {
         this.adminAuthenticated();
 
@@ -220,14 +220,16 @@ const Admin = class extends Controller {
 
         return this.success(updateNum);
     }
-
+    // TODO 暂时没用
     async bulkDestroy() {
         this.adminAuthenticated();
 
         const { query, datas = [] } = this.parseParams();
         let deleteNum = 0;
         if (!_.isEmpty(query)) {
-            deleteNum = await this.resource.destroy({ where: query });
+            deleteNum = await this.resource.destroy({
+                where: query,
+            });
         }
         for (let i = 0; i < datas.length; i++) {
             if (!datas[i].id) continue;
@@ -276,6 +278,7 @@ const Admin = class extends Controller {
         const data = await this.resource.update(params, {
             where: { id },
             silent: true,
+            individualHooks: true,
         });
 
         if (resource && resource.afterUpdate) {
@@ -295,7 +298,10 @@ const Admin = class extends Controller {
 
         if (!id) this.throw(400, 'args error');
 
-        const data = await this.resource.destroy({ where: { id } });
+        const data = await this.resource.destroy({
+            where: { id },
+            individualHooks: true,
+        });
 
         this.action();
 
@@ -349,7 +355,7 @@ const Admin = class extends Controller {
             ],
         });
         if (project) {
-            await this.app.api.projectsUpsert(project);
+            await this.app.api.es.upsertProject(project);
         }
     }
     async updateProjectTag() {
@@ -424,7 +430,7 @@ const Admin = class extends Controller {
                 ],
             });
             if (project) {
-                await this.app.api.projectsUpsert(project);
+                await this.app.api.es.upsertProject(project);
             }
         }
         return this.success(projectIds.length);

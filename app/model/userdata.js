@@ -35,10 +35,6 @@ module.exports = app => {
         return await app.model.userdatas.upsert({ userId, data });
     };
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.userdatas = model;
     return model;
 };

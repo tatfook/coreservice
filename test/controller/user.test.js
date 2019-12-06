@@ -9,6 +9,7 @@ describe('test/controller/user.test.js', () => {
     describe('# GET /users/rank', () => {
         it('## get users by rank successfully', async () => {
             await app.factory.createMany('userRanks', 100);
+            await app.factory.createMany('users', 100);
             const ranks = await app.model.userRanks.findAll();
             const users = await app.model.users.findAll();
             assert(ranks.length === users.length);
@@ -50,8 +51,6 @@ describe('test/controller/user.test.js', () => {
                     },
                 };
             });
-            mock(app.api, 'createGitUser', () => true);
-            mock(app.api, 'createGitProject', () => true);
         });
         // qq游戏大厅登录
         it('## bad request', async () => {
@@ -159,23 +158,6 @@ describe('test/controller/user.test.js', () => {
             const oauth = await app.model.oauthUsers.findOne();
             assert(oauth);
         });
-
-        it('## Git server error', async () => {
-            mock(app.api, 'createGitUser', () => false);
-            const result = await app
-                .httpRequest()
-                .post('/api/v0/users/platform_login')
-                .send({
-                    uid: '123456',
-                    token: 'token',
-                    platform: 'qqHall',
-                })
-                .expect(400)
-                .then(res => res.body);
-            assert(result.code === 0);
-            const user = await app.model.users.findOne();
-            assert(!user);
-        });
     });
 
     describe('# POST /users/search', () => {
@@ -209,7 +191,6 @@ describe('test/controller/user.test.js', () => {
     describe('# POST /users/:id/contributions', () => {
         it('## add users contributions successfully', async () => {
             const { token } = await app.login();
-            await app.factory.create('userRanks', { userId: 1 });
             await app.model.contributions.create({
                 userId: 1,
                 year: 2019,
@@ -235,7 +216,6 @@ describe('test/controller/user.test.js', () => {
 
         it('## add users contributions not exist before successfully', async () => {
             const { token } = await app.login();
-            await app.factory.create('userRanks', { userId: 1 });
             await app
                 .httpRequest()
                 .post('/api/v0/users/1/contributions')
@@ -297,7 +277,6 @@ describe('test/controller/user.test.js', () => {
             // 创建数据
             const user = { id: 1, username: 'test' };
             await app.factory.create('users', user);
-            await app.factory.create('userRanks', { userId: 1 });
             await app.model.contributions.create({
                 userId: 1,
                 year: new Date().getFullYear(),
@@ -319,7 +298,6 @@ describe('test/controller/user.test.js', () => {
             // 创建数据
             const user = { id: 1, username: 'test' };
             await app.factory.create('users', user);
-            await app.factory.create('userRanks', { userId: 1 });
             await app.model.contributions.create({
                 userId: 1,
                 year: new Date().getFullYear(),
@@ -380,8 +358,10 @@ describe('test/controller/user.test.js', () => {
         });
 
         it("## get users' sites by username successfully", async () => {
-            await app.factory.create('sites', { userId: 1 });
-            await app.factory.create('users', { username: 'test' });
+            const user = await app.factory.create('users', {
+                username: 'test',
+            });
+            await app.factory.create('sites', {}, { user });
             const result = await app
                 .httpRequest()
                 .get('/api/v0/users/test/sites')
@@ -607,23 +587,6 @@ describe('test/controller/user.test.js', () => {
                 .then(res => res.body);
             assert(result.message === '验证码错误');
             assert(result.code === 5);
-        });
-
-        it('## register failed create user failed', async () => {
-            mock(app.model.users, 'create', () => {
-                return null;
-            });
-            const result = await app
-                .httpRequest()
-                .post('/api/v0/users/register')
-                .send({
-                    username: 'test',
-                    password: '123456',
-                })
-                .expect(400)
-                .then(res => res.body);
-            assert(result.message === '服务器繁忙,请稍后重试...');
-            assert(result.code === 0);
         });
 
         it('## register successfully', async () => {

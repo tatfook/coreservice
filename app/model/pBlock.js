@@ -71,10 +71,15 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.pBlocks = model;
+
+    model.associate = () => {
+        app.model.pBlocks.hasMany(app.model.pBlockClassifies, {
+            as: 'pBlockClassifies',
+            foreignKey: 'blockId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

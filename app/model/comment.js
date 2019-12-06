@@ -50,20 +50,17 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
-    model.__hook__ = async function(data, oper) {
+    /** **********************
+     * hooks
+     *************************/
+    model.afterCreate(async inst => {
         if (
-            oper === 'create' &&
-            (data.objectType === ENTITY_TYPE_PROJECT ||
-                data.objectType === ENTITY_TYPE_ISSUE)
+            inst.objectType === ENTITY_TYPE_PROJECT ||
+            inst.objectType === ENTITY_TYPE_ISSUE
         ) {
-            // 项目评论 ISSUE回复  活跃度加1
-            await app.model.contributions.addContributions(data.userId);
+            await app.model.contributions.addContributions(inst.userId);
         }
-    };
+    });
 
     model.createComment = async function(
         userId,

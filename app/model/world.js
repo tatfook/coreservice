@@ -88,30 +88,28 @@ module.exports = app => {
             ],
         }
     );
-
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
-
-        const { userId } = data;
-
-        const count = await app.model.worlds.count({ where: { userId } });
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const transaction = options.transaction;
+        const count = await app.model.worlds.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { world: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+    }
+    model.afterCreate(__hook__);
+
+    model.afterDestroy(__hook__);
 
     model.getById = async function(id, userId) {
         const where = { id };
 
         if (userId) where.userId = userId;
 
-        const data = await app.model.sites.findOne({ where });
+        const data = await app.model.worlds.findOne({ where });
 
         return data && data.get({ plain: true });
     };
@@ -120,6 +118,16 @@ module.exports = app => {
         const world = await app.model.worlds.findOne({ where: { projectId } });
 
         return world && world.get({ plain: true });
+    };
+
+    model.prototype.canReadByUser = async function(userId) {
+        // TODO: currently, there's no permission logic for 'world' project
+        if (userId) return true;
+    };
+
+    model.prototype.canWriteByUser = async function(userId) {
+        // TODO: currently, there's no permission logic for 'world' project
+        return this.userId === userId;
     };
 
     app.model.worlds = model;

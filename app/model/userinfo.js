@@ -17,14 +17,6 @@ module.exports = app => {
             allowNull: false,
         },
 
-        // kid: {
-        // type: BIGINT,
-        // },
-
-        // registerUsername: {     // 注册用户名
-        // type: STRING(48),
-        // },
-
         name: {
             type: STRING(48), // 用户姓名
         },
@@ -61,9 +53,16 @@ module.exports = app => {
 
     const model = app.model.define('userinfos', attrs, opts);
 
-    // model.sync({force:true});
-
     app.model.userinfos = model;
+
+    model.associate = () => {
+        app.model.userinfos.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
 
     return model;
 };

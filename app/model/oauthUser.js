@@ -56,10 +56,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.oauthUsers = model;
 
     return model;

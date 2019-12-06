@@ -72,10 +72,15 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.paracraftDevices = model;
+
+    model.associate = () => {
+        app.model.paracraftDevices.hasMany(app.model.paracraftGameCoinKeys, {
+            as: 'paracraftGameCoinKeys',
+            foreignKey: 'deviceId',
+            sourceKey: 'deviceId',
+            constraints: false,
+        });
+    };
     return model;
 };
