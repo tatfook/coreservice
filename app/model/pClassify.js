@@ -42,6 +42,12 @@ module.exports = app => {
             sourceKey: 'id',
             constraints: false,
         });
+        app.model.pClassifies.hasOne(app.model.pClassifyAccesses, {
+            as: 'pClassifyAccesses',
+            foreignKey: 'pClassifyId',
+            sourceKey: 'id',
+            constraints: false,
+        });
     };
     return model;
 };

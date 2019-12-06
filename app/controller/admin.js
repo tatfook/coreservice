@@ -298,10 +298,16 @@ const Admin = class extends Controller {
 
         if (!id) this.throw(400, 'args error');
 
+        const resource = this.ctx.service.resource.getResourceByName(
+            this.resourceName
+        );
         const data = await this.resource.destroy({
             where: { id },
             individualHooks: true,
         });
+        if (resource && resource.afterDelete) {
+            await resource.afterDelete(id);
+        }
 
         this.action();
 

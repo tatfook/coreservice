@@ -80,6 +80,12 @@ module.exports = app => {
             sourceKey: 'id',
             constraints: false,
         });
+        app.model.pBlocks.hasOne(app.model.pBlockAccesses, {
+            as: 'pBlockAccesses',
+            foreignKey: 'pBlockId',
+            sourceKey: 'id',
+            constraints: false,
+        });
     };
     return model;
 };
