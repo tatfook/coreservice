@@ -5,9 +5,14 @@ const _ = require('lodash');
 
 module.exports = app => {
     const config = app.config.self;
+    const adminToken = app.util.jwt_encode(
+        { userId: 1, username: 'coreservice', roleId: 10 },
+        config.secret,
+        3600 * 24 * 365 * 10
+    );
     const Client = Axios.create({
         headers: {
-            Authorization: 'Bearer ' + config.adminToken,
+            Authorization: 'Bearer ' + adminToken,
         },
         baseURL: `${config.esBaseURL}`,
     });
