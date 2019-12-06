@@ -69,8 +69,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.paracraftVisitors = model;
 
     return model;

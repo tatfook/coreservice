@@ -91,12 +91,12 @@ module.exports = app => {
         }
     );
 
-    model.__hook__ = async function(data, oper) {
-        if (oper === 'create' && data.objectType === ENTITY_TYPE_PROJECT) {
+    model.afterCreate(async inst => {
+        if (inst.objectType === ENTITY_TYPE_PROJECT) {
             // ISSUE创建  活跃度加1
-            await app.model.contributions.addContributions(data.userId);
+            await app.model.contributions.addContributions(inst.userId);
         }
-    };
+    });
 
     model.getById = async function(id, userId) {
         const where = { id };

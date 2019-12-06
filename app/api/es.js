@@ -19,12 +19,13 @@ module.exports = app => {
     };
 
     const esAPI = {
-        async upsertUser(user) {
+        async upsertUser(user, transaction = null) {
             const userId = user.id;
-            const userRank = await app.model.UserRank.findOne({
+            let [ userRank ] = await app.model.userRanks.findOrCreate({
                 where: { userId },
+                transaction,
             });
-
+            userRank = userRank.get({ plain: true });
             return Client.post(`/users/${user.id}/upsert`, {
                 id: user.id,
                 username: user.username,
@@ -38,7 +39,7 @@ module.exports = app => {
             });
         },
         async deleteUser(id) {
-            return await Axios.delete(`/users/${id}`);
+            return await Client.delete(`/users/${id}`);
         },
         async upsertProject(project) {
             const user = await app.model.User.findOne({
@@ -48,16 +49,16 @@ module.exports = app => {
             if (!user.realname) return; // 未实名用户的项目不能被查看，因此也不需被检索
 
             if (!project.systemTags) {
-                const tags = await this.app.model.systemTagProjects.findAll({
+                const tags = await app.model.systemTagProjects.findAll({
                     where: {
                         projectId: project.id,
                     },
                 });
                 const tagIds = tags.map(tag => tag.systemTagId);
-                project.systemTags = await this.app.model.systemTags.findAll({
+                project.systemTags = await app.model.systemTags.findAll({
                     where: {
                         id: {
-                            [this.app.Sequelize.Op.in]: tagIds,
+                            [app.Sequelize.Op.in]: tagIds,
                         },
                     },
                 });
@@ -93,10 +94,10 @@ module.exports = app => {
                 point: project.rateCount < 8 ? undefined : project.rate,
                 world_tag_name: (project.extra || {}).worldTagName,
             };
-            return Axios.post(`/projects/${project.id}/upsert`, body);
+            return Client.post(`/projects/${project.id}/upsert`, body);
         },
         async deleteProject(id) {
-            return await Axios.delete(`/projects/${id}`);
+            return await Client.delete(`/projects/${id}`);
         },
         async createPage(repo, filePath, content) {
             if (!isMarkdownPage(filePath)) return;

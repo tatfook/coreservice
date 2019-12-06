@@ -87,10 +87,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     model.getById = async function(id, userId) {
         const where = { id };
 

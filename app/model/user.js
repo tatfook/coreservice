@@ -128,12 +128,13 @@ module.exports = app => {
         return user;
     };
 
-    model.getById = async function(userId) {
+    model.getById = async function(userId, transaction = null) {
         const data = await app.model.users.findOne({
             where: { id: userId },
             attributes: {
                 exclude: [ 'password' ],
             },
+            transaction,
         });
 
         return data && data.get({ plain: true });
@@ -208,5 +209,21 @@ module.exports = app => {
         });
     };
 
+    async function __hook__(inst, options) {
+        await app.api.es.upsertUser(inst, options.transaction);
+    }
+
+    model.afterCreate(__hook__);
+
+    model.afterUpdate(__hook__);
+
+    model.afterDestroy(async (inst, options) => {
+        const transaction = options.transaction;
+        await app.model.userRanks.destroy({
+            where: { userId: inst.id },
+            transaction,
+        });
+        await app.api.es.deleteUser(inst.id);
+    });
     return model;
 };

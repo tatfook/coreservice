@@ -28,7 +28,7 @@ class World extends Service {
             transaction,
         });
         await service.repo.destroyRepo('World', world.id, transaction);
-        await world.destroy({ transaction });
+        await world.destroy({ transaction, individualHooks: true });
     }
 
     base32(text) {

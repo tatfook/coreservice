@@ -49,7 +49,11 @@ class SiteService extends Service {
                 transaction,
             });
             await ctx.service.repo.destroyRepo('Site', site.id, transaction);
-            await ctx.model.Site.destroy({ where: { id }, transaction });
+            await ctx.model.Site.destroy({
+                where: { id },
+                transaction,
+                individualHooks: true,
+            });
             await transaction.commit();
         } catch (e) {
             ctx.logger.error(e.message);

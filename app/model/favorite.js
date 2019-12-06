@@ -52,46 +52,58 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
-    model.__hook__ = async function(data) {
-        const { userId, objectId, objectType } = data;
-        if (data.objectType === ENTITY_TYPE_PROJECT) {
+    async function __hook__(inst, options) {
+        const transaction = options.transaction;
+        const { userId, objectId, objectType } = inst;
+        if (objectType === ENTITY_TYPE_PROJECT) {
             // 获取项目收藏量
-            // const rank = await app.model.projectRanks.getByProjectId(objectId);
             const favorite = await app.model.favorites.count({
                 where: { objectId, objectType },
+                transaction,
             });
-            await app.model.projectRanks.update(
+            await app.model.projects.update(
                 { favorite },
-                { where: { projectId: objectId } }
+                {
+                    where: { id: objectId },
+                    transaction,
+                    individualHooks: true,
+                }
             );
-        } else if (data.objectType === ENTITY_TYPE_USER) {
-            // const rank1 = await app.model.userRanks.getByUserId(userId);
-            // const rank2 = await app.model.userRanks.getByUserId(objectId);
+        } else if (objectType === ENTITY_TYPE_USER) {
             const follow = await app.model.favorites.count({
                 where: { userId, objectType },
+                transaction,
             });
             const fans = await app.model.favorites.count({
                 where: { objectId, objectType },
+                transaction,
             });
-            await app.model.userRanks.update({ follow }, { where: { userId } });
+            await app.model.userRanks.update(
+                { follow },
+                { where: { userId }, transaction }
+            );
             await app.model.userRanks.update(
                 { fans },
-                { where: { userId: objectId } }
+                {
+                    where: { userId: objectId },
+                    transaction,
+                }
             );
+            const followingUser = await app.model.users.getById(
+                userId,
+                transaction
+            );
+            await app.api.es.upsertUser(followingUser, transaction);
+            const followedUser = await app.model.users.getById(
+                objectId,
+                transaction
+            );
+            await app.api.es.upsertUser(followedUser, transaction);
         }
-    };
+    }
 
-    model.getById = async function(id, userId) {
-        const where = { id };
-
-        if (userId) where.userId = userId;
-
-        const data = await app.model.domains.findOne({ where });
-
-        return data && data.get({ plain: true });
-    };
+    model.afterCreate(__hook__);
+    model.afterDestroy(__hook__);
 
     // 获取粉丝
     model.getFollows = async function(objectId, objectType = ENTITY_TYPE_USER) {
@@ -162,17 +174,38 @@ module.exports = app => {
     };
 
     model.favorite = async function(userId, objectId, objectType) {
-        return await app.model.favorites.create({
-            userId,
-            objectId,
-            objectType,
-        });
+        const transaction = await app.model.transaction();
+        try {
+            const favorite = await app.model.favorites.create(
+                {
+                    userId,
+                    objectId,
+                    objectType,
+                },
+                { transaction }
+            );
+            await transaction.commit();
+            return favorite;
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     };
 
     model.unfavorite = async function(userId, objectId, objectType) {
-        return await app.model.favorites.destroy({
-            where: { userId, objectId, objectType },
-        });
+        const transaction = await app.model.transaction();
+        try {
+            const result = await app.model.favorites.destroy({
+                where: { userId, objectId, objectType },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+            return result;
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
     };
 
     model.objectCount = async function(objectId, objectType) {

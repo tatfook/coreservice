@@ -60,10 +60,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     model.getObjectMembers = async function(objectId, objectType) {
         const sql = `select members.id id, users.id as userId, users.username, users.nickname, users.portrait, members.createdAt createdAt  
 			from members, users 

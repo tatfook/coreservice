@@ -81,18 +81,23 @@ module.exports = app => {
 
     const model = app.model.define('sites', attrs, opts);
 
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const { transaction } = options;
 
-        const { userId } = data;
-
-        const count = await app.model.sites.count({ where: { userId } });
+        const count = await app.model.sites.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { site: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+    }
+
+    model.afterCreate(__hook__);
+
+    model.afterDestroy(__hook__);
 
     model.get = async function(userId) {
         const list = await app.model.sites.findAll({ where: { userId } });

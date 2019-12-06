@@ -29,8 +29,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     model.output = async function(text, level = 'DEBUG') {
         await app.model.logs.create({ text, level });
     };

@@ -228,6 +228,7 @@ const Project = class extends Controller {
             await this.model.projects.destroy({
                 where: { id: project.id },
                 transaction,
+                individualHooks: true,
             });
             await transaction.commit();
             return this.success();
@@ -253,9 +254,20 @@ const Project = class extends Controller {
         delete params.rateCount;
         delete params.classifyTags;
 
-        const data = await this.model.projects.update(params, {
-            where: { id, userId },
-        });
+        const transaction = await this.model.transaction();
+        let data;
+        try {
+            await this.model.projects.update(params, {
+                where: { id, userId },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+
         // 更新world的worldTagName
         if (params.extra && params.extra.worldTagName) {
             const world = await this.model.worlds.findOne({
@@ -289,10 +301,7 @@ const Project = class extends Controller {
 
         if (!project) return this.throw(404);
 
-        // project.visit++;
         await this.model.projects.statistics(id, 1, 0, 0);
-
-        // await this.model.projects.update({visit:project.visit}, {where:{id}});
 
         return this.success(project);
     }
@@ -321,11 +330,20 @@ const Project = class extends Controller {
         if (index >= 0) return this.success(project);
 
         project.stars.push(userId);
-        // project.star++;
-        await this.model.projects.update(project, {
-            fields: [ 'stars' ],
-            where: { id },
-        });
+
+        const transaction = await this.model.transaction();
+        try {
+            await this.model.projects.update(project, {
+                fields: [ 'stars' ],
+                where: { id },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         await this.model.projects.statistics(id, 0, 1, 0);
 
@@ -343,12 +361,19 @@ const Project = class extends Controller {
         const index = _.findIndex(project.stars, id => id === userId);
         if (index < 0) return this.success(project);
         project.stars.splice(index, 1);
-        await this.model.projects.update(project, {
-            fields: [ 'stars' ],
-            where: { id },
-        });
-
-        // project.star--;
+        const transaction = await this.model.transaction();
+        try {
+            await this.model.projects.update(project, {
+                fields: [ 'stars' ],
+                where: { id },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
         await this.model.projects.statistics(id, 0, -1, 0);
 
         return this.success(project);

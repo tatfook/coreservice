@@ -182,18 +182,35 @@ module.exports = app => {
     };
     const model = app.model.define('projects', attrs, opts);
 
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
-
-        const { userId } = data;
-
-        const count = await app.model.projects.count({ where: { userId } });
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const transaction = options.transaction;
+        const count = await app.model.projects.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { project: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+        const user = await app.model.users.getById(userId, transaction);
+        await app.api.es.upsertUser(user, transaction);
+    }
+
+    model.afterCreate(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.upsertProject(inst);
+    });
+
+    model.afterUpdate(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.upsertProject(inst);
+    });
+
+    model.afterDestroy(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.deleteProject(inst.id);
+    });
 
     model.getById = async function(id, userId) {
         const where = { id };
@@ -259,11 +276,19 @@ module.exports = app => {
 
         data.statistics = newStatistics;
         project.extend = data;
-
-        await app.model.projects.update(project, {
-            where: { id },
-            silent: true,
-        });
+        const transaction = await app.model.transaction();
+        try {
+            await app.model.projects.update(project, {
+                where: { id },
+                silent: true,
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         return;
     };

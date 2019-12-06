@@ -50,8 +50,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.ips = model;
 
     return model;

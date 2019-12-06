@@ -35,8 +35,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     model.get = async function(key) {
         let data = await app.model.caches.findOne({ where: { key } });
         if (!data) {
