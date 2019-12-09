@@ -333,6 +333,46 @@ describe('/test/controller/project.test.js', () => {
                 assert(project && member && world);
             });
 
+            it('### create world projects failed over limit', async () => {
+                const user = await app.login();
+                await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test1',
+                        type: 1,
+                    })
+                    .expect(200);
+                await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test2',
+                        type: 1,
+                    })
+                    .expect(200);
+                await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test3',
+                        type: 1,
+                    })
+                    .expect(200);
+                await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test4',
+                        type: 1,
+                    })
+                    .expect(400);
+            });
+
             it('### create world projects failed', async () => {
                 app.mockService('world', 'createWorldByProject', function() {
                     throw Error('failed');

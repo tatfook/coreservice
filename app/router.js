@@ -48,6 +48,7 @@ module.exports = app => {
     router.get('/users/:id/contributions', user.contributions);
     router.get('/users/:id/detail', user.detail);
     router.get('/users/:id/sites', user.sites);
+    router.get('/users/:id/worldLimit', user.getWorldLimit);
     router.get('/users/token', user.token);
     router.get('/users/token/info', user.tokeninfo);
     router.post('/users/register', user.register);
