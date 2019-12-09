@@ -797,6 +797,17 @@ const User = class extends Controller {
 
         return this.success(account);
     }
+
+    // 获取用户的限制信息
+    async getWorldLimit() {
+        const { userId } = this.authenticated();
+        const { id } = this.validate({ id: 'int' });
+        if (+userId !== +id) {
+            return this.throw(400);
+        }
+        const worldLimit = await this.service.user.getUserWorldLimit(userId);
+        return this.success(worldLimit);
+    }
 };
 
 module.exports = User;

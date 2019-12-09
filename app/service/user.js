@@ -109,6 +109,23 @@ class User extends Service {
             o.user = users[o.userId];
         });
     }
+
+    /**
+     * 获取用户的世界限制
+     * @param {*} userId 用户ID
+     * @return {Promise<{usedWorld, world}>} usedWorld已使用的world数量，world创建world的上限
+     */
+    async getUserWorldLimit(userId) {
+        const user = await this.ctx.model.users.getById(userId);
+        const userRank = await this.ctx.model.userRanks.getByUserId(userId);
+        const userLimit = await this.ctx.model.userLimits.getByUserId(userId);
+        // 用户是vip或者tLevel则无限制
+        if (user.vip || user.tLevel) {
+            userLimit.world = -1;
+        }
+        userLimit.usedWorld = userRank.world;
+        return userLimit;
+    }
 }
 
 module.exports = User;

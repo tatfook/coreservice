@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 const _ = require('lodash');
-const { USER_ATTRS } = require('../core/consts');
+const { USER_ATTRS, USER_LIMIT_WORLD } = require('../core/consts');
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
@@ -207,18 +207,39 @@ module.exports = app => {
             sourceKey: 'id',
             constraints: false,
         });
+
+        app.model.users.hasOne(app.model.userLimits, {
+            as: 'userLimit',
+            foreignKey: 'userId',
+            constraints: false,
+        });
     };
 
     async function __hook__(inst, options) {
         await app.api.es.upsertUser(inst, options.transaction);
     }
 
-    model.afterCreate(__hook__);
+    model.afterCreate(async (inst, options) => {
+        await app.model.userLimits.create(
+            {
+                userId: inst.id,
+                world: USER_LIMIT_WORLD,
+            },
+            {
+                transaction: options.transaction,
+            }
+        );
+        await __hook__(inst, options);
+    });
 
     model.afterUpdate(__hook__);
 
     model.afterDestroy(async (inst, options) => {
         const transaction = options.transaction;
+        await app.model.userLimits.destroy({
+            where: { userId: inst.id },
+            transaction,
+        });
         await app.model.userRanks.destroy({
             where: { userId: inst.id },
             transaction,

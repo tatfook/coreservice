@@ -188,6 +188,15 @@ const Project = class extends Controller {
                 { transaction }
             );
             if (params.type === PROJECT_TYPE_PARACRAFT) {
+                // 判断有无超限制
+                const worldLimit = await service.user.getUserWorldLimit(userId);
+                if (
+                    worldLimit.world !== -1 &&
+                    worldLimit.usedWorld >= worldLimit.world
+                ) {
+                    await transaction.rollback();
+                    return this.fail(17);
+                }
                 await service.world.createWorldByProject(project, transaction);
             }
             await transaction.commit();

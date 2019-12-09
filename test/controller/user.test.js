@@ -1225,4 +1225,49 @@ describe('test/controller/user.test.js', () => {
             assert(result === true);
         });
     });
+
+    describe('# GET /users/:id/worldLimit', () => {
+        it('## failed by bad request', async () => {
+            const user = await app.login();
+            await app
+                .httpRequest()
+                .get('/api/v0/users/100/worldLimit')
+                .set('Authorization', `Bearer ${user.token}`)
+                .expect(400);
+        });
+
+        it('## vip no limit', async () => {
+            const user = await app.login({ vip: 1 });
+            const result = await app
+                .httpRequest()
+                .get(`/api/v0/users/${user.id}/worldLimit`)
+                .set('Authorization', `Bearer ${user.token}`)
+                .expect(200)
+                .then(res => res.body);
+            assert(result.world === -1);
+        });
+
+        it('## tLevel no limit', async () => {
+            const user = await app.login({ tLevel: 1 });
+            const result = await app
+                .httpRequest()
+                .get(`/api/v0/users/${user.id}/worldLimit`)
+                .set('Authorization', `Bearer ${user.token}`)
+                .expect(200)
+                .then(res => res.body);
+            assert(result.world === -1);
+        });
+
+        it('## commonUser', async () => {
+            const user = await app.login();
+            const result = await app
+                .httpRequest()
+                .get(`/api/v0/users/${user.id}/worldLimit`)
+                .set('Authorization', `Bearer ${user.token}`)
+                .expect(200)
+                .then(res => res.body);
+            assert(result.world === 3);
+            assert(result.usedWorld === 0);
+        });
+    });
 });
