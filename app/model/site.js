@@ -31,11 +31,11 @@ module.exports = app => {
         },
 
         username: {
-            type: STRING(64),
+            type: STRING(48),
         },
 
         sitename: {
-            type: STRING(256),
+            type: STRING(128),
             allowNull: false,
         },
 
