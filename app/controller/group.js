@@ -59,7 +59,7 @@ const Group = class extends Controller {
 
         params.userId = userId;
         delete params.members;
-
+        delete params.groupname;
         const result = await this.model.groups.update(params, {
             where: { id, userId },
         });
@@ -96,6 +96,10 @@ const Group = class extends Controller {
 
         const user = await this.model.users.getByName(params.memberName);
         if (!user) this.throw(400, '成员不存在');
+
+        const group = await this.model.groups.getById(params.id, userId);
+        if (!group) this.throw(400, '组不存在');
+
         const memberId = user.id;
 
         const data = await this.model.members.create({
@@ -118,6 +122,10 @@ const Group = class extends Controller {
 
         const user = await this.model.users.getByName(params.memberName);
         if (!user) this.throw(400, '成员不存在');
+
+        const group = await this.model.groups.getById(params.id, userId);
+        if (!group) this.throw(400, '组不存在');
+
         const memberId = user.id;
 
         const data = await this.model.members.destroy({
@@ -136,6 +144,8 @@ const Group = class extends Controller {
     async getMembers() {
         const userId = this.authenticated().userId;
         const id = this.validate({ id: 'int' }).id;
+        const group = await this.model.groups.getById(id, userId);
+        if (!group) this.throw(400, '组不存在');
 
         const list = await this.model.groups.getGroupMembers(userId, id);
 

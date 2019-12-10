@@ -105,14 +105,14 @@ describe('test/controller/admin.test.js', () => {
             assert(list1.length === list.length);
         });
 
-        it('## query unauthorized return 500', async () => {
+        it('## query unauthorized return 401', async () => {
             await app
                 .httpRequest()
                 .get(
                     '/api/v0/admins/query?sql=select * from users where id > 0'
                 )
                 .set('Authorization', 'Bearer fake token')
-                .expect(500)
+                .expect(401)
                 .then(res => res.body);
         });
 
@@ -167,11 +167,11 @@ describe('test/controller/admin.test.js', () => {
             assert(user.id === 1);
         });
 
-        it('## find one user without token return 500', async () => {
+        it('## find one user without token return 401', async () => {
             await app
                 .httpRequest()
                 .get('/api/v0/admins/users/1')
-                .expect(500)
+                .expect(401)
                 .then(res => res.body);
         });
 
