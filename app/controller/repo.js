@@ -149,6 +149,7 @@ const Repo = class extends Controller {
             where: { path: repoPath },
         });
         if (!repo) ctx.throw(`invalid repo ${repoPath}`, 404);
+        if (this.getAdmin().userId) return repo; // admin can do anything
         const canRead = await service.repo.canReadByUser(
             repo,
             this.getUser().userId
@@ -165,6 +166,7 @@ const Repo = class extends Controller {
             where: { path: repoPath },
         });
         if (!repo) ctx.throw(`invalid repo ${repoPath}`, 404);
+        if (this.getAdmin().userId) return repo; // admin can do anything
         const canWrite = await service.repo.canWriteByUser(
             repo,
             this.getUser().userId

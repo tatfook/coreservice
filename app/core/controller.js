@@ -80,6 +80,10 @@ class BaseController extends Controller {
         return this.ctx.state.user || {};
     }
 
+    getAdmin() {
+        return this.ctx.state.admin || {};
+    }
+
     authenticated() {
         // return {userId:300, organizationId:1, roleId:64};
         const user = this.ctx.state.user;
