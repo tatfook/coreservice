@@ -112,8 +112,13 @@ class RepoService extends Service {
         return this.app.api.git.createFolder(repoPath, folderPath, committer);
     }
 
-    async getFolderFiles(repoPath, folderPath, recursive) {
-        return this.app.api.git.getFolderFiles(repoPath, folderPath, recursive);
+    async getFolderFiles(repoPath, folderPath, recursive, ref) {
+        return this.app.api.git.getFolderFiles(
+            repoPath,
+            folderPath,
+            recursive,
+            ref
+        );
     }
 
     async deleteFolder(repoPath, folderPath, committer) {

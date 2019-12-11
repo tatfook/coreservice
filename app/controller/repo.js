@@ -4,11 +4,12 @@ const Controller = require('../core/controller.js');
 const Repo = class extends Controller {
     async getTree() {
         const repo = await this.getRepoAndEnsureReadable();
-        const { folderPath, recursive } = this.getParams();
+        const { folderPath, recursive, ref } = this.getParams();
         const result = await this.service.repo.getFolderFiles(
             repo.path,
             folderPath,
-            recursive
+            recursive,
+            ref
         );
         return this.success(result);
     }

@@ -77,12 +77,13 @@ module.exports = app => {
 
             return result.data;
         },
-        async getFolderFiles(repoPath, folderPath = '', recursive) {
+        async getFolderFiles(repoPath, folderPath = '', recursive, ref) {
             const result = await Client.get('/folders/files', {
                 params: {
                     repoPath,
                     folderPath,
                     recursive,
+                    ref,
                 },
             });
 
