@@ -18,9 +18,7 @@ module.exports = app => {
         },
         async getRepoInfo(repoPath) {
             const result = await Client.get('/repos', {
-                data: {
-                    repoPath,
-                },
+                data: { repoPath },
             });
 
             return result.data;
@@ -34,10 +32,11 @@ module.exports = app => {
         },
         async downloadRepo(repoPath, ref) {
             const result = await Client.get('/repos/download', {
-                data: {
+                params: {
                     repoPath,
                     ref,
                 },
+                responseType: 'stream',
             });
 
             return result.data;
@@ -59,19 +58,17 @@ module.exports = app => {
             return result.data;
         },
         async createFolder(repoPath, folderPath = '', committer) {
-            const result = await Client.get('/folders', {
-                params: {
-                    repoPath,
-                    folderPath,
-                    committer,
-                },
+            const result = await Client.post('/folders', {
+                repoPath,
+                folderPath,
+                committer,
             });
 
             return result.data;
         },
         async deleteFolder(repoPath, folderPath = '', committer) {
             const result = await Client.delete('/folders', {
-                params: {
+                data: {
                     repoPath,
                     folderPath,
                     committer,
