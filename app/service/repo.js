@@ -96,6 +96,10 @@ class RepoService extends Service {
         return this.app.api.git.getRepoInfo(repoPath);
     }
 
+    async getCommitInfo(repoPath, commitId, ref) {
+        return this.app.api.git.getCommitInfo(repoPath, commitId, ref);
+    }
+
     async deleteRepo(repoPath) {
         return this.app.api.git.deleteRepo(repoPath);
     }
