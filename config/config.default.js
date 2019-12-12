@@ -39,10 +39,10 @@ exports.onerror = {
     },
 };
 
-// for egg-ts-helper https://www.npmjs.com/package/egg-ts-helper
-exports.customLoader = {
-    validator2: {
-        directory: 'app/validator2',
-        inject: 'app',
+exports.ajv = {
+    keyword: 'validator2', // to indicate the namespace and path of schemas, default as 'validator2'
+    options: {
+        allErrors: true, // required for custom error message
+        jsonPointers: true, // required for custom error message
     },
 };

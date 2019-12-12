@@ -5,7 +5,6 @@ const util = require('./app/core/util.js');
 const sms = require('./app/core/sms.js');
 const email = require('./app/core/email.js');
 const axios = require('./app/core/axios.js');
-const api = require('./app/api/index.js');
 const qiniu = require('./app/core/qiniu.js');
 // const pingpp = require('./app/core/pingpp.js');
 const ahocorasick = require('./app/core/ahocorasick.js');
@@ -20,7 +19,6 @@ module.exports = app => {
     sms(app);
     email(app);
     axios(app);
-    api(app);
     qiniu(app);
     ahocorasick(app);
     log(app);
@@ -48,4 +46,6 @@ module.exports = app => {
             return exp;
         },
     });
+
+    app.loader.loadToApp(`${app.baseDir}/app/api`, 'api');
 };
