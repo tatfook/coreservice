@@ -18,7 +18,19 @@ module.exports = app => {
         },
         async getRepoInfo(repoPath) {
             const result = await Client.get('/repos', {
-                data: { repoPath },
+                params: { repoPath },
+            });
+
+            return result.data;
+        },
+        async getCommitInfo(repoPath, commitId, ref) {
+            // 注: commitId 和 ref 同时存在时，commitId有效，ref无效
+            const result = await Client.get('repos/commitInfo', {
+                params: {
+                    repoPath,
+                    commitId,
+                    ref,
+                },
             });
 
             return result.data;
@@ -77,12 +89,13 @@ module.exports = app => {
 
             return result.data;
         },
-        async getFolderFiles(repoPath, folderPath = '', recursive) {
+        async getFolderFiles(repoPath, folderPath = '', recursive, ref) {
             const result = await Client.get('/folders/files', {
                 params: {
                     repoPath,
                     folderPath,
                     recursive,
+                    ref,
                 },
             });
 

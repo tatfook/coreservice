@@ -96,6 +96,10 @@ class RepoService extends Service {
         return this.app.api.git.getRepoInfo(repoPath);
     }
 
+    async getCommitInfo(repoPath, commitId, ref) {
+        return this.app.api.git.getCommitInfo(repoPath, commitId, ref);
+    }
+
     async deleteRepo(repoPath) {
         return this.app.api.git.deleteRepo(repoPath);
     }
@@ -112,8 +116,13 @@ class RepoService extends Service {
         return this.app.api.git.createFolder(repoPath, folderPath, committer);
     }
 
-    async getFolderFiles(repoPath, folderPath, recursive) {
-        return this.app.api.git.getFolderFiles(repoPath, folderPath, recursive);
+    async getFolderFiles(repoPath, folderPath, recursive, ref) {
+        return this.app.api.git.getFolderFiles(
+            repoPath,
+            folderPath,
+            recursive,
+            ref
+        );
     }
 
     async deleteFolder(repoPath, folderPath, committer) {

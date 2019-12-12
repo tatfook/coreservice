@@ -69,11 +69,65 @@ describe('test/controller/repo.test.js', () => {
                         .set('Authorization', `Bearer ${token}`)
                         .expect(403);
                 });
-                it('should not return zip data for invalid repo path', async () => {
+                it('should not return zip data with invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
                     await app
                         .httpRequest()
                         .get(`/api/v0/repos/${encodedPath}/download`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
+            describe('#getCommitInfo', () => {
+                it('should return commit info for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return commit info with commitId', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .send({
+                            commitId:
+                                'a03c42e2b15a802638adbcb730dd15c8a3afe528',
+                        })
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return commit info with ref', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .send({
+                            ref: 'master',
+                        })
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return commit info for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(403);
+                });
+                it('should not return commit info with invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
                         .set('Authorization', `Bearer ${token}`)
                         .expect(404);
                 });
@@ -581,6 +635,60 @@ describe('test/controller/repo.test.js', () => {
                     await app
                         .httpRequest()
                         .get(`/api/v0/repos/${encodedPath}/download`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
+            describe('#getCommitInfo', () => {
+                it('should return commit info for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return commit info with commitId', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .send({
+                            commitId:
+                                'a03c42e2b15a802638adbcb730dd15c8a3afe528',
+                        })
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return commit info with ref', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .send({
+                            ref: 'master',
+                        })
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return commit info for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(403);
+                });
+                it('should not return commit info with invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
                         .set('Authorization', `Bearer ${token}`)
                         .expect(404);
                 });
