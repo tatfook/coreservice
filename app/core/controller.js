@@ -353,7 +353,6 @@ class BaseController extends Controller {
 
         return this.success(result);
     }
-
 }
 
 module.exports = BaseController;
