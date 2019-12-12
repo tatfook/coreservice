@@ -81,6 +81,7 @@ module.exports = app => {
 
     const site = controller.site;
     router.get('/sites/getByName', site.getByName);
+    router.put('/sites/:id/updateVisibility', site.updateVisibility);
     router.get('/sites/:id/privilege', site.privilege);
     router.post('/sites/:id/groups', site.postGroups);
     router.put('/sites/:id/groups', site.putGroups);

@@ -80,4 +80,102 @@ describe('test/service/repo.test.js', () => {
             }
         });
     });
+
+    describe('#destroySite', () => {
+        let user;
+        let site;
+        beforeEach(async () => {
+            user = await app.factory.create('users');
+            site = await ctx.service.site.createSite({
+                userId: user.id,
+                username: user.username,
+                sitename: 'test',
+            });
+        });
+        it('should destroy site', async () => {
+            const result = await ctx.service.site.destroySite(site.id, user.id);
+            assert(result);
+        });
+
+        it('should failed to destroy site if not exist', async () => {
+            const errMessage = 'should failed to delete site';
+            try {
+                await ctx.service.site.destroySite(site.id + 1, user.id);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+
+        it('should failed to destroy site if missing userId', async () => {
+            const errMessage = 'should failed to delete site';
+            try {
+                await ctx.service.site.destroySite(site.id);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+    });
+
+    describe('#updateVisiblity', () => {
+        let user;
+        let site;
+        beforeEach(async () => {
+            user = await app.factory.create('users');
+            site = await ctx.service.site.createSite({
+                userId: user.id,
+                username: user.username,
+                sitename: 'test',
+            });
+        });
+        it('should update site visibility', async () => {
+            const result = await ctx.service.site.updateVisiblity(
+                site.id,
+                user.id,
+                0 // 'public'
+            );
+            assert(result);
+        });
+
+        it('should failed to update site visibility if not exist', async () => {
+            const errMessage = 'should failed to update site visibility';
+            try {
+                await ctx.service.site.updateVisiblity(site.id + 1, user.id, 0);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+
+        it('should failed to update site visibility if missing userId', async () => {
+            const errMessage = 'should failed to update site visibility';
+            try {
+                await ctx.service.site.updateVisiblity(site.id, null, 0);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+
+        it('should failed to update site visibility if missing visibility', async () => {
+            const errMessage = 'should failed to update site visibility';
+            try {
+                await ctx.service.site.updateVisiblity(site.id, user.id);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+
+        it('should failed to update site visibility with invalid visibility', async () => {
+            const errMessage = 'should failed to update site visibility';
+            try {
+                await ctx.service.site.updateVisiblity(site.id, user.id, 99);
+                ctx.throw(errMessage);
+            } catch (e) {
+                assert(e.errMessage !== errMessage);
+            }
+        });
+    });
 });

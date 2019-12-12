@@ -270,6 +270,10 @@ module.exports = app => {
         return app.model.sites.isEditableByMemberId(this.id, userId);
     };
 
+    model.prototype.visibilityName = function() {
+        return this.visibility === 0 ? 'public' : 'private';
+    };
+
     app.model.sites = model;
 
     model.associate = () => {

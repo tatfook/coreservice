@@ -84,11 +84,21 @@ const Site = class extends Controller {
         return this.success(data);
     }
 
+    async updateVisibility() {
+        const userId = this.authenticated().userId;
+        const { id, visibility } = this.validate({
+            id: 'int',
+            visibility: 'int',
+        });
+        await this.service.site.updateVisiblity(id, userId, visibility);
+        return this.success();
+    }
+
     async destroy() {
         const userId = this.authenticated().userId;
-        const params = this.validate({ id: 'int' });
+        const { id } = this.validate({ id: 'int' });
 
-        await this.ctx.service.site.destroySite(params.id, userId);
+        await this.ctx.service.site.destroySite(id, userId);
         return this.success();
     }
 

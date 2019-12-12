@@ -649,6 +649,17 @@ describe('test/controller/repo.test.js', () => {
                         .expect(200);
                     assert(result.body);
                 });
+                it('should return commit info for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
                 it('should return commit info with commitId', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
                     const result = await app
@@ -673,16 +684,6 @@ describe('test/controller/repo.test.js', () => {
                         })
                         .expect(200);
                     assert(result.body);
-                });
-                it('should not return commit info for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    await app
-                        .httpRequest()
-                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
                 });
                 it('should not return commit info with invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');

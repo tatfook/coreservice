@@ -107,34 +107,54 @@ module.exports = app => {
         async createPage(repo, filePath, content) {
             if (!isMarkdownPage(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
-            const site = app.model.Site.findOne({
+            const site = await app.model.Site.findOne({
                 where: { id: repo.resourceId },
             });
             const url = getPageUrl(filePath);
+            const pageId = encodeURIComponent(url);
+            // title is the name of the file, eg: url -> space/repo/file, title -> file
+            const splited_path = url.split('/');
+            const title = splited_path[splited_path.length - 1];
+            const datetime = new Date();
 
             return Client.post('/pages', {
-                visibility: site.visibility,
+                id: pageId,
+                visibility: site.visibilityName(),
                 content,
                 url,
+                title,
+                site: site.sitename,
+                username: site.username,
+                created_at: datetime,
+                updated_at: datetime,
             });
         },
         async updatePage(filePath, content) {
             if (!isMarkdownPage(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
             const pageId = encodeURIComponent(getPageUrl(filePath));
+            const datetime = new Date();
             return Client.put(`/pages/${pageId}`, {
                 content,
+                update_at: datetime,
             });
         },
-        async updateSiteVisibility(repoPath, visibility) {
-            const siteId = encodeURIComponent(repoPath);
-            return Client.put(`/sites/${siteId}/visibility`, {
-                visibility,
+        async updateSiteVisibility(siteId) {
+            const site = await app.model.Site.findOne({
+                where: { id: siteId },
             });
+            return Client.put(
+                `/sites/${site.username}/${site.sitename}/visibility`,
+                {
+                    visibility: site.visibilityName(),
+                }
+            );
         },
-        async deleteSite(repoPath) {
-            const siteId = encodeURIComponent(repoPath);
-            return Client.delete(`/sites/${siteId}`);
+        async deleteSite(siteId) {
+            const site = await app.model.Site.findOne({
+                where: { id: siteId },
+            });
+            return Client.delete(`/sites/${site.username}/${site.sitename}`);
         },
         async deletePage(filePath) {
             if (!isMarkdownPage(filePath)) return;
