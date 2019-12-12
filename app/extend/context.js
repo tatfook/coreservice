@@ -1,7 +1,6 @@
 'use strict';
 const _ = require('lodash');
 const DataLoader = require('dataloader');
-const assert = require('assert');
 module.exports = {
     getParams() {
         return _.merge({}, this.request.body, this.query, this.params);
@@ -44,31 +43,5 @@ module.exports = {
         this.loader[loaderName] =
             this.loader[loaderName] || new DataLoader(batchFn);
         return this.loader[loaderName];
-    },
-
-    /**
-     * json validation
-     *
-     * @param {string|object} schema string for schema id and object for Ajv rules
-     * @param {any} data body or params
-     * @return {undefine} throw an exception instead
-     */
-    async validate(schema, data) {
-        let validater = null;
-        const { ajv } = this.app;
-        if (typeof schema === 'string') {
-            validater = ajv.getSchema(schema);
-            assert(validater, `Schema - ${schema} - IS NOT FOUND`);
-        } else {
-            schema = Object.assign(schema, { $async: true });
-            assert(
-                ajv.validateSchema(schema),
-                `Schema is not valid: ${schema}`
-            );
-            validater = ajv.compile(schema);
-        }
-        data = data || this.getParams();
-        await validater(data);
-        return data;
     },
 };

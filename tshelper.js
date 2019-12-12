@@ -5,13 +5,13 @@
  */
 module.exports = {
     watchDirs: {
-        validator2: {
-            directory: 'app/validator2', // files directory.
+        validator: {
+            directory: 'app/validator', // files directory.
             // pattern: '**/*.(ts|js)', // glob pattern, default is **/*.(ts|js). it doesn't need to configure normally.
             // ignore: '', // ignore glob pattern, default to empty.
             generator: 'auto', // generator name, eg: class、auto、function、object
             interface: 'IValidator', // interface name
-            declareTo: 'Application.validator2', // declare to this interface
+            declareTo: 'Application.validator', // declare to this interface
             // watch: true, // whether need to watch files
             // caseStyle: 'upper', // caseStyle for loader
             // interfaceHandle: val => `ReturnType<typeof ${val}>`, // interfaceHandle

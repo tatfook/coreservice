@@ -161,7 +161,8 @@ const Project = class extends Controller {
         const { ctx, service } = this;
         const userId = this.authenticated().userId;
         const params = await this.ctx.validate(
-            this.app.validator2.project.createBody
+            this.app.validator.project.createBody,
+            this.getParams()
         );
         params.userId = userId;
         // params.status = params.type == PROJECT_TYPE_PARACRAFT ? 1 : 2; // 1 - 创建中  2 - 创建完成
