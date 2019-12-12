@@ -1,6 +1,7 @@
 'use strict';
 exports.keys = 'keepwork';
 
+const { ValidationError } = require('ajv');
 exports.cors = {
     origin: '*',
 };
@@ -30,5 +31,18 @@ exports.onerror = {
         if (e.name === 'SequelizeUniqueConstraintError') {
             ctx.status = 409;
         }
+
+        if (e instanceof ValidationError) {
+            ctx.body = JSON.stringify(e.errors);
+            ctx.status = 422;
+        }
+    },
+};
+
+// for egg-ts-helper https://www.npmjs.com/package/egg-ts-helper
+exports.customLoader = {
+    validator2: {
+        directory: 'app/validator2',
+        inject: 'app',
     },
 };

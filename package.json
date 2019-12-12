@@ -5,6 +5,9 @@
     "main": "backpack.config.js",
     "dependencies": {
         "aho-corasick.js": "0.0.1",
+        "ajv": "^6.10.2",
+        "ajv-errors": "^1.0.1",
+        "ajv-merge-patch": "^4.1.0",
         "axios": "^0.18.1",
         "blueimp-md5": "^2.10.0",
         "captchapng": "0.0.1",
