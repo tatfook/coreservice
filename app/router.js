@@ -6,7 +6,6 @@ module.exports = app => {
     const { router, config, controller } = app;
     const selfConfig = config.self;
 
-    // const prefix = selfConfig.apiUrlPrefix;
     router.prefix(selfConfig.apiUrlPrefix);
 
     const index = controller.index;
@@ -246,7 +245,6 @@ module.exports = app => {
     );
 
     const sensitiveWord = controller.sensitiveWord;
-    // router.get(`sensitiveWords/importOldWords`, sensitiveWord.importOldWords);
     router.get('/sensitiveWords/trim', sensitiveWord.trim);
     router.all('/sensitiveWords/check', sensitiveWord.check);
     router.post('/sensitiveWords/import', sensitiveWord.importWords);

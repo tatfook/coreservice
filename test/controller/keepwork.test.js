@@ -325,7 +325,7 @@ apnic|CN|asn|3717|1|20020801|allocated`;
                 .httpRequest()
                 .post('/api/v0/keepworks/paracraft_download_url')
                 .send(body)
-                .expect(500);
+                .expect(401);
         });
     });
 

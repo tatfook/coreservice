@@ -156,23 +156,6 @@ module.exports = app => {
         return result;
     };
 
-    // 获取收藏的页面
-    model.getFavoritePages = async function(userId) {
-        const sql = `select pages.*
-			from favorites, pages 
-			where favorites.objectId = pages.id and objectType = :objectType and favorites.userId = :userId`;
-
-        const result = await app.model.query(sql, {
-            type: app.model.QueryTypes.SELECT,
-            replacements: {
-                objectType: ENTITY_TYPE_PAGE,
-                userId,
-            },
-        });
-
-        return result;
-    };
-
     model.favorite = async function(userId, objectId, objectType) {
         const transaction = await app.model.transaction();
         try {
