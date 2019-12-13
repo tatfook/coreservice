@@ -49,7 +49,7 @@ class SiteService extends Service {
                 transaction,
                 individualHooks: true,
             });
-            await app.api.es.deleteSite(site.id); // delete site related pages
+            await app.api.es.deleteSite(site.username, site.sitename); // delete site related pages
             await transaction.commit();
             return true;
         } catch (e) {
@@ -72,7 +72,12 @@ class SiteService extends Service {
                     transaction,
                 }
             );
-            await this.app.api.es.updateSiteVisibility(site.id);
+            const visibilityName = ctx.model.Site.visibilityName(visibility);
+            await this.app.api.es.updateSiteVisibility(
+                site.username,
+                site.sitename,
+                visibilityName
+            );
             await transaction.commit();
             return true;
         } catch (e) {

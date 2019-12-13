@@ -262,16 +262,16 @@ module.exports = app => {
         return await app.model.sites.count({ where: { userId } });
     };
 
+    model.visibilityName = function(visibility) {
+        return visibility === 0 ? 'public' : 'private';
+    };
+
     model.prototype.canReadByUser = async function(userId) {
         return app.model.sites.isReadableByMemberId(this.id, userId);
     };
 
     model.prototype.canWriteByUser = async function(userId) {
         return app.model.sites.isEditableByMemberId(this.id, userId);
-    };
-
-    model.prototype.visibilityName = function() {
-        return this.visibility === 0 ? 'public' : 'private';
     };
 
     app.model.sites = model;

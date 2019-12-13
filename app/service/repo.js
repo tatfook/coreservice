@@ -137,7 +137,8 @@ class RepoService extends Service {
     }
 
     async createFile(repo, filePath, content, committer) {
-        const result = await this.app.api.git.upsertFile(
+        const { app } = this;
+        const result = await app.api.git.upsertFile(
             repo.path,
             filePath,
             content,
@@ -145,7 +146,19 @@ class RepoService extends Service {
         );
         if (repo.isSite()) {
             // sync data to es
-            await this.app.api.es.createPage(repo, filePath, content);
+            const site = await app.model.Site.findOne({
+                where: { id: repo.resourceId },
+            });
+            const visibilityName = app.model.Site.visibilityName(
+                site.visibility
+            );
+            await app.api.es.createPage(
+                site.username,
+                site.sitename,
+                filePath,
+                content,
+                visibilityName
+            );
         }
         return result;
     }
@@ -190,8 +203,9 @@ class RepoService extends Service {
     }
 
     async moveFile(repo, filePath, newFilePath, committer) {
-        if (!newFilePath) this.ctx.throw('invalid new file path', 400);
-        const result = await this.app.api.git.moveFile(
+        const { ctx, app, service } = this;
+        if (!newFilePath) ctx.throw('invalid new file path', 400);
+        const result = await app.api.git.moveFile(
             repo.path,
             filePath,
             newFilePath,
@@ -199,15 +213,23 @@ class RepoService extends Service {
         );
         if (repo.isSite()) {
             // sync data to es
-            const content = await this.service.repo.getFileRaw(
+            const site = await app.model.Site.findOne({
+                where: { id: repo.resourceId },
+            });
+            const content = await service.repo.getFileRaw(
                 repo.path,
                 newFilePath
             );
-            await this.app.api.es.movePage(
-                repo,
-                filePath,
+            const visibilityName = app.model.Site.visibilityName(
+                site.visibility
+            );
+            await app.api.es.deletePage(filePath);
+            await app.api.es.createPage(
+                site.username,
+                site.sitename,
                 newFilePath,
-                content
+                content,
+                visibilityName
             );
         }
         return result;
