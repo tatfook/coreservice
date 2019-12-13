@@ -159,7 +159,7 @@ class RepoService extends Service {
         );
         if (repo.isSite()) {
             // sync data to es
-            await this.app.api.es.updatePage(repo, filePath, content);
+            await this.app.api.es.updatePage(filePath, content);
         }
         return result;
     }
@@ -172,7 +172,7 @@ class RepoService extends Service {
         );
         if (repo.isSite()) {
             // sync data to es
-            await this.app.api.es.deletePage(repo, filePath);
+            await this.app.api.es.deletePage(filePath);
         }
         return result;
     }

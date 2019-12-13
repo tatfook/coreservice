@@ -2,6 +2,7 @@
 'use strict';
 const Axios = require('axios');
 const _ = require('lodash');
+const util = require('../core/util');
 
 module.exports = app => {
     const config = app.config.self;
@@ -111,7 +112,7 @@ module.exports = app => {
                 where: { id: repo.resourceId },
             });
             const url = getPageUrl(filePath);
-            const pageId = encodeURIComponent(url);
+            const pageId = util.md5(url);
             // title is the name of the file, eg: url -> space/repo/file, title -> file
             const splited_path = url.split('/');
             const title = splited_path[splited_path.length - 1];
@@ -132,7 +133,7 @@ module.exports = app => {
         async updatePage(filePath, content) {
             if (!isMarkdownPage(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
-            const pageId = encodeURIComponent(getPageUrl(filePath));
+            const pageId = util.md5(getPageUrl(filePath));
             const datetime = new Date();
             return Client.put(`/pages/${pageId}`, {
                 content,
@@ -158,7 +159,7 @@ module.exports = app => {
         },
         async deletePage(filePath) {
             if (!isMarkdownPage(filePath)) return;
-            const pageId = encodeURIComponent(getPageUrl(filePath));
+            const pageId = util.md5(getPageUrl(filePath));
             return Client.delete(`/pages/${pageId}`);
         },
         async movePage(repo, filePath, newFilePath, content) {
