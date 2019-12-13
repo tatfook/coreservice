@@ -160,8 +160,10 @@ const Project = class extends Controller {
     async create() {
         const { ctx, service } = this;
         const userId = this.authenticated().userId;
-        const params = this.validate({ type: 'int' });
-
+        const params = await this.ctx.validate(
+            this.app.validator.project.createBody,
+            this.getParams()
+        );
         params.userId = userId;
         // params.status = params.type == PROJECT_TYPE_PARACRAFT ? 1 : 2; // 1 - 创建中  2 - 创建完成
         delete params.star;

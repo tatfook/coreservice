@@ -409,6 +409,39 @@ describe('/test/controller/project.test.js', () => {
                 const world = await app.model.worlds.findOne();
                 assert(project && !world);
             });
+
+            it('### create site projects bad request', async () => {
+                const user = await app.login();
+                let result = await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test',
+                        type: 2,
+                    })
+                    .expect(422)
+                    .then(res => res.text);
+                result = JSON.parse(result)[0];
+                assert(
+                    result.dataPath === '/type' && result.keyword === 'enum'
+                );
+            });
+
+            it('### create site projects no type', async () => {
+                const user = await app.login();
+                let result = await app
+                    .httpRequest()
+                    .post('/api/v0/projects')
+                    .set('Authorization', `Bearer ${user.token}`)
+                    .send({
+                        name: 'test',
+                    })
+                    .expect(422)
+                    .then(res => res.text);
+                result = JSON.parse(result)[0];
+                assert(result.keyword === 'required');
+            });
         });
 
         describe('## update projects', () => {

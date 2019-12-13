@@ -1,7 +1,6 @@
 'use strict';
 const _ = require('lodash');
 const DataLoader = require('dataloader');
-
 module.exports = {
     getParams() {
         return _.merge({}, this.request.body, this.query, this.params);

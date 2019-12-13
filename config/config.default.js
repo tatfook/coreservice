@@ -1,6 +1,7 @@
 'use strict';
 exports.keys = 'keepwork';
 
+const { ValidationError } = require('egg-ajv/error');
 exports.cors = {
     origin: '*',
 };
@@ -30,5 +31,15 @@ exports.onerror = {
         if (e.name === 'SequelizeUniqueConstraintError') {
             ctx.status = 409;
         }
+
+        if (e instanceof ValidationError) {
+            ctx.body = JSON.stringify(e.errors);
+            ctx.status = 422;
+        }
     },
+};
+
+exports.ajv = {
+    keyword: 'validator', // to indicate the namespace and path of schemas, default as 'validator'
+    removeAdditional: false,
 };
