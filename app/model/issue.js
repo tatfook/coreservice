@@ -123,7 +123,7 @@ module.exports = app => {
     };
 
     model.getObjectIssues = async function(query, options = {}) {
-        const result = await app.model.issues.findAndCount({
+        const result = await app.model.issues.findAndCountAll({
             ...options,
             where: query,
         });

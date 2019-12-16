@@ -151,7 +151,6 @@ module.exports = app => {
     router.resources('/projectRates', projectRate);
 
     const issue = controller.issue;
-    router.post('/issues/count', issue.count);
     router.post('/issues/search', issue.search);
     router.get('/issues/statistics', issue.statistics);
     router.resources('/issues', issue);
