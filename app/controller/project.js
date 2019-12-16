@@ -246,7 +246,7 @@ const Project = class extends Controller {
         } catch (e) {
             ctx.logger.error(e.message);
             await transaction.rollback();
-            return this.fail(9);
+            return this.fail(18);
         }
     }
 
