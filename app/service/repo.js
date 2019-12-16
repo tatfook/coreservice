@@ -116,11 +116,12 @@ class RepoService extends Service {
         return this.app.api.git.createFolder(repoPath, folderPath, committer);
     }
 
-    async getFolderFiles(repoPath, folderPath, recursive, ref) {
+    async getFolderFiles(repoPath, folderPath, recursive, commitId, ref) {
         return this.app.api.git.getFolderFiles(
             repoPath,
             folderPath,
             recursive,
+            commitId,
             ref
         );
     }

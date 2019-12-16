@@ -89,12 +89,19 @@ module.exports = app => {
 
             return result.data;
         },
-        async getFolderFiles(repoPath, folderPath = '', recursive, ref) {
+        async getFolderFiles(
+            repoPath,
+            folderPath = '',
+            recursive,
+            commitId,
+            ref
+        ) {
             const result = await Client.get('/folders/files', {
                 params: {
                     repoPath,
                     folderPath,
                     recursive,
+                    commitId,
                     ref,
                 },
             });
