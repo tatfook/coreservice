@@ -465,99 +465,99 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
-            describe('#deleteFolder', () => {
-                it('should delete folder for owner', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const result = await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(200);
-                    assert(result.body);
-                });
-                it('should failed to delete folder for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
-                });
-                it('should failed to delete folder for invalid repo path', async () => {
-                    const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(404);
-                });
-            });
-            describe('#renameFolder', () => {
-                it('should rename folder for owner', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    const result = await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(200);
-                    assert(result.body);
-                });
-                it('should failed to rename if new path is empty', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(400);
-                });
-                it('should failed to delete folder for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
-                });
-                it('should failed to delete folder for invalid repo path', async () => {
-                    const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(404);
-                });
-            });
+            // describe('#deleteFolder', () => {
+            //     it('should delete folder for owner', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const result = await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(200);
+            //         assert(result.body);
+            //     });
+            //     it('should failed to delete folder for stranger', async () => {
+            //         const tmpUser = await app.login({ username: 'tmp' });
+            //         token = tmpUser.token;
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(403);
+            //     });
+            //     it('should failed to delete folder for invalid repo path', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path + 'abc');
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(404);
+            //     });
+            // });
+            // describe('#renameFolder', () => {
+            //     it('should rename folder for owner', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         const result = await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(200);
+            //         assert(result.body);
+            //     });
+            //     it('should failed to rename if new path is empty', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(400);
+            //     });
+            //     it('should failed to delete folder for stranger', async () => {
+            //         const tmpUser = await app.login({ username: 'tmp' });
+            //         token = tmpUser.token;
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(403);
+            //     });
+            //     it('should failed to delete folder for invalid repo path', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path + 'abc');
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(404);
+            //     });
+            // });
         });
     });
 
@@ -649,6 +649,17 @@ describe('test/controller/repo.test.js', () => {
                         .expect(200);
                     assert(result.body);
                 });
+                it('should return commit info for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const result = await app
+                        .httpRequest()
+                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
                 it('should return commit info with commitId', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
                     const result = await app
@@ -673,16 +684,6 @@ describe('test/controller/repo.test.js', () => {
                         })
                         .expect(200);
                     assert(result.body);
-                });
-                it('should not return commit info for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    await app
-                        .httpRequest()
-                        .get(`/api/v0/repos/${encodedPath}/commitInfo`)
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
                 });
                 it('should not return commit info with invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
@@ -988,99 +989,99 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
-            describe('#deleteFolder', () => {
-                it('should delete folder for owner', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const result = await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(200);
-                    assert(result.body);
-                });
-                it('should failed to delete folder for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
-                });
-                it('should failed to delete folder for invalid repo path', async () => {
-                    const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .delete(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(404);
-                });
-            });
-            describe('#renameFolder', () => {
-                it('should rename folder for owner', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    const result = await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(200);
-                    assert(result.body);
-                });
-                it('should failed to rename if new path is empty', async () => {
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(400);
-                });
-                it('should failed to delete folder for stranger', async () => {
-                    const tmpUser = await app.login({ username: 'tmp' });
-                    token = tmpUser.token;
-                    const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(403);
-                });
-                it('should failed to delete folder for invalid repo path', async () => {
-                    const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFolderPath = encodeURIComponent('test/abc');
-                    const newFolderPath = 'test2/abc';
-                    await app
-                        .httpRequest()
-                        .post(
-                            `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
-                        )
-                        .send({ newFolderPath })
-                        .set('Authorization', `Bearer ${token}`)
-                        .expect(404);
-                });
-            });
+            // describe('#deleteFolder', () => {
+            //     it('should delete folder for owner', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const result = await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(200);
+            //         assert(result.body);
+            //     });
+            //     it('should failed to delete folder for stranger', async () => {
+            //         const tmpUser = await app.login({ username: 'tmp' });
+            //         token = tmpUser.token;
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(403);
+            //     });
+            //     it('should failed to delete folder for invalid repo path', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path + 'abc');
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .delete(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(404);
+            //     });
+            // });
+            // describe('#renameFolder', () => {
+            //     it('should rename folder for owner', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         const result = await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(200);
+            //         assert(result.body);
+            //     });
+            //     it('should failed to rename if new path is empty', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(400);
+            //     });
+            //     it('should failed to delete folder for stranger', async () => {
+            //         const tmpUser = await app.login({ username: 'tmp' });
+            //         token = tmpUser.token;
+            //         const encodedPath = encodeURIComponent(repo.path);
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(403);
+            //     });
+            //     it('should failed to delete folder for invalid repo path', async () => {
+            //         const encodedPath = encodeURIComponent(repo.path + 'abc');
+            //         const encodedFolderPath = encodeURIComponent('test/abc');
+            //         const newFolderPath = 'test2/abc';
+            //         await app
+            //             .httpRequest()
+            //             .post(
+            //                 `/api/v0/repos/${encodedPath}/folders/${encodedFolderPath}/rename`
+            //             )
+            //             .send({ newFolderPath })
+            //             .set('Authorization', `Bearer ${token}`)
+            //             .expect(404);
+            //     });
+            // });
         });
     });
 });

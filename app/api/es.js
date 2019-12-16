@@ -2,25 +2,29 @@
 'use strict';
 const Axios = require('axios');
 const _ = require('lodash');
+const util = require('../core/util');
 
 module.exports = app => {
-    const config = app.config.self;
-    const adminToken = app.util.jwt_encode(
-        { userId: 1, username: 'coreservice', roleId: 10 },
-        config.secret,
-        3600 * 24 * 365 * 10
-    );
+    const esConfig = app.config.elasticsearch;
+    const adminToken = esConfig.token;
     const Client = Axios.create({
         headers: {
-            Authorization: 'Bearer ' + adminToken,
+            Authorization: adminToken,
         },
-        baseURL: `${config.esBaseURL}`,
+        baseURL: `${esConfig.url}`,
     });
     const getPageUrl = filePath => {
         return filePath.replace('.md', '');
     };
     const isMarkdownPage = filePath => {
         return _.endsWith(filePath, '.md');
+    };
+    const isInIgnoreList = filePath => {
+        const ignorelist = esConfig.ingore_list;
+        _.forEach(ignorelist, item => {
+            if (_.endsWith(filePath, item)) return true;
+        });
+        return false;
     };
 
     const esAPI = {
@@ -104,50 +108,49 @@ module.exports = app => {
         async deleteProject(id) {
             return await Client.delete(`/projects/${id}`);
         },
-        async createPage(repo, filePath, content) {
-            if (!isMarkdownPage(filePath)) return;
+        async createPage(username, sitename, filePath, content, visibility) {
+            if (!isMarkdownPage(filePath) || isInIgnoreList(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
-            const site = app.model.Site.findOne({
-                where: { id: repo.resourceId },
-            });
             const url = getPageUrl(filePath);
+            // title is the name of the file, eg: url -> space/repo/file, title -> file
+            const splited_path = url.split('/');
+            const title = splited_path[splited_path.length - 1];
+            const datetime = new Date();
 
             return Client.post('/pages', {
-                visibility: site.visibility,
+                id: util.md5(url),
+                visibility,
                 content,
                 url,
+                title,
+                username,
+                site: sitename,
+                created_at: datetime,
+                updated_at: datetime,
             });
         },
         async updatePage(filePath, content) {
-            if (!isMarkdownPage(filePath)) return;
+            if (!isMarkdownPage(filePath) || isInIgnoreList(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
-            const pageId = encodeURIComponent(getPageUrl(filePath));
+            const pageId = util.md5(getPageUrl(filePath));
+            const datetime = new Date();
             return Client.put(`/pages/${pageId}`, {
                 content,
+                updated_at: datetime,
             });
         },
-        async updateSiteVisibility(repoPath, visibility) {
-            const siteId = encodeURIComponent(repoPath);
-            return Client.put(`/sites/${siteId}/visibility`, {
+        async updateSiteVisibility(username, sitename, visibility) {
+            return Client.put(`/sites/${username}/${sitename}/visibility`, {
                 visibility,
             });
         },
-        async deleteSite(repoPath) {
-            const siteId = encodeURIComponent(repoPath);
-            return Client.delete(`/sites/${siteId}`);
+        async deleteSite(username, sitename) {
+            return Client.delete(`/sites/${username}/${sitename}`);
         },
         async deletePage(filePath) {
             if (!isMarkdownPage(filePath)) return;
-            const pageId = encodeURIComponent(getPageUrl(filePath));
+            const pageId = util.md5(getPageUrl(filePath));
             return Client.delete(`/pages/${pageId}`);
-        },
-        async movePage(repo, filePath, newFilePath, content) {
-            if (!isMarkdownPage(filePath)) return;
-            content = await app.api.keepwork.parseMarkdown(content);
-            return Promise.all([
-                this.deletePage(filePath),
-                this.createPage(repo, newFilePath, content),
-            ]);
         },
     };
 

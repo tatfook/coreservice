@@ -262,6 +262,10 @@ module.exports = app => {
         return await app.model.sites.count({ where: { userId } });
     };
 
+    model.visibilityName = function(visibility) {
+        return visibility === 0 ? 'public' : 'private';
+    };
+
     model.prototype.canReadByUser = async function(userId) {
         return app.model.sites.isReadableByMemberId(this.id, userId);
     };

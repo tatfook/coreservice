@@ -35,11 +35,6 @@ class SiteService extends Service {
         if (!site) ctx.throw('Invalid site', 400);
         const transaction = await ctx.model.transaction();
         try {
-            const repo = ctx.model.Repo.findOne({
-                where: { resourceType: 'Site', resourceId: id },
-                transaction,
-            });
-            await app.api.es.deleteSite(repo.path); // delete site related pages
             await ctx.model.SiteGroup.destroy({
                 where: { userId, siteId: id },
                 transaction,
@@ -54,11 +49,41 @@ class SiteService extends Service {
                 transaction,
                 individualHooks: true,
             });
+            await app.api.es.deleteSite(site.username, site.sitename); // delete site related pages
             await transaction.commit();
+            return true;
         } catch (e) {
             ctx.logger.error(e.message);
             await transaction.rollback();
             ctx.throw('Failed to destroy site', 400);
+        }
+    }
+
+    async updateVisiblity(id, userId, visibility) {
+        const { ctx } = this;
+        const site = await ctx.model.Site.getById(id, userId);
+        if (!site) ctx.throw('Invalid site', 400);
+        const transaction = await ctx.model.transaction();
+        try {
+            await ctx.model.sites.update(
+                { visibility },
+                {
+                    where: { id, userId },
+                    transaction,
+                }
+            );
+            const visibilityName = ctx.model.Site.visibilityName(visibility);
+            await this.app.api.es.updateSiteVisibility(
+                site.username,
+                site.sitename,
+                visibilityName
+            );
+            await transaction.commit();
+            return true;
+        } catch (e) {
+            ctx.logger.error(e.message);
+            await transaction.rollback();
+            ctx.throw('Failed to update visibility', 400);
         }
     }
 }
