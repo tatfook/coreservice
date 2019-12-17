@@ -70,9 +70,9 @@ module.exports = app => {
 
         if (data.statusCode === '000000') return 0;
 
-        if (data.statusCode === '160040') return 19; // 超过发送上限
+        if (data.statusCode === '160040') return 20; // 超过发送上限
 
-        if (data.statusCode === '160038') return 18; // 过于频繁
+        if (data.statusCode === '160038') return 19; // 过于频繁
 
         return -1;
     };
