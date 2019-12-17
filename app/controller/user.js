@@ -538,8 +538,8 @@ const User = class extends Controller {
         // 自动化测试
         const isAutoTest = this.app.unittest || cellphone === '15219998888';
         if (!isAutoTest) {
-            const ok = await app.sendSms(cellphone, [ captcha, '3分钟' ]);
-            if (!ok) return this.throw(500, '请求次数过多');
+            const code = await app.sendSms(cellphone, [ captcha, '3分钟' ]);
+            if (code) return this.fail(code);
         } else {
             captcha = '123456';
         }
