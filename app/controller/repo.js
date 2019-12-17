@@ -155,7 +155,6 @@ const Repo = class extends Controller {
     }
 
     async getRepoAndEnsureReadable() {
-        this.authenticated();
         const { ctx, service } = this;
         const { repoPath } = this.getParams();
         const repo = await ctx.model.Repo.findOne({
@@ -172,7 +171,6 @@ const Repo = class extends Controller {
     }
 
     async getRepoAndEnsureWritable() {
-        this.authenticated();
         const { ctx, service } = this;
         const { repoPath } = this.getParams();
         const repo = await ctx.model.Repo.findOne({
