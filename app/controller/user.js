@@ -67,7 +67,7 @@ const User = class extends Controller {
 
         this.formatQuery(query);
 
-        const data = await this.model.users.findAndCount({
+        const data = await this.model.users.findAndCountAll({
             ...this.queryOptions,
             attributes: userAttrs,
             where: query,

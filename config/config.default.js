@@ -41,5 +41,5 @@ exports.onerror = {
 
 exports.ajv = {
     keyword: 'validator', // to indicate the namespace and path of schemas, default as 'validator'
-    removeAdditional: false,
+    removeAdditional: true,
 };

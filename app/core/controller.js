@@ -200,7 +200,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -216,7 +216,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -230,7 +230,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount(query);
+        const result = await model.findAndCountAll(query);
 
         this.success(result);
     }

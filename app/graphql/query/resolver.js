@@ -35,7 +35,7 @@ module.exports = {
         },
 
         games(root, { query = {} }, ctx) {
-            return ctx.model.games.findAndCount({
+            return ctx.model.games.findAndCountAll({
                 where: query,
             });
         },

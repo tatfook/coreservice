@@ -1,20 +1,14 @@
 'use strict';
-
-const joi = require('joi');
+/**
+ * 成员接口，对应的yapi文档
+ * http://yapi.kp-para.cn/project/32/interface/api/cat_187
+ */
 const {
-    ENTITY_TYPE_USER,
     ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
     ENTITY_TYPE_GROUP,
     ENTITY_TYPE_PROJECT,
 } = require('../core/consts.js');
-const ENTITYS = [
-    ENTITY_TYPE_USER,
-    ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
-    ENTITY_TYPE_GROUP,
-    ENTITY_TYPE_PROJECT,
-];
+
 const Controller = require('../core/controller.js');
 
 const Member = class extends Controller {
@@ -33,13 +27,10 @@ const Member = class extends Controller {
     }
 
     async index() {
-        const params = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
+        const params = await this.ctx.validate(
+            'validator.member.common',
+            this.getParams()
+        );
 
         const list = await this.model.members.getObjectMembers(
             params.objectId,
@@ -54,44 +45,37 @@ const Member = class extends Controller {
     // 块创建
     async bulkCreate() {
         const { userId } = this.authenticated();
-        const { objectId, objectType, memberIds = [] } = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
+        const {
+            objectId,
+            objectType,
+            memberIds = [],
+        } = await this.ctx.validate(
+            'validator.member.bulkCreate',
+            this.getParams()
+        );
         if (memberIds.length === 0) return this.success('OK');
-        // const list = [];
-
         const model = this.getModel(objectType);
         const data = await model.getById(objectId, userId);
         if (!data) return this.throw(400);
 
-        for (let i = 0; i < memberIds.length; i++) {
-            await this.model.members.upsert({
+        const promises = memberIds.map(item => {
+            return this.model.members.upsert({
                 userId,
                 objectId,
                 objectType,
-                memberId: memberIds[i],
+                memberId: item,
             });
-        }
-
-        // const result = await this.model.members.bulkCreate(list);
-
+        });
+        await Promise.all(promises);
         return this.success('OK');
     }
 
     async create() {
         const { userId } = this.authenticated();
-        const params = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-            memberId: 'int',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.member.create,
+            this.getParams()
+        );
         params.userId = userId;
 
         const model = this.getModel(params.objectType);
@@ -105,7 +89,10 @@ const Member = class extends Controller {
 
     async destroy() {
         const { userId } = this.authenticated();
-        const { id } = this.validate({ id: 'int' });
+        const { id } = await this.ctx.validate(
+            this.app.validator.id,
+            this.getParams()
+        );
 
         const member = await this.model.members.findOne({
             where: { id, userId },
@@ -127,15 +114,11 @@ const Member = class extends Controller {
 
     async exist() {
         const { userId } = this.authenticated();
-        const { objectId, objectType, memberId = userId } = this.validate({
-            memberId: 'int_optional',
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
-
+        const {
+            objectId,
+            objectType,
+            memberId = userId,
+        } = await this.ctx.validate('validator.member.exist', this.getParams());
         const data = await this.model.members.findOne({
             where: {
                 objectId,
