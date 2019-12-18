@@ -3,7 +3,7 @@
 const Service = require('egg').Service;
 
 class SiteService extends Service {
-    async createSite({ userId, username, sitename, extra }) {
+    async createSite({ userId, username, sitename, extra = {} }) {
         const { ctx } = this;
         const transaction = await ctx.model.transaction();
         try {
@@ -24,7 +24,7 @@ class SiteService extends Service {
             await transaction.commit();
             return site;
         } catch (e) {
-            ctx.logger.error(e.message);
+            ctx.logger.error(e);
             await transaction.rollback();
             ctx.throw('Failed to create site', 400);
         }
@@ -54,7 +54,7 @@ class SiteService extends Service {
             await transaction.commit();
             return true;
         } catch (e) {
-            ctx.logger.error(e.message);
+            ctx.logger.error(e);
             await transaction.rollback();
             ctx.throw('Failed to destroy site', 400);
         }
@@ -82,7 +82,7 @@ class SiteService extends Service {
             await transaction.commit();
             return true;
         } catch (e) {
-            ctx.logger.error(e.message);
+            ctx.logger.error(e);
             await transaction.rollback();
             ctx.throw('Failed to update visibility', 400);
         }

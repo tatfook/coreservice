@@ -19,7 +19,9 @@ class RepoService extends Service {
 
     async syncRepo(repo, transaction) {
         if (repo.synced) return;
-        let gitRepo = await this.service.repo.getRepoInfo(repo.path); // 如果git repo已经存在则直接返回同步成功
+        let gitRepo = await this.service.repo
+            .getRepoInfo(repo.path)
+            .catch(() => {}); // 如果git repo已经存在则直接返回同步成功
         if (!gitRepo) {
             gitRepo = await this.service.repo.createRepo(
                 repo.username,

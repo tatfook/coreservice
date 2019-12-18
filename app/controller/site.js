@@ -58,6 +58,7 @@ const Site = class extends Controller {
         const { userId, username } = this.authenticated();
         const params = this.validate({
             sitename: 'string',
+            extra: 'object_optional',
         });
 
         params.userId = userId;

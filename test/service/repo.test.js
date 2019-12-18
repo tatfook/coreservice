@@ -151,7 +151,7 @@ describe('test/service/repo.test.js', () => {
         beforeEach(async () => {
             repo = await app.factory.create('repos');
             app.mockService('repo', 'getRepoInfo', () => {
-                return; // 确保repo不存在
+                ctx.throw('not exist');
             });
         });
 

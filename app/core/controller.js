@@ -15,6 +15,8 @@ const rules = {
     string_optional: joi.string(),
     boolean: joi.boolean().required(),
     boolean_optional: joi.boolean(),
+    object: joi.object().required(),
+    object_optional: joi.object(),
 };
 
 class BaseController extends Controller {
