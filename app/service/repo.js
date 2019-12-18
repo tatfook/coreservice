@@ -150,12 +150,13 @@ class RepoService extends Service {
         return this.app.api.git.moveFolder(repoPath, folderPath, newFolderPath);
     }
 
-    async createFile(repo, filePath, content, committer) {
+    async createFile(repo, filePath, content, encoding, committer) {
         const { app } = this;
         const result = await app.api.git.upsertFile(
             repo.path,
             filePath,
             content,
+            encoding,
             committer
         );
         if (repo.isSite()) {
@@ -177,11 +178,12 @@ class RepoService extends Service {
         return result;
     }
 
-    async updateFile(repo, filePath, content, committer) {
+    async updateFile(repo, filePath, content, encoding, committer) {
         const result = await this.app.api.git.upsertFile(
             repo.path,
             filePath,
             content,
+            encoding,
             committer
         );
         if (repo.isSite()) {

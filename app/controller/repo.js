@@ -68,12 +68,13 @@ const Repo = class extends Controller {
 
     async createFile() {
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath, content } = this.getParams();
+        const { filePath, content, encoding } = this.getParams();
         const committer = this.getUser().username;
         const result = await this.service.repo.createFile(
             repo,
             filePath,
             content,
+            encoding,
             committer
         );
         return this.success(result);
@@ -81,12 +82,13 @@ const Repo = class extends Controller {
 
     async updateFile() {
         const repo = await this.getRepoAndEnsureWritable();
-        const { filePath, content } = this.getParams();
+        const { filePath, content, encoding } = this.getParams();
         const committer = this.getUser().username;
         const result = await this.service.repo.updateFile(
             repo,
             filePath,
             content,
+            encoding,
             committer
         );
         return this.success(result);

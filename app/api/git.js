@@ -118,11 +118,12 @@ module.exports = app => {
             return result.data;
         },
         // return commitId
-        async upsertFile(repoPath, filePath, content, committer) {
+        async upsertFile(repoPath, filePath, content, encoding, committer) {
             const result = await Client.post('/files', {
                 repoPath,
                 filePath,
                 content,
+                encoding,
                 committer,
             });
 
