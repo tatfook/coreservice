@@ -1,27 +1,15 @@
 'use strict';
-
-const joi = require('joi');
+/**
+ * 申请类接口
+ * http://yapi.kp-para.cn/project/32/interface/api/cat_197
+ */
 
 const Controller = require('../core/controller.js');
 const {
-    ENTITY_TYPE_USER,
-    ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
-    ENTITY_TYPE_GROUP,
-    ENTITY_TYPE_PROJECT,
-
     APPLY_STATE_DEFAULT,
     APPLY_STATE_AGREE,
     APPLY_STATE_REFUSE,
-    APPLY_TYPE_MEMBER,
 } = require('../core/consts.js');
-const ENTITYS = [
-    ENTITY_TYPE_USER,
-    ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
-    ENTITY_TYPE_GROUP,
-    ENTITY_TYPE_PROJECT,
-];
 
 const Apply = class extends Controller {
     get modelName() {
@@ -29,11 +17,10 @@ const Apply = class extends Controller {
     }
 
     async index() {
-        const query = this.validate({
-            objectType: joi.number().valid(ENTITY_TYPE_PROJECT),
-            objectId: 'int',
-            applyType: 'int',
-        });
+        const query = await this.ctx.validate(
+            this.app.validator.apply.common,
+            this.getParams()
+        );
 
         const list = await this.model.applies.getObjectApplies({
             where: query,
@@ -44,16 +31,14 @@ const Apply = class extends Controller {
 
     async create() {
         const { userId } = this.authenticated();
-        const params = this.validate({
-            objectType: joi.number().valid(ENTITY_TYPE_PROJECT),
-            objectId: 'int',
-            applyType: joi.number().valid(APPLY_TYPE_MEMBER),
-            applyId: 'int',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.apply.create,
+            this.getParams()
+        );
 
         params.userId = userId;
         params.state = APPLY_STATE_DEFAULT;
-        // delete params.state;
+
         await this.model.applies.upsert(params);
         const data = await this.model.applies.findOne({
             where: {
@@ -69,7 +54,10 @@ const Apply = class extends Controller {
 
     async update() {
         const { userId } = this.authenticated();
-        const { id, state } = this.validate({ id: 'int', state: 'int' });
+        const { id, state } = await this.ctx.validate(
+            this.app.validator.apply.update,
+            this.getParams()
+        );
         let ok = 0;
 
         if (state === APPLY_STATE_AGREE) {
@@ -84,15 +72,10 @@ const Apply = class extends Controller {
     }
 
     async state() {
-        const params = this.validate({
-            applyId: 'int',
-            applyType: 'int',
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.apply.state,
+            this.getParams()
+        );
 
         const list = await this.model.applies.findAll({
             order: [[ 'createdAt', 'desc' ]],
