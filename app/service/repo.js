@@ -19,12 +19,14 @@ class RepoService extends Service {
 
     async syncRepo(repo, transaction) {
         if (repo.synced) return;
-        const result = await this.service.repo.createRepo(
-            repo.username,
-            repo.repoName
-        );
-
-        if (result) return repo.update({ synced: true }, { transaction });
+        let gitRepo = await this.service.repo.getRepoInfo(repo.path); // 如果git repo已经存在则直接返回同步成功
+        if (!gitRepo) {
+            gitRepo = await this.service.repo.createRepo(
+                repo.username,
+                repo.repoName
+            );
+        }
+        if (gitRepo) return repo.update({ synced: true }, { transaction });
     }
 
     async destroyRepo(resourceType, resourceId, transaction) {
@@ -37,7 +39,16 @@ class RepoService extends Service {
             transaction,
         });
         if (!repo) ctx.throw('repo not exist', 404);
-        if (repo.synced) await service.repo.deleteRepo(repo.path);
+
+        if (repo.synced) {
+            try {
+                await service.repo.deleteRepo(repo.path);
+            } catch (e) {
+                // 注：如果在上一次失败的删除操作事务中已经执行了repo删除，那么再次尝试删除就会出现此error。
+                // 目前缺乏针对事务间调用的补偿措施
+                ctx.logger.error('Repo Error: ', e.message);
+            }
+        }
         return repo.destroy({ transaction });
     }
 

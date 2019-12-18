@@ -3,7 +3,7 @@
 const Service = require('egg').Service;
 
 class SiteService extends Service {
-    async createSite({ userId, username, sitename }) {
+    async createSite({ userId, username, sitename, extra }) {
         const { ctx } = this;
         const transaction = await ctx.model.transaction();
         try {
@@ -12,6 +12,7 @@ class SiteService extends Service {
                     userId,
                     username,
                     sitename,
+                    extra,
                 },
                 { transaction }
             );

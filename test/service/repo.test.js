@@ -150,6 +150,9 @@ describe('test/service/repo.test.js', () => {
         let repo;
         beforeEach(async () => {
             repo = await app.factory.create('repos');
+            app.mockService('repo', 'getRepoInfo', () => {
+                return; // 确保repo不存在
+            });
         });
 
         it('should sync if project was exist', async () => {
@@ -166,6 +169,20 @@ describe('test/service/repo.test.js', () => {
             assert(repo.synced === true);
             const result = await ctx.service.repo.syncRepo(repo);
             assert(!result);
+        });
+
+        it('should mark syned as true if git repo was already exist', async () => {
+            app.mockService('repo', 'getRepoInfo', () => {
+                return {
+                    name: repo.name,
+                    space: repo.username,
+                    path: repo.path,
+                };
+            });
+            const result = await ctx.service.repo.syncRepo(repo);
+            assert(result);
+            await repo.reload();
+            assert(repo.synced === true);
         });
 
         it('should failed if create git repo failed', async () => {
@@ -226,22 +243,17 @@ describe('test/service/repo.test.js', () => {
             assert(repoCount === 1);
         });
 
-        it('should failed if delete git repo failed', async () => {
+        it('should succeed if delete git repo failed', async () => {
             app.mockService('repo', 'deleteRepo', () => {
                 ctx.throw('failed');
             });
-            const errMessage = 'should failed to destroy invalid repo';
-            try {
-                await ctx.service.repo.destroyRepo(
-                    repo.resourceType,
-                    repo.resourceId
-                );
-                ctx.throw(errMessage);
-            } catch (e) {
-                assert(e.message !== errMessage);
-            }
+            const result = await ctx.service.repo.destroyRepo(
+                repo.resourceType,
+                repo.resourceId
+            );
+            assert(result);
             const repoCount = await ctx.model.Repo.count();
-            assert(repoCount === 1);
+            assert(repoCount === 0);
         });
 
         describe('#with transaction', () => {
