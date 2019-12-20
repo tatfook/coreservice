@@ -28,7 +28,7 @@ const GameWorks = class extends Controller {
     }
 
     async search() {
-        const query = this.validate();
+        const query = this.getParams();
         const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
         const gameWhere = {};
         if (query.gameName) {
@@ -80,7 +80,10 @@ const GameWorks = class extends Controller {
     }
 
     async snapshoot() {
-        const { ids = [] } = this.validate();
+        const { ids = [] } = await this.ctx.validate(
+            this.app.validator.gameWork.snapshoot,
+            this.getParams()
+        );
         if (ids.length === 0) return this.success('OK');
 
         const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
