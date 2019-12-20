@@ -13,7 +13,7 @@ class RepoService extends Service {
             await this.app.api.git.syncRepo(repoPath, porject.http_url_to_repo);
             return true;
         } catch (e) {
-            ctx.logger.error(repoPath, ' not exist. err: ', e.message);
+            ctx.logger.error(repoPath, ' not exist. err: ', e);
         }
     }
 
@@ -48,7 +48,7 @@ class RepoService extends Service {
             } catch (e) {
                 // 注：如果在上一次失败的删除操作事务中已经执行了repo删除，那么再次尝试删除就会出现此error。
                 // 目前缺乏针对事务间调用的补偿措施
-                ctx.logger.error('Repo Error: ', e.message);
+                ctx.logger.error('Repo Error: ', e);
             }
         }
         return repo.destroy({ transaction });

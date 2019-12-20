@@ -204,7 +204,7 @@ const Project = class extends Controller {
             await transaction.commit();
             return this.success(project);
         } catch (e) {
-            ctx.logger.error(e.message);
+            ctx.logger.error(e);
             await transaction.rollback();
             return this.fail(9);
         }
@@ -244,7 +244,7 @@ const Project = class extends Controller {
             await transaction.commit();
             return this.success();
         } catch (e) {
-            ctx.logger.error(e.message);
+            ctx.logger.error(e);
             await transaction.rollback();
             return this.fail(18);
         }
