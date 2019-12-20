@@ -35,6 +35,7 @@ const Trade = class extends Controller {
             goodsId: 'int', // 物品id
             count: 'int', // 购买量
             discountId: 'int_optional', // 优惠券id
+            // TODO 移除这三个选项
             rmb: 'int_optional',
             coin: 'int_optional',
             bean: 'int_optional',
@@ -65,11 +66,9 @@ const Trade = class extends Controller {
         const user = await this.model.users.getById(userId);
         if (!user) return this.fail(12);
 
-        const rmb = (params.rmb === undefined ? goods.rmb : params.rmb) * count;
-        const coin =
-            (params.coin === undefined ? goods.coin : params.coin) * count;
-        const bean =
-            (params.bean === undefined ? goods.bean : params.bean) * count;
+        const rmb = goods.rmb * count;
+        const coin = goods.coin * count;
+        const bean = goods.bean * count;
         let realRmb = rmb;
         let realCoin = coin;
         let realBean = bean;
