@@ -10,7 +10,6 @@ const Migration = class extends Controller {
         const pace = 1000;
         let step = 0;
         const total = await ctx.model.Site.count();
-        ctx.logger.info('Generating site repos, total amount is ', total);
         while (step < total) {
             const sites = await ctx.model.Site.findAll({
                 offset: step,
@@ -25,12 +24,11 @@ const Migration = class extends Controller {
                 );
                 await transaction.commit();
             } catch (e) {
-                ctx.logger.error(e.message);
+                ctx.logger.error(e);
                 await transaction.rollback();
             }
             step = step + pace;
         }
-        ctx.logger.info('Finish to generate site repos!');
         ctx.body = 'success';
     }
 
@@ -41,7 +39,6 @@ const Migration = class extends Controller {
         const pace = 1000;
         let step = 0;
         const total = await ctx.model.World.count();
-        ctx.logger.info('Generating world repos, total amount is ', total);
         while (step < total) {
             const worlds = await ctx.model.World.findAll({
                 offset: step,
@@ -59,12 +56,11 @@ const Migration = class extends Controller {
                 );
                 await transaction.commit();
             } catch (e) {
-                ctx.logger.error(e.message);
+                ctx.logger.error(e);
                 await transaction.rollback();
             }
             step = step + pace;
         }
-        ctx.logger.info('Finish to generate world repos!');
         ctx.body = 'success';
     }
 
