@@ -266,6 +266,19 @@ describe('test/controller/repo.test.js', () => {
                         .set('Authorization', `Bearer ${token}`)
                         .expect(404);
                 });
+                it('should file raw data with correct content type', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.jpg');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}/raw`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                    assert(result.type === 'image/jpeg');
+                });
             });
             describe('#getFileHistory', () => {
                 it('should return file history for owner', async () => {

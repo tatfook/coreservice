@@ -1,5 +1,6 @@
 'use strict';
 const Controller = require('../core/controller.js');
+const mime = require('mime');
 
 const Repo = class extends Controller {
     async getTree() {
@@ -52,6 +53,8 @@ const Repo = class extends Controller {
             filePath,
             commitId
         );
+        const mimeType = mime.getType(filePath);
+        if (mimeType) this.ctx.set('Content-Type', mimeType);
         return this.success(result);
     }
 
