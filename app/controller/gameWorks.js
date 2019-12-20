@@ -37,7 +37,7 @@ const GameWorks = class extends Controller {
         }
 
         const list = await this.model.gameWorks
-            .findAndCount({
+            .findAndCountAll({
                 ...this.queryOptions,
                 include: [
                     {

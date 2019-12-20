@@ -9,11 +9,6 @@ exports.cors = {
     package: 'egg-cors',
 };
 
-exports.validate = {
-    enable: true,
-    package: 'egg-validate',
-};
-
 exports.graphql = {
     enable: true,
     package: 'egg-graphql',
@@ -22,4 +17,9 @@ exports.graphql = {
 exports.redis = {
     enable: true,
     package: 'egg-redis',
+};
+
+exports.ajv = {
+    enable: true,
+    package: 'egg-ajv',
 };

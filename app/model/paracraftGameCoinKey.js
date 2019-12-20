@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON, DATE } = app.Sequelize;
-
+    // paracraft嵌入设备
     const model = app.model.define(
         'paracraftGameCoinKeys',
         {
@@ -94,10 +94,15 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.paracraftGameCoinKeys = model;
+
+    model.associate = () => {
+        app.model.paracraftGameCoinKeys.belongsTo(app.model.paracraftDevices, {
+            as: 'paracraftDevices',
+            foreignKey: 'deviceId',
+            targetKey: 'deviceId',
+            constraints: false,
+        });
+    };
     return model;
 };

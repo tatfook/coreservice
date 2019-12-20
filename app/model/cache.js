@@ -2,7 +2,7 @@
 
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // TODO 使用redis替代其功能
     const model = app.model.define(
         'caches',
         {
@@ -34,8 +34,6 @@ module.exports = app => {
             collate: 'utf8mb4_bin',
         }
     );
-
-    // model.sync({force:true});
 
     model.get = async function(key) {
         let data = await app.model.caches.findOne({ where: { key } });

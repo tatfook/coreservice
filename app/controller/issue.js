@@ -1,62 +1,46 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
-
-const joi = require('joi');
 const _ = require('lodash');
 
 const Controller = require('../core/controller.js');
 const {
-    ENTITY_TYPE_USER,
-    ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
-    ENTITY_TYPE_GROUP,
     ENTITY_TYPE_PROJECT, // 项目
+    PROJECT_PRIVILEGE_ISSUE_VIEW_ALL,
+    PROJECT_PRIVILEGE_ISSUE_EDIT_ALL,
 } = require('../core/consts.js');
 
-const ENTITYS = [
-    ENTITY_TYPE_USER,
-    ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
-    ENTITY_TYPE_GROUP,
-    ENTITY_TYPE_PROJECT,
-];
-
 const Issue = class extends Controller {
-    get modelName() {
-        return 'issues';
-    }
-
     async isPrivilege(objectId, objectType, userId, editable) {
         if (objectType !== ENTITY_TYPE_PROJECT) return false;
 
         const isMember = await this.model.members.findOne({
-            objectId,
-            objectType,
-            memberId: userId,
+            where: {
+                objectId,
+                objectType,
+                memberId: userId,
+            },
         });
         if (isMember) return true;
 
         const project = await this.model.projects.getById(objectId);
         if (!editable) {
             // 读取
-            if (project.privilege & 32) return true;
+            if (project.privilege & PROJECT_PRIVILEGE_ISSUE_VIEW_ALL) {
+                return true;
+            }
             return false;
         }
-        if (project.privilege & 128) return true;
-        false;
+        if (project.privilege & PROJECT_PRIVILEGE_ISSUE_EDIT_ALL) return true;
 
         return false;
     }
-
+    // http://yapi.kp-para.cn/project/32/interface/api/732
     async search() {
         const { userId } = this.getUser();
-        const query = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
+        const query = await this.ctx.validate(
+            this.app.validator.issue.query,
+            this.getParams()
+        );
 
         const isCanOper = await this.isPrivilege(
             query.objectId,
@@ -89,15 +73,10 @@ const Issue = class extends Controller {
 
     async index() {
         const { userId } = this.getUser();
-        const query = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-            state: 'int_optional',
-            title: 'string_optional',
-        });
+        const query = await this.ctx.validate(
+            'validator.issue.query',
+            this.getParams()
+        );
 
         const isCanOper = await this.isPrivilege(
             query.objectId,
@@ -119,12 +98,10 @@ const Issue = class extends Controller {
 
     async create() {
         const { userId } = this.authenticated();
-        const params = this.validate({
-            objectType: joi.number().valid(ENTITYS),
-            objectId: 'int',
-            title: 'string',
-            content: 'string',
-        });
+        const params = await this.ctx.validate(
+            'validator.issue.createBody',
+            this.getParams()
+        );
         params.userId = userId;
 
         const isCanOper = await this.isPrivilege(
@@ -143,7 +120,6 @@ const Issue = class extends Controller {
         params.text = params.no + ' ' + params.title;
 
         let data = await this.model.issues.create(params);
-        if (!data) return this.throw(500);
         data = data.get({ plain: true });
 
         return this.success(data);
@@ -151,7 +127,10 @@ const Issue = class extends Controller {
 
     async update() {
         const { userId } = this.authenticated();
-        const params = this.validate({ id: 'int' });
+        const params = await this.ctx.validate(
+            'validator.issue.updateBody',
+            this.getParams()
+        );
         const { id } = params;
 
         const issue = await this.model.issues.getById(id);
@@ -177,7 +156,10 @@ const Issue = class extends Controller {
 
     async destroy() {
         const { userId } = this.authenticated();
-        const { id } = this.validate({ id: 'int' });
+        const { id } = await this.ctx.validate(
+            'validator.id',
+            this.getParams()
+        );
 
         const issue = await this.model.issues.getById(id);
         if (!issue) this.throw(400);
@@ -197,7 +179,10 @@ const Issue = class extends Controller {
 
     async show() {
         const { userId } = this.getUser();
-        const { id } = this.validate({ id: 'int' });
+        const { id } = await this.ctx.validate(
+            'validator.id',
+            this.getParams()
+        );
         const issue = await this.model.issues.getById(id);
         if (!issue) this.throw(400);
 
@@ -216,13 +201,10 @@ const Issue = class extends Controller {
     }
 
     async statistics() {
-        const { objectId, objectType } = this.validate({
-            objectId: 'int',
-            objectType: joi
-                .number()
-                .valid(ENTITYS)
-                .required(),
-        });
+        const { objectId, objectType } = await this.ctx.validate(
+            this.app.validator.issue.query,
+            this.getParams()
+        );
 
         const list = await this.model.issues.getObjectStatistics(
             objectId,

@@ -54,10 +54,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     model.getByUserId = async function(userId) {
         const account = await app.model.accounts
             .findOne({ where: { userId } })
@@ -72,5 +68,14 @@ module.exports = app => {
     };
 
     app.model.accounts = model;
+
+    model.associate = () => {
+        app.model.accounts.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

@@ -44,10 +44,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     model.addContributions = async function(userId, count = 1) {
         const date = new Date();
         const year = date.getFullYear();

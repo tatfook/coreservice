@@ -32,7 +32,7 @@ const Comment = class extends Controller {
 
         this.formatQuery(params);
 
-        const list = await this.model.comments.findAndCount({
+        const list = await this.model.comments.findAndCountAll({
             ...this.queryOptions,
             where: params,
         });

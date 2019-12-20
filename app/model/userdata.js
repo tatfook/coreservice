@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, JSON } = app.Sequelize;
-
+    // TODO 存储的用户的token信息
     const model = app.model.define(
         'userdatas',
         {
@@ -34,10 +34,6 @@ module.exports = app => {
     model.set = async function(userId, data) {
         return await app.model.userdatas.upsert({ userId, data });
     };
-
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
 
     app.model.userdatas = model;
     return model;

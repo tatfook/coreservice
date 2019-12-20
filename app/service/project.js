@@ -34,15 +34,18 @@ class Project extends Service {
         extra.rate[rateLevel] = (extra.rate[rateLevel] || 0) + 1;
         extra.rate.count = projectRateCount;
 
-        await this.app.model.projects.update(
-            { rate: projectRate, rateCount: projectRateCount, extra },
-            { where: { id: projectId } }
-        );
+        const transaction = await this.model.transaction();
+        try {
+            await this.app.model.projects.update(
+                { rate: projectRate, rateCount: projectRateCount, extra },
+                { where: { id: projectId }, transaction, individualHooks: true }
+            );
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
-        project.rate = projectRate;
-        project.extra = extra;
-
-        this.app.api.projectsUpsert(project);
         return;
     }
 
@@ -186,7 +189,7 @@ class Project extends Service {
                     ],
                 });
                 if (_project) {
-                    return await this.app.api.projectsUpsert(_project);
+                    return await this.app.api.es.upsertProject(_project);
                 }
             };
         });

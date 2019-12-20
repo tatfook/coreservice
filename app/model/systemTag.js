@@ -40,10 +40,23 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.systemTags = model;
+
+    model.associate = () => {
+        app.model.systemTags.belongsToMany(app.model.projects, {
+            through: {
+                model: app.model.systemTagProjects,
+            },
+            foreignKey: 'systemTagId',
+            constraints: false,
+        });
+
+        app.model.systemTags.hasMany(app.model.tags, {
+            as: 'tags',
+            foreignKey: 'tagId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

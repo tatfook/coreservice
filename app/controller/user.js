@@ -67,7 +67,7 @@ const User = class extends Controller {
 
         this.formatQuery(query);
 
-        const data = await this.model.users.findAndCount({
+        const data = await this.model.users.findAndCountAll({
             ...this.queryOptions,
             attributes: userAttrs,
             where: query,
@@ -129,9 +129,19 @@ const User = class extends Controller {
         }
 
         delete params.email;
-        const ok = await ctx.model.users.update(params, {
-            where: { id: userId },
-        });
+        let ok;
+        const transaction = await ctx.model.transaction();
+        try {
+            ok = await ctx.model.users.update(params, {
+                where: { id: userId },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         return this.success(ok && ok[0] === 1);
     }
@@ -261,63 +271,61 @@ const User = class extends Controller {
 
         if (!user) {
             // 用户不存在则注册用户
-            user = await this.model.users.create({
-                nickname,
-                username,
-                password: this.app.util.md5(password),
-                channel: 4,
-            });
-            if (!user) return this.fail(0);
-            user = user.get({ plain: true });
+            const transaction = await this.model.transaction();
+            try {
+                user = await this.model.users.create(
+                    {
+                        nickname,
+                        username,
+                        password: this.app.util.md5(password),
+                        channel: 4,
+                    },
+                    { transaction }
+                );
 
-            // 用户注册
-            await this.ctx.service.user.register(user);
+                user = user.get({ plain: true });
 
-            // 创建lesson用户
-            await this.app.lessonModel.users.create({
-                id: user.id,
-                username: user.username,
-            });
+                // 用户注册
+                await this.ctx.service.user.register(user);
 
-            username = 'qh' + moment().format('YYYYMMDD') + user.id;
-            await this.model.users.update(
-                { username },
-                { where: { id: user.id } }
-            );
-            user.username = username;
+                // 创建lesson用户
+                await this.app.lessonModel.users.create({
+                    id: user.id,
+                    username: user.username,
+                });
 
-            // 创建用户账号记录
-            await this.model.accounts.upsert({ userId: user.id });
+                username = 'qh' + moment().format('YYYYMMDD') + user.id;
 
-            // 同步用户到wikicraft
-            // const data = await axios.post(config.keepworkBaseURL + "user/register",
-            // {username, password}).then(res => res.data).catch(e => console.log("创建wikicraft用户失败", e));
-            // if (!data || data.error.id != 0) {
-            // await this.model.users.destroy({where:{id:user.id}});
-            // console.log("创建wikicraft用户失败", data);
-            // return this.fail(-1, 400, data);
-            // }
-            const ok = await this.app.api.createGitUser({
-                id: user.id,
-                username,
-                password,
-                extra: { external: true },
-            });
-            if (!ok) {
-                await this.model.users.destroy({ where: { id: user.id } });
-                return this.fail(0);
+                await this.model.users.update(
+                    { username },
+                    {
+                        where: { id: user.id },
+                        transaction,
+                        individualHooks: true,
+                    }
+                );
+
+                user.username = username;
+
+                // 创建用户账号记录
+                await this.model.accounts.upsert(
+                    { userId: user.id },
+                    { transaction }
+                );
+
+                await this.model.oauthUsers.upsert(
+                    {
+                        userId: user.id,
+                        externalId: params.uid,
+                        type: oauthType,
+                    },
+                    { transaction }
+                );
+                await transaction.commit();
+            } catch (error) {
+                await transaction.rollback();
+                throw error;
             }
-            await this.app.api.createGitProject({
-                username: user.username,
-                sitename: '__keepwork__',
-                visibility: 'public',
-            });
-
-            await this.model.oauthUsers.upsert({
-                userId: user.id,
-                externalId: params.uid,
-                type: oauthType,
-            });
         }
 
         payload.userId = user.id;
@@ -391,29 +399,26 @@ const User = class extends Controller {
             const value = await this.model.caches.get(key);
             if (value !== captcha) return this.fail(5);
         }
+        const transaction = await this.model.transaction();
+        try {
+            user = await model.users.create(
+                {
+                    // cellphone: params.cellphone || null,
+                    nickname: params.nickname || username,
+                    username,
+                    password: util.md5(params.password),
+                    realname: cellphone || null,
+                    email: params.email || null,
+                    channel: params.channel || 0,
+                },
+                { transaction }
+            );
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
-        // 同步用户到wikicraft
-        // if (this.app.config.env != "unittest") {
-        // const data = await axios.post(config.keepworkBaseURL + "user/register", {username, password}).then(res => res.data).catch(e => {
-        // console.log("创建wikicraft用户失败", e);
-        // });
-        // if (!data || data.error.id != 0) {
-        // console.log("创建wikicraft用户失败", data);
-        // return this.fail(-1, 400, data);
-        // }
-        // }
-
-        user = await model.users.create({
-            // cellphone: params.cellphone || null,
-            nickname: params.nickname || username,
-            username,
-            password: util.md5(params.password),
-            realname: cellphone || null,
-            email: params.email || null,
-            channel: params.channel || 0,
-        });
-
-        if (!user) return this.fail(0);
         user = user.get({ plain: true });
 
         // 用户注册
@@ -427,23 +432,6 @@ const User = class extends Controller {
 
         // 创建用户账号记录
         await this.model.accounts.upsert({ userId: user.id });
-
-        if (this.app.config.env !== 'unittest') {
-            const ok = await this.app.api.createGitUser({
-                id: user.id,
-                username: user.username,
-                password: params.password,
-            });
-            if (!ok) {
-                await this.model.users.destroy({ where: { id: user.id } });
-                return this.fail(0);
-            }
-            // await this.app.api.createGitProject({
-            //     username: user.username,
-            //     sitename: '__keepwork__',
-            //     visibility: 'public',
-            // });
-        }
 
         if (params.oauthToken) {
             await model.oauthUsers.update(
@@ -808,6 +796,17 @@ const User = class extends Controller {
         const account = await this.model.accounts.getByUserId(userId);
 
         return this.success(account);
+    }
+
+    // 获取用户的限制信息
+    async getWorldLimit() {
+        const { userId } = this.authenticated();
+        const { id } = this.validate({ id: 'int' });
+        if (+userId !== +id) {
+            return this.throw(400);
+        }
+        const worldLimit = await this.service.user.getUserWorldLimit(userId);
+        return this.success(worldLimit);
     }
 };
 

@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING } = app.Sequelize;
-
+    // TODO 课程包tag有用到，同移除lessonModel时一起优化
     const model = app.model.define(
         'tags',
         {
@@ -47,10 +47,16 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.tags = model;
+
+    model.associate = () => {
+        app.model.tags.belongsTo(app.model.systemTags, {
+            as: 'systemTags',
+            foreignKey: 'tagId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
+
     return model;
 };

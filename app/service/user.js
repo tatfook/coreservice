@@ -85,7 +85,7 @@ class User extends Service {
     }
 
     async createRegisterMsg(user) {
-        return this.app.api.createRegisterMsg(user);
+        return this.app.api.lesson.createRegisterMsg(user);
     }
 
     async register(user) {
@@ -108,6 +108,23 @@ class User extends Service {
         _.each(list, o => {
             o.user = users[o.userId];
         });
+    }
+
+    /**
+     * 获取用户的世界限制
+     * @param {*} userId 用户ID
+     * @return {Promise<{usedWorld, world}>} usedWorld已使用的world数量，world创建world的上限
+     */
+    async getUserWorldLimit(userId) {
+        const user = await this.ctx.model.users.getById(userId);
+        const userRank = await this.ctx.model.userRanks.getByUserId(userId);
+        const userLimit = await this.ctx.model.userLimits.getByUserId(userId);
+        // 用户是vip或者tLevel则无限制
+        if (user.vip || user.tLevel) {
+            userLimit.world = -1;
+        }
+        userLimit.usedWorld = userRank.world;
+        return userLimit;
     }
 }
 

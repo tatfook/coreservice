@@ -106,8 +106,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     model.generateDiscount = function() {
         const startTime = new Date().getTime();
         const endTime = startTime + 1000 * 3600 * 24 * 30;

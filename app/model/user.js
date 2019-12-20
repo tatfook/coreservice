@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 const _ = require('lodash');
-const { USER_ATTRS } = require('../core/consts');
+const { USER_ATTRS, USER_LIMIT_WORLD } = require('../core/consts');
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, JSON } = app.Sequelize;
 
@@ -96,8 +96,6 @@ module.exports = app => {
 
     const model = app.model.define('users', attrs, opts);
 
-    // model.sync({force:true});
-
     model.get = async function(id) {
         if (_.toNumber(id)) {
             return await this.getById(_.toNumber(id));
@@ -130,12 +128,13 @@ module.exports = app => {
         return user;
     };
 
-    model.getById = async function(userId) {
+    model.getById = async function(userId, transaction = null) {
         const data = await app.model.users.findOne({
             where: { id: userId },
             attributes: {
                 exclude: [ 'password' ],
             },
+            transaction,
         });
 
         return data && data.get({ plain: true });
@@ -161,5 +160,91 @@ module.exports = app => {
     };
 
     app.model.users = model;
+
+    model.associate = () => {
+        app.model.users.hasOne(app.model.userinfos, {
+            as: 'userinfos',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.accounts, {
+            as: 'accounts',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.roles, {
+            as: 'roles',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.issues, {
+            as: 'issues',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasMany(app.model.gameWorks, {
+            as: 'gameWorks',
+            foreignKey: 'userId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.users.hasOne(app.model.userLimits, {
+            as: 'userLimit',
+            foreignKey: 'userId',
+            constraints: false,
+        });
+    };
+
+    async function __hook__(inst, options) {
+        await app.api.es.upsertUser(inst, options.transaction);
+    }
+
+    model.afterCreate(async (inst, options) => {
+        await app.model.userLimits.create(
+            {
+                userId: inst.id,
+                world: USER_LIMIT_WORLD,
+            },
+            {
+                transaction: options.transaction,
+            }
+        );
+        await __hook__(inst, options);
+    });
+
+    model.afterUpdate(__hook__);
+
+    model.afterDestroy(async (inst, options) => {
+        const transaction = options.transaction;
+        await app.model.userLimits.destroy({
+            where: { userId: inst.id },
+            transaction,
+        });
+        await app.model.userRanks.destroy({
+            where: { userId: inst.id },
+            transaction,
+        });
+        await app.api.es.deleteUser(inst.id);
+    });
     return model;
 };

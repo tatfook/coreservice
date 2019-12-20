@@ -2,7 +2,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
-
+    // 合作申请
     const model = app.model.define(
         'paracraftVisitors',
         {
@@ -68,8 +68,6 @@ module.exports = app => {
             collate: 'utf8mb4_bin',
         }
     );
-
-    // model.sync({force:true});
 
     app.model.paracraftVisitors = model;
 
