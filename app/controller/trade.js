@@ -41,8 +41,8 @@ const Trade = class extends Controller {
             bean: 'int_optional',
         });
         const { type, goodsId, count, discountId = 0, extra = {} } = params;
-
-        if (count < 0) return this.throw(400);
+        // count 为10的整数倍
+        if (count <= 0 || count % 10) return this.throw(400);
 
         const goods = await this.model.goods
             .findOne({ where: { id: goodsId } })
