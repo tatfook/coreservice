@@ -10,10 +10,9 @@ const Domain = class extends Controller {
     }
 
     async show() {
-        const params = this.validate();
+        const params = this.getParams();
         const id = _.toNumber(params.id) || decodeURIComponent(params.id);
         let data;
-
         if (_.isNumber(id)) data = await this.model.domains.getById(id);
         else data = await this.model.domains.getByDomain(id);
 
@@ -21,12 +20,12 @@ const Domain = class extends Controller {
     }
 
     async exist() {
-        const domain = decodeURIComponent(
-            this.validate({ domain: 'string' }).domain
+        const params = await this.ctx.validate(
+            this.app.validator.domain.exist,
+            this.getParams()
         );
-
+        const domain = decodeURIComponent(params.domain);
         const data = await this.model.domains.findOne({ where: { domain } });
-
         return this.success(!!data);
     }
 };
