@@ -1,6 +1,7 @@
 'use strict';
 const Controller = require('../core/controller.js');
 const mime = require('mime');
+const _path = require('path');
 
 const Repo = class extends Controller {
     async getTree() {
@@ -53,8 +54,24 @@ const Repo = class extends Controller {
             filePath,
             commitId
         );
-        const mimeType = mime.getType(filePath);
-        if (mimeType) this.ctx.set('Content-Type', mimeType);
+        const filename = _path.basename(filePath);
+        const mimeType = mime.getType(filename);
+        if (mimeType) {
+            this.ctx.set('Content-Type', mimeType);
+            if (mimeType.indexOf('text/') !== 0) {
+                if (mimeType.indexOf('image/') === 0) {
+                    this.ctx.set(
+                        'Content-Disposition',
+                        `inline; filename=${filename}`
+                    );
+                } else {
+                    this.ctx.set(
+                        'Content-Disposition',
+                        `attachment; filename=${filename}`
+                    );
+                }
+            }
+        }
         return this.success(result);
     }
 

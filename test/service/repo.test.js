@@ -278,61 +278,232 @@ describe('test/service/repo.test.js', () => {
         describe('site', () => {
             let site;
             let repo;
-            beforeEach(async () => {
-                user = await app.factory.create('users');
-                site = await app.factory.create('sites', {}, { user });
-                repo = await app.factory.create('repos', {
-                    username: site.username,
-                    repoName: site.sitename,
-                    resourceId: site.id,
-                    resourceType: 'Site',
+            describe('public', () => {
+                beforeEach(async () => {
+                    user = await app.factory.create('users');
+                    site = await app.factory.create(
+                        'sites',
+                        { visibility: 0 },
+                        { user }
+                    );
+                    repo = await app.factory.create('repos', {
+                        username: site.username,
+                        repoName: site.sitename,
+                        resourceId: site.id,
+                        resourceType: 'Site',
+                    });
+                });
+
+                it('should return true if user is owner', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true if user is stranger', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id + 100
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true if user is visitor', async () => {
+                    const result = await ctx.service.repo.canReadByUser(repo);
+                    assert(result === true);
                 });
             });
+            describe('private', () => {
+                beforeEach(async () => {
+                    user = await app.factory.create('users');
+                    site = await app.factory.create(
+                        'sites',
+                        { visibility: 1 },
+                        { user }
+                    );
+                    repo = await app.factory.create('repos', {
+                        username: site.username,
+                        repoName: site.sitename,
+                        resourceId: site.id,
+                        resourceType: 'Site',
+                    });
+                });
 
-            it('should return true if user is owner', async () => {
-                const result = await ctx.service.repo.canReadByUser(
-                    repo,
-                    user.id
-                );
-                assert(result === true);
-            });
+                it('should return true if user is owner', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id
+                    );
+                    assert(result === true);
+                });
 
-            it('should return false if user is stranger', async () => {
-                const result = await ctx.service.repo.canReadByUser(
-                    repo,
-                    user.id + 100
-                );
-                assert(result === false);
+                it('should return false if user is stranger', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id + 100
+                    );
+                    assert(result === false);
+                });
+
+                it('should return false if user is visitor', async () => {
+                    const result = await ctx.service.repo.canReadByUser(repo);
+                    assert(result === false);
+                });
             });
         });
         describe('world', () => {
             let world;
             let repo;
-            beforeEach(async () => {
-                user = await app.factory.create('users');
-                world = await app.factory.create('worlds', {}, { user });
-                repo = await app.factory.create('repos', {
-                    username: user.username,
-                    repoName: world.worldName,
-                    resourceId: world.id,
-                    resourceType: 'World',
+            describe('without project', () => {
+                beforeEach(async () => {
+                    user = await app.factory.create('users');
+                    world = await app.factory.create(
+                        'worlds',
+                        { projectId: 99999 },
+                        { user }
+                    );
+                    repo = await app.factory.create('repos', {
+                        username: user.username,
+                        repoName: world.worldName,
+                        resourceId: world.id,
+                        resourceType: 'World',
+                    });
+                });
+
+                it('should return true if user is owner', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true even if user is stranger', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id + 100
+                    );
+                    assert(result === true);
+                });
+
+                it('should return false if user is visitor', async () => {
+                    const result = await ctx.service.repo.canReadByUser(repo);
+                    assert(result === false);
                 });
             });
+            describe('public', () => {
+                let project;
+                beforeEach(async () => {
+                    user = await app.factory.create('users');
+                    project = await app.factory.create('projects', {
+                        visibility: 0,
+                    });
+                    world = await app.factory.create(
+                        'worlds',
+                        {},
+                        { user, project }
+                    );
+                    repo = await app.factory.create('repos', {
+                        username: user.username,
+                        repoName: world.worldName,
+                        resourceId: world.id,
+                        resourceType: 'World',
+                    });
+                });
 
-            it('should return true if user is owner', async () => {
-                const result = await ctx.service.repo.canReadByUser(
-                    repo,
-                    user.id
-                );
-                assert(result === true);
+                it('should return true if user is owner', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true if user is member', async () => {
+                    const user2 = await app.factory.create('users');
+                    await app.factory.create('members', {
+                        user,
+                        objectType: 5,
+                        objectId: project.id,
+                        memberId: user2.id,
+                    });
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user2.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true even if user is stranger', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id + 100
+                    );
+                    assert(result === true);
+                });
+
+                it('should return false if user is visitor', async () => {
+                    const result = await ctx.service.repo.canReadByUser(repo);
+                    assert(result === false);
+                });
             });
+            describe('private', () => {
+                let project;
+                beforeEach(async () => {
+                    user = await app.factory.create('users');
+                    project = await app.factory.create('projects', {
+                        visibility: 1,
+                    });
+                    world = await app.factory.create(
+                        'worlds',
+                        {},
+                        { user, project }
+                    );
+                    repo = await app.factory.create('repos', {
+                        username: user.username,
+                        repoName: world.worldName,
+                        resourceId: world.id,
+                        resourceType: 'World',
+                    });
+                });
 
-            it('should return true even if user is stranger', async () => {
-                const result = await ctx.service.repo.canReadByUser(
-                    repo,
-                    user.id + 100
-                );
-                assert(result === true);
+                it('should return true if user is owner', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return true if user is member', async () => {
+                    const user2 = await app.factory.create('users');
+                    await app.factory.create('members', {
+                        user,
+                        objectType: 5,
+                        objectId: project.id,
+                        memberId: user2.id,
+                    });
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user2.id
+                    );
+                    assert(result === true);
+                });
+
+                it('should return false if user is stranger', async () => {
+                    const result = await ctx.service.repo.canReadByUser(
+                        repo,
+                        user.id + 100
+                    );
+                    assert(result === false);
+                });
+
+                it('should return false if user is visitor', async () => {
+                    const result = await ctx.service.repo.canReadByUser(repo);
+                    assert(result === false);
+                });
             });
         });
     });
@@ -371,10 +542,18 @@ describe('test/service/repo.test.js', () => {
         });
         describe('world', () => {
             let world;
+            let project;
             let repo;
             beforeEach(async () => {
                 user = await app.factory.create('users');
-                world = await app.factory.create('worlds', {}, { user });
+                project = await app.factory.create('projects', {
+                    visibility: 0,
+                });
+                world = await app.factory.create(
+                    'worlds',
+                    {},
+                    { user, project }
+                );
                 repo = await app.factory.create('repos', {
                     username: user.username,
                     repoName: world.worldName,
@@ -387,6 +566,21 @@ describe('test/service/repo.test.js', () => {
                 const result = await ctx.service.repo.canWriteByUser(
                     repo,
                     user.id
+                );
+                assert(result === true);
+            });
+
+            it('should return true if user is member', async () => {
+                const user2 = await app.factory.create('users');
+                await app.factory.create('members', {
+                    user,
+                    objectType: 5,
+                    objectId: project.id,
+                    memberId: user2.id,
+                });
+                const result = await ctx.service.repo.canWriteByUser(
+                    repo,
+                    user2.id
                 );
                 assert(result === true);
             });
