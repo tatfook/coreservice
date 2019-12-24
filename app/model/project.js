@@ -317,6 +317,15 @@ module.exports = app => {
             constraints: false,
         });
 
+        app.model.projects.hasMany(app.model.members, {
+            as: 'members',
+            foreignKey: 'objectId',
+            constraints: false,
+            scope: {
+                objectType: ENTITY_TYPE_PROJECT,
+            },
+        });
+
         app.model.projects.belongsTo(app.model.users, {
             as: 'users',
             foreignKey: 'userId',

@@ -1,6 +1,7 @@
 'use strict';
 
 const Axios = require('axios');
+const mime = require('mime');
 
 module.exports = app => {
     const Client = Axios.create({
@@ -152,12 +153,18 @@ module.exports = app => {
             return result.data;
         },
         async getFileRaw(repoPath, filePath, commitId) {
+            const mimeType = mime.getType(filePath);
+            let responseType = 'json';
+            if (mimeType && mimeType.indexOf('text/') !== 0) {
+                responseType = 'stream';
+            }
             const result = await Client.get('/files/raw', {
                 params: {
                     repoPath,
                     filePath,
                     commitId,
                 },
+                responseType,
             });
 
             return result.data;

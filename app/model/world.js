@@ -1,5 +1,8 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
+const { ENTITY_VISIBILITY_PUBLIC } = require('../core/consts.js');
+const _ = require('lodash');
+
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
 
@@ -121,13 +124,38 @@ module.exports = app => {
     };
 
     model.prototype.canReadByUser = async function(userId) {
-        // TODO: currently, there's no permission logic for 'world' project
-        if (userId) return true;
+        if (this.userId === userId) return true;
+        const project = await app.model.Project.findOne({
+            where: { id: this.projectId },
+            include: [ 'members' ],
+        });
+        if (project && project.visibility !== ENTITY_VISIBILITY_PUBLIC) {
+            let canRead = false;
+            _.forEach(project.members, member => {
+                if (member.memberId === userId) {
+                    canRead = true; // TODO: member 具有自己的权限判断，待补充
+                    return false;
+                }
+            });
+            return canRead;
+        }
+        return !!userId;
     };
 
     model.prototype.canWriteByUser = async function(userId) {
-        // TODO: currently, there's no permission logic for 'world' project
-        return this.userId === userId;
+        if (this.userId === userId) return true;
+        const project = await app.model.Project.findOne({
+            where: { id: this.projectId },
+            include: [ 'members' ],
+        });
+        let canWrite = false;
+        _.forEach(project.members, member => {
+            if (member.memberId === userId) {
+                canWrite = true; // TODO: member 具有自己的权限判断，待补充
+                return false;
+            }
+        });
+        return canWrite;
     };
 
     app.model.worlds = model;
