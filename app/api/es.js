@@ -2,7 +2,6 @@
 'use strict';
 const Axios = require('axios');
 const _ = require('lodash');
-const util = require('../core/util');
 
 module.exports = app => {
     const esConfig = app.config.elasticsearch;
@@ -118,7 +117,6 @@ module.exports = app => {
             const datetime = new Date();
 
             return Client.post('/pages', {
-                id: util.md5(url),
                 visibility,
                 content,
                 url,
@@ -132,7 +130,7 @@ module.exports = app => {
         async updatePage(filePath, content) {
             if (!isMarkdownPage(filePath) || isInIgnoreList(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);
-            const pageId = util.md5(getPageUrl(filePath));
+            const pageId = encodeURIComponent(getPageUrl(filePath));
             const datetime = new Date();
             return Client.put(`/pages/${pageId}`, {
                 content,
@@ -149,7 +147,7 @@ module.exports = app => {
         },
         async deletePage(filePath) {
             if (!isMarkdownPage(filePath)) return;
-            const pageId = util.md5(getPageUrl(filePath));
+            const pageId = encodeURIComponent(getPageUrl(filePath));
             return Client.delete(`/pages/${pageId}`);
         },
     };
