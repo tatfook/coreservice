@@ -139,7 +139,7 @@ class RepoService extends Service {
         );
     }
 
-    async deleteFolder(folderPath, committer, repo) {
+    async deleteFolder(repo, folderPath, committer) {
         const { username, repoName, path } = repo;
         // sync all folder files for site
         const result = await this.app.api.git.deleteFolder(
@@ -147,7 +147,7 @@ class RepoService extends Service {
             folderPath,
             committer
         );
-        await this.app.api.es.deleteFolder(folderPath, username, repoName);
+        await this.app.api.es.deleteFolder(repoName, username, folderPath);
         return result;
     }
 
