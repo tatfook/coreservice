@@ -153,7 +153,9 @@ module.exports = app => {
 
         async deleteFolder(repoName, username, folderPath) {
             return Client.delete(
-                `/pages/${username}/${repoName}/folder/${folderPath}`
+                `/sites/${username}/${repoName}/folder/${encodeURIComponent(
+                    folderPath
+                )}`
             );
         },
 
