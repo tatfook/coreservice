@@ -139,11 +139,11 @@ class RepoService extends Service {
         );
     }
 
-    async deleteFolder(repoPath, folderPath, committer, repo) {
-        const { username, repoName } = repo;
+    async deleteFolder(folderPath, committer, repo) {
+        const { username, repoName, path } = repo;
         // sync all folder files for site
         const result = await this.app.api.git.deleteFolder(
-            repoPath,
+            path,
             folderPath,
             committer
         );
@@ -152,11 +152,11 @@ class RepoService extends Service {
     }
 
     async moveFolder(repo, folderPath, newFolderPath) {
-        const { repoPath, repoName, username } = repo;
+        const { path, repoName, username } = repo;
         if (!newFolderPath) this.ctx.throw('invalid new folder path', 400);
         // sync all folder files for site
         const result = await this.app.api.git.moveFolder(
-            repoPath,
+            path,
             folderPath,
             newFolderPath
         );
