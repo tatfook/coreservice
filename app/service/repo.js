@@ -139,15 +139,33 @@ class RepoService extends Service {
         );
     }
 
-    async deleteFolder(repoPath, folderPath, committer) {
-        // TODO: sync all folder files for site
-        return this.app.api.git.deleteFolder(repoPath, folderPath, committer);
+    async deleteFolder(repoPath, folderPath, committer, repoName) {
+        // sync all folder files for site
+        const result = await this.app.api.git.deleteFolder(
+            repoPath,
+            folderPath,
+            committer
+        );
+        await this.app.api.es.deleteFolder(folderPath, committer, repoName);
+        return result;
     }
 
-    async moveFolder(repoPath, folderPath, newFolderPath) {
+    async moveFolder(repo, folderPath, newFolderPath) {
+        const { repoPath, repoName, username } = repo;
         if (!newFolderPath) this.ctx.throw('invalid new folder path', 400);
-        // TODO: sync all folder files for site
-        return this.app.api.git.moveFolder(repoPath, folderPath, newFolderPath);
+        // sync all folder files for site
+        const result = await this.app.api.git.moveFolder(
+            repoPath,
+            folderPath,
+            newFolderPath
+        );
+        await this.app.api.es.moveFolder(
+            repoName,
+            username,
+            folderPath,
+            newFolderPath
+        );
+        return result;
     }
 
     async createFile(repo, filePath, content, encoding, committer) {
