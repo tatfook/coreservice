@@ -20,7 +20,7 @@ coverage/
 config/config.*.js
 newrelic_*
 
-yarn.lock
+package-lock.json
 
 .vscode
 typings
