@@ -156,7 +156,7 @@ const Repo = class extends Controller {
         const { folderPath } = this.getParams();
         const committer = this.getUser().username;
         const result = await this.service.repo.deleteFolder(
-            repo.path,
+            repo,
             folderPath,
             committer
         );
@@ -168,7 +168,7 @@ const Repo = class extends Controller {
         const { folderPath, newFolderPath } = this.getParams();
         const committer = this.getUser().username;
         const result = await this.service.repo.moveFolder(
-            repo.path,
+            repo,
             folderPath,
             newFolderPath,
             committer

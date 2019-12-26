@@ -9,7 +9,10 @@ const Game = class extends Controller {
 
     async members() {
         // this.adminAuthenticated();
-        const { gameName, gameNo, name, cellphone } = this.validate();
+        const { gameName, gameNo, name, cellphone } = await this.ctx.validate(
+            this.app.validator.game.query,
+            this.getParams()
+        );
         const { limit, offset } = this.ctx.state.queryOptions;
         let filterStr = '';
 
