@@ -151,9 +151,9 @@ module.exports = app => {
             return Client.delete(`/pages/${pageId}`);
         },
 
-        async deleteFolder(folderPath, committer, repoName) {
+        async deleteFolder(folderPath, username, repoName) {
             return Client.delete(
-                `/pages/${committer}/${repoName}/folder/${folderPath}`
+                `/pages/${username}/${repoName}/folder/${folderPath}`
             );
         },
 

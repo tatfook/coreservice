@@ -142,7 +142,7 @@ const Repo = class extends Controller {
             repo.path,
             folderPath,
             committer,
-            repo.repoName
+            repo
         );
         return this.success(result);
     }

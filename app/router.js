@@ -238,7 +238,6 @@ module.exports = app => {
     router.delete('/repos/:repoPath/files/:filePath', repo.deleteFile);
     router.post('/repos/:repoPath/files/:filePath/rename', repo.renameFile);
     router.post('/repos/:repoPath/folders/:folderPath', repo.createFolder);
-    // ES数据同步, 文件夹的删除和改名操作开放
     router.delete('/repos/:repoPath/folders/:folderPath', repo.deleteFolder);
     router.post(
         '/repos/:repoPath/folders/:folderPath/rename',
