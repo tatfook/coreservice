@@ -20,13 +20,24 @@ module.exports = app => {
     };
     const isInIgnoreList = filePath => {
         const ignorelist = esConfig.ingore_list;
-        _.forEach(ignorelist, item => {
-            if (_.endsWith(filePath, item)) return true;
-        });
+        const len = ignorelist.length;
+        for (let i = 0; i < len; i++) {
+            if (_.endsWith(filePath, ignorelist[i])) return true;
+        }
         return false;
     };
 
     const esAPI = {
+        async bulk({ body, type, index }) {
+            return Client.post('/bulk', {
+                body,
+                type,
+                index,
+            });
+        },
+        async clearIndexData({ index }) {
+            return Client.delete('/clearIndexData', { data: { index } });
+        },
         async upsertUser(user, transaction = null) {
             const userId = user.id;
             let [ userRank ] = await app.model.userRanks.findOrCreate({
