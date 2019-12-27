@@ -300,4 +300,10 @@ module.exports = app => {
         migration.generateWorldRepo
     );
     router.post('/admin/migration/syncRepo', migration.syncRepo);
+    router.post('/admin/migration/esRebuildPage', migration.esRebuildPage);
+    router.post('/admin/migration/esRebuildUser', migration.esRebuildUser);
+    router.post(
+        '/admin/migration/esRebuildProject',
+        migration.esRebuildProject
+    );
 };
