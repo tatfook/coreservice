@@ -20,4 +20,4 @@ beforeEach(async () => {
     await Promise.all(list);
 });
 
-afterEach(async () => { });
+afterEach(async () => {});

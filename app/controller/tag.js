@@ -15,7 +15,7 @@ const Tag = class extends Controller {
         await ctx.validate(this.app.validator.id, { id });
 
         const sysTag = await ctx.model.systemTags
-            .findOne({ attributes: ['id', 'tagname'], where: { id } })
+            .findOne({ attributes: [ 'id', 'tagname' ], where: { id } })
             .then(r => r.get());
 
         const list = await ctx.model.tags
@@ -28,7 +28,8 @@ const Tag = class extends Controller {
             .then(list => list.map(o => o.toJSON()));
         const pkgIds = list.map(o => o.objectId);
         const packages = await ctx.app.api.lesson.getPackagesByCondition({
-            id: { $in: pkgIds }, state: 2,
+            id: { $in: pkgIds },
+            state: 2,
         });
 
         return this.success({ ...sysTag, packages });

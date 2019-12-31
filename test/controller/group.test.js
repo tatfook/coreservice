@@ -302,8 +302,8 @@ describe('test/controller/favorite.test.js', () => {
 
             assert(
                 result[0] &&
-                result[0].id === group.id &&
-                result[0].members.length === 10
+                    result[0].id === group.id &&
+                    result[0].members.length === 10
             );
         });
     });

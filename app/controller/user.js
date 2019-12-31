@@ -9,7 +9,7 @@ const _ = require('lodash');
 
 const consts = require('../core/consts.js');
 const Controller = require('../core/controller.js');
-const userAttrs = ['id', 'username', 'nickname', 'portrait', 'vip', 'tLevel'];
+const userAttrs = [ 'id', 'username', 'nickname', 'portrait', 'vip', 'tLevel' ];
 const User = class extends Controller {
     get modelName() {
         return 'users';
@@ -526,7 +526,7 @@ const User = class extends Controller {
         // 自动化测试
         const isAutoTest = this.app.unittest || cellphone === '15219998888';
         if (!isAutoTest) {
-            const code = await app.sendSms(cellphone, [captcha, '3分钟']);
+            const code = await app.sendSms(cellphone, [ captcha, '3分钟' ]);
             if (code) return this.fail(code);
         } else {
             captcha = '123456';
@@ -584,7 +584,7 @@ const User = class extends Controller {
             return this.success('OK');
         }
 
-        let result = [0];
+        let result = [ 0 ];
         if (params.isBind) {
             result = await this.model.users.update(
                 { cellphone },
@@ -687,7 +687,7 @@ const User = class extends Controller {
             }
         }
 
-        let result = [0];
+        let result = [ 0 ];
         if (!params.isBind) {
             result = await model.users.update(
                 { email: null },

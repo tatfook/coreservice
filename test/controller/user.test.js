@@ -447,7 +447,7 @@ describe('test/controller/user.test.js', () => {
 
         it('## register failed username has ahocorasick', async () => {
             mock(app.ahocorasick, 'check', () => {
-                return [1, 1, 1];
+                return [ 1, 1, 1 ];
             });
             const result = await app
                 .httpRequest()
@@ -601,9 +601,9 @@ describe('test/controller/user.test.js', () => {
                 .then(res => res.body);
             assert(
                 result &&
-                result.id &&
-                result.username === 'test' &&
-                result.token
+                    result.id &&
+                    result.username === 'test' &&
+                    result.token
             );
             const account = await app.model.accounts.findOne();
             assert(account);
