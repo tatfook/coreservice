@@ -5,7 +5,7 @@ const Service = require('egg').Service;
 
 class User extends Service {
     // 简化用户信息
-    getSimpleUser() {}
+    getSimpleUser() { }
 
     async getUser({ userId, username, cellphone, email }) {
         const user = await this.app.model.users

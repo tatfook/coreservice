@@ -133,6 +133,7 @@ module.exports = app => {
     router.get('/qinius/token', qiniu.token);
 
     const tag = controller.tag;
+    router.get('/tags/packages', tag.getPackages);
     router.resources('/tags', tag);
 
     const project = controller.project;

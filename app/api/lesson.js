@@ -15,6 +15,21 @@ module.exports = app => {
             });
             return result.data;
         },
+
+        async createUser({ id, username }) {
+            return await Client.post('/coreApi/user', {
+                id,
+                username,
+                apiKey: LESSON_API_KEY,
+            });
+        },
+
+        async getPackagesByCondition(condition) {
+            const ret = await Client.get('/coreApi/packages', {
+                params: { condition, apiKey: LESSON_API_KEY },
+            });
+            return ret.data.data;
+        },
     };
 
     return lessonApi;
