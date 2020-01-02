@@ -581,6 +581,8 @@ const User = class extends Controller {
                 { realname: cellphone },
                 { where: { id: userId } }
             );
+            // 用户已实名则将其项目导入至es
+            await this.app.api.es.syncProjectsByUserId(userId);
             return this.success('OK');
         }
 
