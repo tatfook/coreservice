@@ -1,8 +1,8 @@
-const { app } = require('egg-mock/bootstrap');
+const { app, assert, mock } = require('egg-mock/bootstrap');
 
 describe('test/controller/trade.test.js', () => {
     describe('# POST /trades/search', () => {
-        it.only('## success', async () => {
+        it('## success', async () => {
             const user = await app.login();
             await app
                 .httpRequest()
@@ -13,14 +13,14 @@ describe('test/controller/trade.test.js', () => {
     });
 
     describe('# POST /trades', () => {
-        it.only('## unauthorized', async () => {
+        it('## unauthorized', async () => {
             await app
                 .httpRequest()
                 .post('/api/v0/trades')
                 .expect(401);
         });
 
-        it.only('## bad request', async () => {
+        it('## bad request', async () => {
             const user = await app.login();
             await app
                 .httpRequest()
@@ -29,7 +29,7 @@ describe('test/controller/trade.test.js', () => {
                 .expect(422);
         });
 
-        it.only('## count 为10的整数倍', async () => {
+        it('## count 为10的整数倍', async () => {
             const user = await app.login();
             // count 为10的整数倍
             await app
@@ -55,7 +55,7 @@ describe('test/controller/trade.test.js', () => {
                 .expect(400);
         });
 
-        it.only('## goods not found', async () => {
+        it('## goods not found', async () => {
             const user = await app.login();
             await app
                 .httpRequest()
@@ -67,6 +67,119 @@ describe('test/controller/trade.test.js', () => {
                     count: 400,
                 })
                 .expect(400);
+        });
+
+        it('## account not found', async () => {
+            const user = await app.login();
+            const good = await app.model.goods.create({
+                platform: 2,
+                callback: 'http://192.168.15.148:56888/HttpPayHandle.lua',
+                rmb: 0.0,
+                coin: 0,
+                bean: 70,
+            });
+            await app
+                .httpRequest()
+                .post('/api/v0/trades')
+                .set('Authorization', `Bearer ${user.token}`)
+                .send({
+                    type: 1,
+                    goodsId: good.id,
+                    count: 400,
+                })
+                .expect(500);
+        });
+
+        it('## account not enough', async () => {
+            const user = await app.login();
+            const good = await app.model.goods.create({
+                platform: 2,
+                callback: 'http://192.168.15.148:56888/HttpPayHandle.lua',
+                rmb: 0.0,
+                coin: 0,
+                bean: 70,
+            });
+            await app.model.accounts.create({
+                userId: user.id,
+                bean: 600,
+            });
+            await app
+                .httpRequest()
+                .post('/api/v0/trades')
+                .set('Authorization', `Bearer ${user.token}`)
+                .send({
+                    type: 1,
+                    goodsId: good.id,
+                    count: 10,
+                })
+                .expect(400)
+                .then(res => {
+                    assert(res.body.code === 13);
+                });
+        });
+
+        it('## account not enough', async () => {
+            const user = await app.login();
+            const good = await app.model.goods.create({
+                platform: 2,
+                callback: 'http://192.168.15.148:56888/HttpPayHandle.lua',
+                rmb: 0.0,
+                coin: 0,
+                bean: 70,
+            });
+            await app.model.accounts.create({
+                userId: user.id,
+                bean: 600,
+            });
+            await app
+                .httpRequest()
+                .post('/api/v0/trades')
+                .set('Authorization', `Bearer ${user.token}`)
+                .send({
+                    type: 1,
+                    goodsId: good.id,
+                    count: 10,
+                })
+                .expect(400)
+                .then(res => {
+                    assert(res.body.code === 13);
+                });
+        });
+
+        it('## success', async () => {
+            const axios = require('axios');
+            mock(axios, 'get', function() {
+                return new Promise(function(resolve) {
+                    resolve({ data: ',result=0,' });
+                });
+            });
+            mock(axios, 'post', function() {
+                return new Promise(function(resolve) {
+                    resolve();
+                });
+            });
+            const user = await app.login();
+            const good = await app.model.goods.create({
+                platform: 2,
+                callback: 'http://192.168.15.148:56888/HttpPayHandle.lua',
+                rmb: 0.0,
+                coin: 0,
+                bean: 70,
+            });
+            await app.model.accounts.create({
+                userId: user.id,
+                bean: 700,
+            });
+            await app
+                .httpRequest()
+                .post('/api/v0/trades')
+                .set('Authorization', `Bearer ${user.token}`)
+                .send({
+                    type: 1,
+                    goodsId: good.id,
+                    count: 10,
+                })
+                .expect(200);
         });
     });
 });
