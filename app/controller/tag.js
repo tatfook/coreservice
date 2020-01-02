@@ -15,8 +15,10 @@ const Tag = class extends Controller {
         await ctx.validate(this.app.validator.id, { id });
 
         const sysTag = await ctx.model.systemTags
-            .findOne({ attributes: [ 'id', 'tagname' ], where: { id } })
-            .then(r => r.get());
+            .findOne({ attributes: ['id', 'tagname'], where: { id } })
+            .then(r => r && r.get());
+
+        if (!sysTag) return this.success({});
 
         const list = await ctx.model.tags
             .findAll({
