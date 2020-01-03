@@ -145,6 +145,7 @@ module.exports = app => {
     router.get('/projects/:id/star', project.isStar);
     router.post('/projects/:id/star', project.star);
     router.post('/projects/:id/unstar', project.unstar);
+    router.get('/projects/mostStar', project.mostStar);
     router.resources('/projects', project);
 
     // 项目评分

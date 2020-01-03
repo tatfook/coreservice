@@ -195,6 +195,54 @@ class Project extends Service {
         });
         return await Promise.all(promises);
     }
+    /**
+     * 大家都觉得赞，只取8个
+     * @param {Number} offset 分页
+     * @param {Number} limit 分页
+     * @return {Promise<{rows, count}>} 返回值
+     */
+    async getMostStar(offset, limit) {
+        const countSql = `
+        SELECT 
+            COUNT(*) as count
+        FROM
+            projects a
+                JOIN
+            users b ON a.userId = b.id
+                AND b.realname IS NOT NULL;`;
+        const [{ count }] = await this.app.model.query(countSql, {
+            type: this.app.model.QueryTypes.SELECT,
+        });
+        const rowsSql = `
+        (SELECT 
+            a.*
+        FROM
+            projects a
+                JOIN
+            users b ON a.userId = b.id AND lastStar > 0
+                AND b.realname IS NOT NULL
+        WHERE
+            a.updatedAt > DATE_SUB(NOW(), INTERVAL 1 WEEK)
+        ORDER BY a.lastStar DESC limit ?,?) UNION (SELECT 
+           a.*
+        FROM
+            projects a
+                JOIN
+            users b ON a.userId = b.id 
+                AND b.realname IS NOT NULL
+        WHERE
+            a.updatedAt <= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+        ORDER BY a.star DESC, a.updatedAt desc limit ?,?);`;
+        let rows = await this.app.model.query(rowsSql, {
+            replacements: [ offset, limit, offset, limit ],
+            type: this.app.model.QueryTypes.SELECT,
+        });
+        rows = rows.slice(0, 8);
+        return {
+            count,
+            rows,
+        };
+    }
 }
 
 module.exports = Project;
