@@ -196,7 +196,7 @@ class Project extends Service {
         return await Promise.all(promises);
     }
     /**
-     * 大家都觉得赞，只取8个
+     * 大家都觉得赞
      * @param {Number} offset 分页
      * @param {Number} limit 分页
      * @return {Promise<{rows, count}>} 返回值
@@ -237,7 +237,7 @@ class Project extends Service {
             replacements: [ offset, limit, offset, limit ],
             type: this.app.model.QueryTypes.SELECT,
         });
-        rows = rows.slice(0, 8);
+        rows = rows.slice(0, limit);
         return {
             count,
             rows,
