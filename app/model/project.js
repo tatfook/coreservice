@@ -268,7 +268,7 @@ module.exports = app => {
         project.lastStar = 0;
         project.lastComment = 0;
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 7; i++) {
             project.lastVisit += newStatistics[curTime - i * dayTime].visit;
             project.lastStar += newStatistics[curTime - i * dayTime].star;
             project.lastComment += newStatistics[curTime - i * dayTime].comment;

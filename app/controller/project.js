@@ -435,6 +435,16 @@ const Project = class extends Controller {
 
         return this.success(game);
     }
+    // 大家都觉得赞 #5946
+    async mostStar() {
+        const { offset, limit } = this.queryOptions;
+        const result = await this.service.project.getMostStar(offset, limit);
+        const rows = result.rows;
+
+        await this.setProjectUser(rows);
+
+        return this.success(result);
+    }
 };
 
 module.exports = Project;
