@@ -115,9 +115,20 @@ module.exports = app => {
             };
             return Client.post(`/projects/${project.id}/upsert`, body);
         },
+
+        async syncProjectsByUserId(userId) {
+            const projects = await app.model.projects.findAll({
+                where: { userId },
+            });
+            await Promise.all(
+                projects.map(project => this.upsertProject(project))
+            );
+        },
+
         async deleteProject(id) {
             return await Client.delete(`/projects/${id}`);
         },
+
         async createPage(username, sitename, filePath, content, visibility) {
             if (!isMarkdownPage(filePath) || isInIgnoreList(filePath)) return;
             content = await app.api.keepwork.parseMarkdown(content);

@@ -1101,6 +1101,33 @@ describe('test/controller/user.test.js', () => {
             });
             assert(user.cellphone === '1234567892');
         });
+
+        it('## realname successfully', async () => {
+            const _user = await app.login({
+                username: 'test',
+            });
+            const token = _user.token;
+            await app.factory.create('projects', {}, { user: _user });
+            await app.model.caches.set('1234567892', { captcha: '12345' });
+            const result = await app
+                .httpRequest()
+                .post('/api/v0/users/cellphone_captcha')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    cellphone: '1234567892',
+                    realname: '1234567892',
+                    captcha: '12345',
+                })
+                .expect(200)
+                .then(res => res.body);
+            assert(result);
+            const user = await app.model.users.findOne({
+                where: {
+                    id: 1,
+                },
+            });
+            assert(user.realname === '1234567892');
+        });
     });
 
     describe('# POST /users/reset_password', () => {
