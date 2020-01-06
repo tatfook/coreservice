@@ -8,9 +8,13 @@ class RepoService extends Service {
         const { ctx, service } = this;
         const repoPath = repo.path;
         try {
-            let project = await service.gitlab.getProject(repoPath).catch(() => {});
+            let project = await service.gitlab
+                .getProject(repoPath)
+                .catch(() => {});
             if (!project) {
-                project = await service.gitlab.getProject(repo.username + '/keepwork' + repo.repoName);
+                project = await service.gitlab.getProject(
+                    repo.username + '/keepwork' + repo.repoName
+                );
             }
             await service.repo.syncRepo(repo);
             await this.app.api.git.syncRepo(repoPath, project.http_url_to_repo);
