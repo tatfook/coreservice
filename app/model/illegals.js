@@ -62,60 +62,116 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
-    model.__hook__ = async function(data, oper) {
-        const objectId = data.objectId;
-        if (oper === 'destroy') {
-            // 解封
-            if (data.objectType === ENTITY_TYPE_USER) {
-                await app.model.query(`call p_enable_user(${objectId})`);
-                const user = await app.model.users
-                    .findOne({ where: { id: objectId } })
-                    .then(o => o && o.toJSON());
-                const projects = await app.model.projects
-                    .findAll({ where: { userId: objectId } })
-                    .then(list => _.map(list, o => o.toJSON()));
-                await app.api.usersUpsert(user);
-                for (let i = 0; i < projects.length; i++) {
-                    await app.api.projectsUpsert(projects[i]);
-                }
-            } else if (data.objectType === ENTITY_TYPE_PROJECT) {
-                await app.model.query(`call p_enable_project(${objectId})`);
-                const project = await app.model.projects
-                    .findOne({ where: { id: objectId } })
-                    .then(o => o && o.toJSON());
-                await app.api.projectsUpsert(project);
-            } else if (data.objectType === ENTITY_TYPE_SITE) {
-                await app.model.query(`call p_enable_site(${objectId})`);
+    model.afterCreate(async (inst, options) => {
+        // 封停
+        const { objectId, objectType } = inst;
+        const transaction = options.transaction;
+        if (objectType === ENTITY_TYPE_USER) {
+            const user = await app.model.users
+                .findOne({ where: { id: objectId }, transaction })
+                .then(o => o && o.toJSON());
+            const projects = await app.model.projects
+                .findAll({ where: { userId: objectId }, transaction })
+                .then(list => _.map(list, o => o.toJSON()));
+            await app.model.query(`call p_disable_user(${objectId})`, {
+                transaction,
+            });
+            await app.api.es.deleteUser(user.id);
+            for (let i = 0; i < projects.length; i++) {
+                await app.api.es.deleteProject(projects[i].id);
             }
-        } else {
-            // 封停
-            if (data.objectType === ENTITY_TYPE_USER) {
-                const user = await app.model.users
-                    .findOne({ where: { id: objectId } })
-                    .then(o => o && o.toJSON());
-                const projects = await app.model.projects
-                    .findAll({ where: { userId: objectId } })
-                    .then(list => _.map(list, o => o.toJSON()));
-                await app.model.query(`call p_disable_user(${objectId})`);
-                await app.api.usersDestroy(user);
-                for (let i = 0; i < projects.length; i++) {
-                    await app.api.projectsDestroy(projects[i]);
-                }
-            } else if (data.objectType === ENTITY_TYPE_PROJECT) {
-                const project = await app.model.projects
-                    .findOne({ where: { id: objectId } })
-                    .then(o => o && o.toJSON());
-                await app.model.query(`call p_disable_project(${objectId})`);
-                await app.api.projectsDestroy(project);
-            } else if (data.objectType === ENTITY_TYPE_SITE) {
-                await app.model.query(`call p_disable_site(${objectId})`);
-            }
+        } else if (objectType === ENTITY_TYPE_PROJECT) {
+            const project = await app.model.projects
+                .findOne({ where: { id: objectId }, transaction })
+                .then(o => o && o.toJSON());
+            await app.model.query(`call p_disable_project(${objectId})`, {
+                transaction,
+            });
+            await app.api.es.deleteProject(project.id);
+        } else if (objectType === ENTITY_TYPE_SITE) {
+            await app.model.query(`call p_disable_site(${objectId})`, {
+                transaction,
+            });
         }
-    };
+    });
+
+    model.afterDestroy(async (inst, options) => {
+        // 解封
+        const { objectId, objectType } = inst;
+        const transaction = options.transaction;
+        if (objectType === ENTITY_TYPE_USER) {
+            await app.model.query(`call p_enable_user(${objectId})`, {
+                transaction,
+            });
+            const user = await app.model.users
+                .findOne({ where: { id: objectId }, transaction })
+                .then(o => o && o.toJSON());
+            const projects = await app.model.projects
+                .findAll({ where: { userId: objectId }, transaction })
+                .then(list => _.map(list, o => o.toJSON()));
+            await app.api.es.upsertUser(user, transaction);
+            for (let i = 0; i < projects.length; i++) {
+                await app.api.es.upsertProject(projects[i], transaction);
+            }
+        } else if (objectType === ENTITY_TYPE_PROJECT) {
+            await app.model.query(`call p_enable_project(${objectId})`, {
+                transaction,
+            });
+            const project = await app.model.projects
+                .findOne({ where: { id: objectId }, transaction })
+                .then(o => o && o.toJSON());
+            await app.api.es.upsertProject(project, transaction);
+        } else if (objectType === ENTITY_TYPE_SITE) {
+            await app.model.query(`call p_enable_site(${objectId})`, {
+                transaction,
+            });
+        }
+    });
 
     app.model.illegals = model;
 
+    model.associate = () => {
+        app.model.illegals.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.projects, {
+            as: 'projects',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.sites, {
+            as: 'sites',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalUsers, {
+            as: 'illegalUsers',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalProjects, {
+            as: 'illegalProjects',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.illegals.belongsTo(app.model.illegalSites, {
+            as: 'illegalSites',
+            foreignKey: 'objectId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

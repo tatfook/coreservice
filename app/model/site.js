@@ -31,11 +31,11 @@ module.exports = app => {
         },
 
         username: {
-            type: STRING(64),
+            type: STRING(48),
         },
 
         sitename: {
-            type: STRING(256),
+            type: STRING(128),
             allowNull: false,
         },
 
@@ -71,21 +71,33 @@ module.exports = app => {
     };
     app.model.illegalSites = app.model.define('illegalSites', attrs, opts);
 
+    app.model.illegalSites.associate = () => {
+        app.model.illegalSites.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
+
     const model = app.model.define('sites', attrs, opts);
 
-    // model.sync({force:true});
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const { transaction } = options;
 
-        const { userId } = data;
-
-        const count = await app.model.sites.count({ where: { userId } });
+        const count = await app.model.sites.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { site: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+    }
+
+    model.afterCreate(__hook__);
+
+    model.afterDestroy(__hook__);
 
     model.get = async function(userId) {
         const list = await app.model.sites.findAll({ where: { userId } });
@@ -106,7 +118,7 @@ module.exports = app => {
     model.getByName = async function(username, sitename) {
         const sql = `select sites.*, users.username
 			from users, sites
-			where users.id = sites.userId 
+			where users.id = sites.userId
 			and users.username = :username and sites.sitename = :sitename`;
 
         const list = await app.model.query(sql, {
@@ -162,7 +174,7 @@ module.exports = app => {
 
         let level = 0;
 
-        let sql = `select level 
+        let sql = `select level
 			from members
 			where objectId = :objectId and objectType = :objectType and memberId = :memberId`;
         let list = await app.model.query(sql, {
@@ -176,9 +188,9 @@ module.exports = app => {
 
         _.each(list, val => (level = level < val.level ? val.level : level));
 
-        sql = `select siteGroups.level 
-			from siteGroups, members 
-			where siteGroups.groupId = members.objectId  and members.objectType = :objectType 
+        sql = `select siteGroups.level
+			from siteGroups, members
+			where siteGroups.groupId = members.objectId  and members.objectType = :objectType
 			and siteGroups.siteId = :siteId and members.memberId = :memberId`;
 
         list = await app.model.query(sql, {
@@ -204,8 +216,8 @@ module.exports = app => {
     model.getJoinSites = async function(userId, level) {
         level = level || USER_ACCESS_LEVEL_WRITE;
 
-        const sql = `select sites.*, users.username, siteGroups.level 
-			from sites, siteGroups, members, users 
+        const sql = `select sites.*, users.username, siteGroups.level
+			from sites, siteGroups, members, users
 			where sites.id = siteGroups.siteId and siteGroups.groupId = members.objectId and members.objectType = :objectType and sites.userId = users.id
 			and members.memberId = :memberId and siteGroups.level >= :level`;
 
@@ -230,9 +242,9 @@ module.exports = app => {
     };
 
     model.getSiteGroups = async function(userId, siteId) {
-        const sql = `select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname 
+        const sql = `select siteGroups.id, siteGroups.siteId, siteGroups.groupId, siteGroups.level, groups.groupname
 			from siteGroups, groups
-		   	where siteGroups.groupId = groups.id 
+		   	where siteGroups.groupId = groups.id
 			and siteGroups.userId = :userId and siteGroups.siteId = :siteId`;
 
         const list = await app.model.query(sql, {
@@ -250,6 +262,27 @@ module.exports = app => {
         return await app.model.sites.count({ where: { userId } });
     };
 
+    model.visibilityName = function(visibility) {
+        return visibility === 0 ? 'public' : 'private';
+    };
+
+    model.prototype.canReadByUser = async function(userId) {
+        return app.model.sites.isReadableByMemberId(this.id, userId);
+    };
+
+    model.prototype.canWriteByUser = async function(userId) {
+        return app.model.sites.isEditableByMemberId(this.id, userId);
+    };
+
     app.model.sites = model;
+
+    model.associate = () => {
+        app.model.sites.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
+
     return model;
 };

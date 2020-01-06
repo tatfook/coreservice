@@ -15,17 +15,11 @@ const rules = {
     string_optional: joi.string(),
     boolean: joi.boolean().required(),
     boolean_optional: joi.boolean(),
+    object: joi.object().required(),
+    object_optional: joi.object(),
 };
 
 class BaseController extends Controller {
-    // constructor() {
-    // super();
-    // }
-
-    get cache() {
-        return this.app.cache;
-    }
-
     get model() {
         return this.app.model;
     }
@@ -88,6 +82,10 @@ class BaseController extends Controller {
         return this.ctx.state.user || {};
     }
 
+    getAdmin() {
+        return this.ctx.state.admin || {};
+    }
+
     authenticated() {
         // return {userId:300, organizationId:1, roleId:64};
         const user = this.ctx.state.user;
@@ -104,11 +102,17 @@ class BaseController extends Controller {
     adminAuthenticated() {
         const config = this.config.self;
         const token = this.ctx.state.token;
-        const user = this.app.util.jwt_decode(
-            token || '',
-            config.adminSecret,
-            false
-        );
+        let user;
+        try {
+            user = this.app.util.jwt_decode(
+                token || '',
+                config.adminSecret,
+                false
+            );
+        } catch (error) {
+            return this.throw(401);
+        }
+
         if (!user) return this.throw(401);
 
         return user;
@@ -198,7 +202,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -214,7 +218,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -228,7 +232,7 @@ class BaseController extends Controller {
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount(query);
+        const result = await model.findAndCountAll(query);
 
         this.success(result);
     }

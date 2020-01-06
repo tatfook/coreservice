@@ -64,8 +64,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.orders = model;
 
     return model;

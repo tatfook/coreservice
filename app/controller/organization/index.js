@@ -72,7 +72,7 @@ const Index = class extends Controller {
         // query.organizationId = query.organizationId || organizationId;
         query.organizationId = organizationId;
 
-        const logs = await this.model.lessonOrganizationLogs.findAndCount({
+        const logs = await this.model.lessonOrganizationLogs.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });

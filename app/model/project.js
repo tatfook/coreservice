@@ -173,24 +173,44 @@ module.exports = app => {
         opts
     );
 
+    app.model.illegalProjects.associate = () => {
+        app.model.illegalProjects.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+    };
     const model = app.model.define('projects', attrs, opts);
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
-
-        const { userId } = data;
-
-        const count = await app.model.projects.count({ where: { userId } });
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const transaction = options.transaction;
+        const count = await app.model.projects.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { project: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+        const user = await app.model.users.getById(userId, transaction);
+        await app.api.es.upsertUser(user, transaction);
+    }
+
+    model.afterCreate(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.upsertProject(inst);
+    });
+
+    model.afterUpdate(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.upsertProject(inst);
+    });
+
+    model.afterDestroy(async (inst, options) => {
+        await __hook__(inst, options);
+        await app.api.es.deleteProject(inst.id);
+    });
 
     model.getById = async function(id, userId) {
         const where = { id };
@@ -256,11 +276,19 @@ module.exports = app => {
 
         data.statistics = newStatistics;
         project.extend = data;
-
-        await app.model.projects.update(project, {
-            where: { id },
-            silent: true,
-        });
+        const transaction = await app.model.transaction();
+        try {
+            await app.model.projects.update(project, {
+                where: { id },
+                silent: true,
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         return;
     };
@@ -273,23 +301,61 @@ module.exports = app => {
         await this.statistics(id, 0, 0, -1);
     };
 
-    // model.statistics = async function() {
-    // const paracraftCount = await app.model.projects.count({where:{type:PROJECT_TYPE_PARACRAFT}});
-    // const siteCount = await app.model.projects.count({where:{type:PROJECT_TYPE_SITE}});
-    // const projectCount = paracraftCount + siteCount;
-
-    // const sql = `select count(*) count from projects where privilege & :recuritValue`;
-    // const list = await app.model.query(sql, {
-    // replacements: {
-    // recuritValue: PROJECT_PRIVILEGE_RECRUIT_ENABLE,
-    // }
-    // });
-    // const recuritCount = list[0] ? list[0].count : 0;
-    // const userCount = await app.model.users.count({});
-
-    // return {paracraftCount, siteCount, recuritCount, userCount, projectCount}
-    // }
-
     app.model.projects = model;
+
+    model.associate = () => {
+        app.model.projects.hasOne(app.model.illegals, {
+            as: 'illegals',
+            foreignKey: 'objectId',
+            constraints: false,
+        });
+
+        app.model.projects.hasMany(app.model.favorites, {
+            as: 'favorites',
+            foreignKey: 'objectId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+
+        app.model.projects.hasMany(app.model.members, {
+            as: 'members',
+            foreignKey: 'objectId',
+            constraints: false,
+            scope: {
+                objectType: ENTITY_TYPE_PROJECT,
+            },
+        });
+
+        app.model.projects.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+
+        app.model.projects.belongsToMany(app.model.systemTags, {
+            through: {
+                model: app.model.systemTagProjects,
+            },
+            as: 'systemTags',
+            foreignKey: 'projectId',
+            constraints: false,
+        });
+
+        app.model.projects.belongsToMany(app.model.systemTags, {
+            through: {
+                model: app.model.systemTagProjects,
+            },
+            as: 'filterTags',
+            foreignKey: 'projectId',
+        });
+
+        app.model.projects.hasOne(app.model.gameWorks, {
+            as: 'gameWorks',
+            foreignKey: 'projectId',
+            sourceKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

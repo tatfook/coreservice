@@ -17,53 +17,6 @@ const Project = class extends Controller {
         return 'projects';
     }
 
-    // 创建3D 实现3D世界相关的文件的创建
-    // project 对象项目记录对象
-    async createWorld(project) {
-        const worldName = project.name; // 世界名
-        const projectId = project.id; // 项目ID
-        const userId = project.userId; // 用户ID
-
-        const data = await this.ctx.service.world.generateDefaultWorld(
-            worldName
-        );
-        // console.log(
-        //     data ? `创建世界成功:${worldName}` : `创建世界失败:${worldName}`
-        // );
-        if (!data) {
-            await this.model.projects.destroy({ where: { id: projectId } });
-            return false;
-        }
-        try {
-            await this.model.worlds.create({ worldName, projectId, userId });
-            // await this.model.projects.update({status:2}, {where:{id:projectId}});
-        } catch (e) {}
-
-        return true;
-    }
-
-    async destroyWorld(project) {
-        const worldName = project.name; // 世界名
-        const projectId = project.id; // 项目ID
-        const userId = project.userId; // 用户ID
-
-        await this.model.worlds.destroy({ where: { projectId, userId } });
-
-        await this.ctx.service.world.removeProject(worldName);
-
-        return true;
-    }
-
-    async status() {
-        // const {id} = this.validate({id:"int"});
-
-        // let project = await this.model.projects.findOne({where:{id}});
-        // if (!project) return this.success(0);
-        // project = project.get({plain:true});
-
-        return this.success(2);
-    }
-
     async setProjectUser(list) {
         const userIds = [];
 
@@ -79,14 +32,14 @@ const Project = class extends Controller {
             o.user = users[o.userId];
         });
     }
-
+    // TODO 该接口会将所有库中所有项目返回
     async search() {
         const model = this.model[this.modelName];
         const query = this.validate();
 
         this.formatQuery(query);
 
-        const result = await model.findAndCount({
+        const result = await model.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -205,9 +158,12 @@ const Project = class extends Controller {
     }
 
     async create() {
+        const { ctx, service } = this;
         const userId = this.authenticated().userId;
-        const params = this.validate({ type: 'int' });
-
+        const params = await this.ctx.validate(
+            this.app.validator.project.createBody,
+            this.getParams()
+        );
         params.userId = userId;
         // params.status = params.type == PROJECT_TYPE_PARACRAFT ? 1 : 2; // 1 - 创建中  2 - 创建完成
         delete params.star;
@@ -218,60 +174,80 @@ const Project = class extends Controller {
         delete params.rate;
         delete params.rateCount;
         delete params.classifyTags;
-
-        const data = await this.model.projects.create(params);
-        if (!data) return this.throw(500, '记录创建失败');
-        const project = data.get({ plain: true });
-
-        // 将创建者加到自己项目的成员列表中
-        await this.model.members.create({
-            userId,
-            memberId: userId,
-            objectType: ENTITY_TYPE_PROJECT,
-            objectId: project.id,
-        });
-
-        if (params.type === PROJECT_TYPE_PARACRAFT) {
-            const ok = await this.createWorld(project);
-            if (!ok) return this.fail(9);
-            // const ok = await this.createWorld(project);
-            // if (!ok) {
-            // await this.model.projects.destroy({where:{id:project.id}});
-            // return this.throw(500, "创建世界失败");
-            // }
+        const transaction = await ctx.model.transaction();
+        try {
+            const project = await ctx.model.projects.create(params, {
+                transaction,
+            });
+            // 将创建者加到自己项目的成员列表中
+            await this.model.members.create(
+                {
+                    userId,
+                    memberId: userId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                    objectId: project.id,
+                },
+                { transaction }
+            );
+            if (params.type === PROJECT_TYPE_PARACRAFT) {
+                // 判断有无超限制
+                const worldLimit = await service.user.getUserWorldLimit(userId);
+                if (
+                    worldLimit.world !== -1 &&
+                    worldLimit.usedWorld >= worldLimit.world
+                ) {
+                    await transaction.rollback();
+                    return this.fail(17);
+                }
+                await service.world.createWorldByProject(project, transaction);
+            }
+            await transaction.commit();
+            return this.success(project);
+        } catch (e) {
+            ctx.logger.error(e);
+            await transaction.rollback();
+            return this.fail(9);
         }
-
-        return this.success(project);
     }
 
     async destroy() {
+        const { ctx, service } = this;
         const { userId } = this.authenticated();
         const { id } = this.validate({ id: 'int' });
 
         const project = await this.model.projects.getById(id, userId);
         if (!project) return this.success('OK');
 
-        if (project.type === PROJECT_TYPE_PARACRAFT) {
-            await this.destroyWorld(project);
-            // if (!ok) return this.throw(500, "删除世界失败");
+        const transaction = await ctx.model.transaction();
+        try {
+            if (project.type === PROJECT_TYPE_PARACRAFT) {
+                await service.world.destroyWorldByProject(project, transaction);
+            }
+            // 前面已确保项目是属于自己的
+            await this.model.favorites.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.comments.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.issues.destroy({
+                where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
+                transaction,
+            });
+            await this.model.projects.destroy({
+                where: { id: project.id },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+            return this.success();
+        } catch (e) {
+            ctx.logger.error(e);
+            await transaction.rollback();
+            return this.fail(18);
         }
-
-        const data = await this.model.projects.destroy({
-            where: { id, userId },
-        });
-
-        // 前面已确保项目是属于自己的
-        await this.model.favorites.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-        await this.model.comments.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-        await this.model.issues.destroy({
-            where: { objectId: id, objectType: ENTITY_TYPE_PROJECT },
-        });
-
-        return this.success(data);
     }
 
     async update() {
@@ -289,9 +265,20 @@ const Project = class extends Controller {
         delete params.rateCount;
         delete params.classifyTags;
 
-        const data = await this.model.projects.update(params, {
-            where: { id, userId },
-        });
+        const transaction = await this.model.transaction();
+        let data;
+        try {
+            await this.model.projects.update(params, {
+                where: { id, userId },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
+
         // 更新world的worldTagName
         if (params.extra && params.extra.worldTagName) {
             const world = await this.model.worlds.findOne({
@@ -317,7 +304,7 @@ const Project = class extends Controller {
         }
         return this.success(data);
     }
-
+    // TODO 存在刷访问量的风险
     async visit() {
         const { id } = this.validate({ id: 'int' });
 
@@ -325,10 +312,7 @@ const Project = class extends Controller {
 
         if (!project) return this.throw(404);
 
-        // project.visit++;
         await this.model.projects.statistics(id, 1, 0, 0);
-
-        // await this.model.projects.update({visit:project.visit}, {where:{id}});
 
         return this.success(project);
     }
@@ -357,11 +341,20 @@ const Project = class extends Controller {
         if (index >= 0) return this.success(project);
 
         project.stars.push(userId);
-        // project.star++;
-        await this.model.projects.update(project, {
-            fields: [ 'stars' ],
-            where: { id },
-        });
+
+        const transaction = await this.model.transaction();
+        try {
+            await this.model.projects.update(project, {
+                fields: [ 'stars' ],
+                where: { id },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
 
         await this.model.projects.statistics(id, 0, 1, 0);
 
@@ -379,12 +372,19 @@ const Project = class extends Controller {
         const index = _.findIndex(project.stars, id => id === userId);
         if (index < 0) return this.success(project);
         project.stars.splice(index, 1);
-        await this.model.projects.update(project, {
-            fields: [ 'stars' ],
-            where: { id },
-        });
-
-        // project.star--;
+        const transaction = await this.model.transaction();
+        try {
+            await this.model.projects.update(project, {
+                fields: [ 'stars' ],
+                where: { id },
+                transaction,
+                individualHooks: true,
+            });
+            await transaction.commit();
+        } catch (error) {
+            await transaction.rollback();
+            throw error;
+        }
         await this.model.projects.statistics(id, 0, -1, 0);
 
         return this.success(project);
@@ -407,97 +407,12 @@ const Project = class extends Controller {
         return this.success(project);
     }
 
-    async world() {
-        // const {id} = this.validate()
-    }
-
-    async importProject() {
-        const worlds = [];
-        for (let i = 0; i < worlds.length; i++) {
-            const world = worlds[i];
-            const { userid, worldsName } = world;
-            let project = null;
-            try {
-                project = await this.model.projects.create({
-                    userId: userid,
-                    name: worldsName,
-                    type: PROJECT_TYPE_PARACRAFT,
-                    privilege: 165,
-                });
-                project = project.get({ plain: true });
-            } catch (e) {
-                this.logger.error(e);
-                continue;
-            }
-
-            try {
-                await this.model.worlds.create({
-                    // id: _id,
-                    userId: userid,
-                    worldName: worldsName,
-                    projectId: project.id,
-                    fileSize: world.filesTotals,
-                    giturl: world.giturl,
-                    commitId: world.commitId,
-                    download: world.download,
-                    revision: world.revision,
-                    archiveUrl: world.giturl
-                        ? world.giturl +
-                          '/repository/archive.zip?ref=' +
-                          world.commitId
-                        : '',
-                });
-            } catch (e) {
-                this.logger.error(e);
-            }
-        }
-        // console.log(worlds.length);
-        return this.success(worlds);
-    }
-
-    async importProjectCover() {
-        // const worlds = await this.model.worlds.findAll({limit:100000});
-        // for (let i = 0; i < worlds.length; i++) {
-        //     // const world = worlds[i].get({plain:true});
-        //     const world = worlds[i];
-        //     const { userid, worldsName, _id, commitId = 'master' } = world;
-        //     if (!world.preview) continue;
-        //     let previewUrl = world.preview;
-        //     try {
-        //         previewUrl = JSON.parse(world.preview)[0].previewUrl;
-        //     } catch (e) {
-        //         previewUrl = world.preview;
-        //     }
-        //     let project = await this.model.projects.findOne({
-        //         where: { userId: userid, name: worldsName },
-        //     });
-        //     if (!project) continue;
-        //     project = project.get({ plain: true });
-        //     const extra = project.extra;
-        //     previewUrl = previewUrl.replace(/http:/, 'https:');
-        //     const archiveUrl =
-        //         previewUrl.replace(/\/raw\/.*$/, '') +
-        //         '/repository/archive.zip?ref=' +
-        //         commitId;
-        //     await this.model.worlds.update(
-        //         { extra: { coverUrl: previewUrl }, archiveUrl },
-        //         { where: { userId: userid, worldName: worldsName } }
-        //     );
-        //     extra.imageUrl = previewUrl;
-        //     await this.model.projects.update(
-        //         { extra },
-        //         { where: { id: project.id } }
-        //     );
-        // }
-        // // console.log(worlds.length);
-        // return this.success('OK');
-    }
-
     // 获取项目参加的赛事
     async game() {
         const { id } = this.validate({ id: 'int' });
         const curdate = new Date();
         const Op = this.app.Sequelize.Op;
+        // TODO startDate 字符串类型？？
         const game = await this.model.games
             .findOne({
                 include: [

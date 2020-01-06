@@ -106,8 +106,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.goods = model;
 
     return model;

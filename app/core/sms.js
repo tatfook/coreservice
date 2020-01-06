@@ -68,9 +68,13 @@ module.exports = app => {
             .post(url, params, { headers })
             .then(res => res.data);
 
-        if (data.statusCode === '000000') return true;
+        if (data.statusCode === '000000') return 0;
 
-        return false;
+        if (data.statusCode === '160040') return 20; // 超过发送上限
+
+        if (data.statusCode === '160038') return 19; // 过于频繁
+
+        return -1;
     };
 
     app.sendSms = sendSms;

@@ -24,33 +24,24 @@ const World = class extends Controller {
         // 更新对应项目更新时间
         const projectId = world.projectId;
         if (projectId) {
-            await this.model.projects.update(
-                { id: projectId },
-                { where: { id: projectId } }
-            );
+            const transaction = await this.model.transaction();
+            try {
+                await this.model.projects.update(
+                    { id: projectId },
+                    {
+                        where: { id: projectId },
+                        transaction,
+                        individualHooks: true,
+                    }
+                );
+                await transaction.commit();
+            } catch (error) {
+                await transaction.rollback();
+                throw error;
+            }
         }
 
         return this.success('OK');
-    }
-
-    async test() {
-        const params = this.validate({
-            worldName: 'string',
-        });
-
-        const ok = await this.ctx.service.world.generateDefaultWorld(
-            params.worldName
-        );
-        return this.success(ok);
-    }
-
-    async testDelete() {
-        const params = this.validate({
-            worldName: 'string',
-        });
-
-        const ok = await this.ctx.service.world.removeProject(params.worldName);
-        return this.success(ok);
     }
 };
 

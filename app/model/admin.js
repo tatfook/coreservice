@@ -71,8 +71,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.admins = model;
     return model;
 };

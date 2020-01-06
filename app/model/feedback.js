@@ -65,8 +65,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true});
-
     app.model.feedbacks = model;
     return model;
 };

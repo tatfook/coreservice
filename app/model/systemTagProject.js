@@ -48,10 +48,6 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.systemTagProjects = model;
     return model;
 };

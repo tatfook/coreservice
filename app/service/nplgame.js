@@ -5,7 +5,7 @@ const Service = require('../core/service.js');
 
 class NplGame extends Service {
     async getGames(query = {}) {
-        return await this.app.model.games.findAndCount({ where: query });
+        return await this.app.model.games.findAndCountAll({ where: query });
     }
 
     async getGameWorks(query) {

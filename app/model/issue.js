@@ -6,7 +6,7 @@ const { ENTITY_TYPE_PROJECT, USER_ATTRS } = require('../core/consts.js');
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, TEXT, JSON } = app.Sequelize;
-
+    // objectType未来表大时要考虑拆表 TODO
     const model = app.model.define(
         'issues',
         {
@@ -91,16 +91,12 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
-    model.__hook__ = async function(data, oper) {
-        if (oper === 'create' && data.objectType === ENTITY_TYPE_PROJECT) {
+    model.afterCreate(async inst => {
+        if (inst.objectType === ENTITY_TYPE_PROJECT) {
             // ISSUE创建  活跃度加1
-            await app.model.contributions.addContributions(data.userId);
+            await app.model.contributions.addContributions(inst.userId);
         }
-    };
+    });
 
     model.getById = async function(id, userId) {
         const where = { id };
@@ -127,7 +123,7 @@ module.exports = app => {
     };
 
     model.getObjectIssues = async function(query, options = {}) {
-        const result = await app.model.issues.findAndCount({
+        const result = await app.model.issues.findAndCountAll({
             ...options,
             where: query,
         });
@@ -196,5 +192,14 @@ module.exports = app => {
     };
 
     app.model.issues = model;
+
+    model.associate = () => {
+        app.model.issues.belongsTo(app.model.users, {
+            as: 'users',
+            foreignKey: 'userId',
+            targetKey: 'id',
+            constraints: false,
+        });
+    };
     return model;
 };

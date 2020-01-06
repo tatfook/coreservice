@@ -6,7 +6,6 @@ const Controller = require('../core/controller.js');
 const {
     ENTITY_TYPE_USER,
     ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
     ENTITY_TYPE_GROUP,
     ENTITY_TYPE_PROJECT,
     USER_ATTRS,
@@ -15,7 +14,6 @@ const {
 const ENTITYS = [
     ENTITY_TYPE_USER,
     ENTITY_TYPE_SITE,
-    ENTITY_TYPE_PAGE,
     ENTITY_TYPE_GROUP,
     ENTITY_TYPE_PROJECT,
 ];
@@ -30,7 +28,7 @@ const Favorite = class extends Controller {
 
         this.formatQuery(query);
 
-        const result = await this.model.favorites.findAndCount({
+        const result = await this.model.favorites.findAndCountAll({
             ...this.queryOptions,
             where: query,
         });
@@ -53,8 +51,6 @@ const Favorite = class extends Controller {
             list = await model.favorites.getFollowing(userId);
         } else if (objectType === ENTITY_TYPE_SITE) {
             list = await model.favorites.getFavoriteSites(userId);
-        } else if (objectType === ENTITY_TYPE_PAGE) {
-            list = await model.favorites.getFavoritePages(userId);
         } else {
             const models = {
                 [ENTITY_TYPE_PROJECT]: {

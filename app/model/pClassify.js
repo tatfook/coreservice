@@ -1,7 +1,7 @@
 'use strict';
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
-
+    // paracraft客户端，用户封装的代码块分类
     const model = app.model.define(
         'pClassifies',
         {
@@ -33,12 +33,15 @@ module.exports = app => {
         }
     );
 
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
     app.model.pClassifies = model;
+
     model.associate = () => {
+        app.model.pClassifies.hasMany(app.model.pBlockClassifies, {
+            as: 'pBlockClassifies',
+            foreignKey: 'classifyId',
+            sourceKey: 'id',
+            constraints: false,
+        });
         app.model.pClassifies.hasOne(app.model.pClassifyAccesses, {
             as: 'pClassifyAccesses',
             foreignKey: 'pClassifyId',

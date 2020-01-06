@@ -1,5 +1,8 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
+const { ENTITY_VISIBILITY_PUBLIC } = require('../core/consts.js');
+const _ = require('lodash');
+
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
 
@@ -88,30 +91,28 @@ module.exports = app => {
             ],
         }
     );
-
-    // model.sync({force:true}).then(() => {
-    // console.log("create table successfully");
-    // });
-
-    model.__hook__ = async function(data) {
-        // if (oper == "update") return;
-
-        const { userId } = data;
-
-        const count = await app.model.worlds.count({ where: { userId } });
+    async function __hook__(inst, options) {
+        const { userId } = inst;
+        const transaction = options.transaction;
+        const count = await app.model.worlds.count({
+            where: { userId },
+            transaction,
+        });
         await app.model.userRanks.update(
             { world: count },
-            { where: { userId } }
+            { where: { userId }, transaction }
         );
-        // await app.model.userRanks.increment({project:1})
-    };
+    }
+    model.afterCreate(__hook__);
+
+    model.afterDestroy(__hook__);
 
     model.getById = async function(id, userId) {
         const where = { id };
 
         if (userId) where.userId = userId;
 
-        const data = await app.model.sites.findOne({ where });
+        const data = await app.model.worlds.findOne({ where });
 
         return data && data.get({ plain: true });
     };
@@ -120,6 +121,41 @@ module.exports = app => {
         const world = await app.model.worlds.findOne({ where: { projectId } });
 
         return world && world.get({ plain: true });
+    };
+
+    model.prototype.canReadByUser = async function(userId) {
+        if (this.userId === userId) return true;
+        const project = await app.model.Project.findOne({
+            where: { id: this.projectId },
+            include: [ 'members' ],
+        });
+        if (project && project.visibility !== ENTITY_VISIBILITY_PUBLIC) {
+            let canRead = false;
+            _.forEach(project.members, member => {
+                if (member.memberId === userId) {
+                    canRead = true; // TODO: member 具有自己的权限判断，待补充
+                    return false;
+                }
+            });
+            return canRead;
+        }
+        return !!userId;
+    };
+
+    model.prototype.canWriteByUser = async function(userId) {
+        if (this.userId === userId) return true;
+        const project = await app.model.Project.findOne({
+            where: { id: this.projectId },
+            include: [ 'members' ],
+        });
+        let canWrite = false;
+        _.forEach(project.members, member => {
+            if (member.memberId === userId) {
+                canWrite = true; // TODO: member 具有自己的权限判断，待补充
+                return false;
+            }
+        });
+        return canWrite;
     };
 
     app.model.worlds = model;
