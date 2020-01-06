@@ -208,7 +208,8 @@ module.exports = app => {
 
     const order = controller.order;
     router.post('/orders/charge', order.charge);
-    router.resources('/orders', order);
+    router.post('/orders', order.create);
+    router.get('/orders/:id', order.show);
 
     const trade = controller.trade;
     router.post('/trades/search', trade._search);
