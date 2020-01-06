@@ -8,7 +8,12 @@ let Client;
 class GitlabService extends Service {
     get client() {
         if (!Client) {
-            Client = Axios.create({ baseURL: this.app.config.self.gitlabURL });
+            Client = Axios.create({
+                baseURL: this.app.config.self.gitlabURL,
+                headers: {
+                    'private-token': this.app.config.self.gitlab.admin_token,
+                },
+            });
         }
         return Client;
     }
