@@ -70,9 +70,9 @@ const Migration = class extends Controller {
         const { ctx, service } = this;
         const pace = 10;
         let step = 0;
-        const total = await ctx.model.Repo.findAll({
+        const total = await ctx.model.Repo.count({
             where: { synced: 0 },
-        }).count();
+        });
         ctx.logger.info('Begin to sync repos, total amount is ', total);
         while (step < total) {
             const repos = await ctx.model.Repo.findAll({
