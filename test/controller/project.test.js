@@ -561,7 +561,7 @@ describe('/test/controller/project.test.js', () => {
     });
 
     describe('# GET /projects/mostStar', () => {
-        it.only('## success', async () => {
+        it('## success', async () => {
             const user = await app.factory.create('users', {
                 realname: '124578945',
             });
