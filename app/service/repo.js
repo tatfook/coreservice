@@ -8,9 +8,16 @@ class RepoService extends Service {
         const { ctx, service } = this;
         const repoPath = repo.path;
         try {
-            const porject = await service.gitlab.getProject(repoPath);
+            let project = await service.gitlab
+                .getProject(repoPath)
+                .catch(() => {});
+            if (!project) {
+                project = await service.gitlab.getProject(
+                    repo.username + '/keepwork' + repo.repoName
+                );
+            }
             await service.repo.syncRepo(repo);
-            await this.app.api.git.syncRepo(repoPath, porject.http_url_to_repo);
+            await this.app.api.git.syncRepo(repoPath, project.http_url_to_repo);
             return true;
         } catch (e) {
             ctx.logger.error(repoPath, ' not exist. err: ', e);
