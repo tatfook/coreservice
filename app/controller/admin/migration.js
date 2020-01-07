@@ -35,7 +35,7 @@ const Migration = class extends Controller {
                                 conf.baseUrl,
                                 'repos',
                                 encodeURIComponent(repo.path),
-                                'download'
+                                'archive.zip'
                             );
                             if (world.commitId !== 'master') {
                                 archiveUrl += `?ref=${world.commitId}`;

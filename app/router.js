@@ -232,6 +232,7 @@ module.exports = app => {
     const repo = controller.repo;
     router.get('/repos/:repoPath/tree', repo.getTree);
     router.get('/repos/:repoPath/download', repo.download);
+    router.get('/repos/:repoPath/archive.zip', repo.download);
     router.get('/repos/:repoPath/commitInfo', repo.getCommitInfo);
     router.get('/repos/:repoPath/files/:filePath/info', repo.getFileInfo);
     router.get('/repos/:repoPath/files/:filePath/raw', repo.getFileRaw);
