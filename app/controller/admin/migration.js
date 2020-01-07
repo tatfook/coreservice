@@ -1,7 +1,8 @@
 'use strict';
 
 const Controller = require('../../core/controller.js');
-const URL = require('url');
+const _url = require('url');
+const _path = require('path');
 
 const Migration = class extends Controller {
     async fixWorldArchiveUrl() {
@@ -30,19 +31,25 @@ const Migration = class extends Controller {
                                 transaction,
                             });
                             if (!repo) return;
-                            let archiveUrl = URL.resolve(
+                            let archiveUrl = _url.resolve(
                                 conf.origin,
-                                conf.baseUrl,
-                                'repos',
-                                encodeURIComponent(repo.path),
-                                'archive.zip'
+                                _path.join(
+                                    conf.baseUrl,
+                                    'repos',
+                                    encodeURIComponent(repo.path),
+                                    'archive.zip'
+                                )
                             );
                             if (world.commitId !== 'master') {
                                 archiveUrl += `?ref=${world.commitId}`;
                             }
                             await ctx.model.worlds.update(
                                 { archiveUrl },
-                                { where: { id: world.id }, transaction }
+                                {
+                                    where: { id: world.id },
+                                    silent: true,
+                                    transaction,
+                                }
                             );
                         };
                         return fixArchive();
