@@ -139,7 +139,7 @@ module.exports = app => {
             });
             return canRead;
         }
-        return !!userId;
+        return true; // 公开项目允许陌生人访问
     };
 
     model.prototype.canWriteByUser = async function(userId) {
