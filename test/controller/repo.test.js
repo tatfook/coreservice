@@ -1426,12 +1426,14 @@ describe('test/controller/repo.test.js', () => {
                     assert(result.body);
                     assert(result.body[0]);
                 });
-                it('should not return file list for visitor', async () => {
+                it('should return file list for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    await app
+                    const result = await app
                         .httpRequest()
                         .get(`/api/v0/repos/${encodedPath}/tree`)
-                        .expect(403);
+                        .expect(200);
+                    assert(result.body);
+                    assert(result.body[0]);
                 });
                 it('should not return file list for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
@@ -1463,12 +1465,13 @@ describe('test/controller/repo.test.js', () => {
                         .expect(200);
                     assert(result.body);
                 });
-                it('should not return zip data for visitor', async () => {
+                it('should return zip data for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    await app
+                    const result = await app
                         .httpRequest()
                         .get(`/api/v0/repos/${encodedPath}/download`)
-                        .expect(403);
+                        .expect(200);
+                    assert(result.body);
                 });
                 it('should not return zip data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
@@ -1500,12 +1503,13 @@ describe('test/controller/repo.test.js', () => {
                         .expect(200);
                     assert(result.body);
                 });
-                it('should not return commit info for visitor', async () => {
+                it('should return commit info for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    await app
+                    const result = await app
                         .httpRequest()
                         .get(`/api/v0/repos/${encodedPath}/commitInfo`)
-                        .expect(403);
+                        .expect(200);
+                    assert(result.body);
                 });
                 it('should return commit info with commitId', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
@@ -1572,15 +1576,17 @@ describe('test/controller/repo.test.js', () => {
                     assert(result.body);
                     assert(result.body.id);
                 });
-                it('should not return file info for visitor', async () => {
+                it('should return file info for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
                     const encodedFilePath = encodeURIComponent('test/abc.md');
-                    await app
+                    const result = await app
                         .httpRequest()
                         .get(
                             `/api/v0/repos/${encodedPath}/files/${encodedFilePath}/info`
                         )
-                        .expect(403);
+                        .expect(200);
+                    assert(result.body);
+                    assert(result.body.id);
                 });
                 it('should not return file info for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
@@ -1621,15 +1627,16 @@ describe('test/controller/repo.test.js', () => {
                         .expect(200);
                     assert(result.body);
                 });
-                it('should not return file raw data for visitor', async () => {
+                it('should return file raw data for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
                     const encodedFilePath = encodeURIComponent('test/abc.md');
-                    await app
+                    const result = await app
                         .httpRequest()
                         .get(
                             `/api/v0/repos/${encodedPath}/files/${encodedFilePath}/raw`
                         )
-                        .expect(403);
+                        .expect(200);
+                    assert(result.body);
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
