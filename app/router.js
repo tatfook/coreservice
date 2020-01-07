@@ -292,6 +292,10 @@ module.exports = app => {
     // migration
     const migration = controller.admin.migration;
     router.post(
+        '/admin/migration/fixWorldArchiveUrl',
+        migration.fixWorldArchiveUrl
+    );
+    router.post(
         '/admin/migration/generateSiteRepo',
         migration.generateSiteRepo
     );
