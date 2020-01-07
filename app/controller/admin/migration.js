@@ -3,6 +3,55 @@
 const Controller = require('../../core/controller.js');
 
 const Migration = class extends Controller {
+    async fixWorldArchiveUrl() {
+        this.adminAuthenticated();
+
+        const { ctx, app } = this;
+        const conf = app.config.self;
+        const pace = 1000;
+        let step = 0;
+        const total = await ctx.model.World.count();
+        while (step < total) {
+            const worlds = await ctx.model.World.findAll({
+                offset: step,
+                limit: pace,
+            });
+            const transaction = await ctx.model.transaction();
+            try {
+                await Promise.all(
+                    worlds.map(world => {
+                        const fixArchive = async () => {
+                            const repo = await ctx.model.repos.findOne({
+                                where: {
+                                    resourceType: 'World',
+                                    resourceId: world.id,
+                                },
+                                transaction,
+                            });
+                            if (!repo) return;
+                            let archiveUrl = `${conf.origin}/${
+                                conf.baseUrl
+                            }/repos/${encodeURIComponent(repo.path)}/download`;
+                            if (world.commitId !== 'master') {
+                                archiveUrl += `?ref=${world.commitId}`;
+                            }
+                            await ctx.model.worlds.update(
+                                { archiveUrl },
+                                { where: { id: world.id }, transaction }
+                            );
+                        };
+                        return fixArchive();
+                    })
+                );
+                await transaction.commit();
+            } catch (e) {
+                ctx.logger.error(e);
+                await transaction.rollback();
+            }
+            step = step + pace;
+        }
+        ctx.body = 'success' + total;
+    }
     async generateSiteRepo() {
         this.adminAuthenticated();
 
