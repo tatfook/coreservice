@@ -1,7 +1,7 @@
 'use strict';
 
 const Controller = require('../../core/controller.js');
-const _path = require('path');
+const URL = require('url');
 
 const Migration = class extends Controller {
     async fixWorldArchiveUrl() {
@@ -30,7 +30,7 @@ const Migration = class extends Controller {
                                 transaction,
                             });
                             if (!repo) return;
-                            let archiveUrl = _path.join(
+                            let archiveUrl = URL.resolve(
                                 conf.origin,
                                 conf.baseUrl,
                                 'repos',
