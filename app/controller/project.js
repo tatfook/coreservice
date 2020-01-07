@@ -402,6 +402,10 @@ const Project = class extends Controller {
         );
         if (project.type === PROJECT_TYPE_PARACRAFT) {
             project.world = await this.model.worlds.getByProjectId(project.id);
+            const user = await this.model.users.findOne({
+                where: { id: project.userId },
+            });
+            if (user) project.username = user.username;
         }
 
         return this.success(project);
