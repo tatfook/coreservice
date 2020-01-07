@@ -1,7 +1,6 @@
 'use strict';
 
 const Controller = require('../../core/controller.js');
-const _url = require('url');
 const _path = require('path');
 
 const Migration = class extends Controller {
@@ -31,15 +30,14 @@ const Migration = class extends Controller {
                                 transaction,
                             });
                             if (!repo) return;
-                            let archiveUrl = _url.resolve(
-                                conf.origin,
+                            let archiveUrl =
+                                conf.origin +
                                 _path.join(
                                     conf.baseUrl,
                                     'repos',
                                     encodeURIComponent(repo.path),
                                     'archive.zip'
-                                )
-                            );
+                                );
                             if (world.commitId !== 'master') {
                                 archiveUrl += `?ref=${world.commitId}`;
                             }
