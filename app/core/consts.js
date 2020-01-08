@@ -148,5 +148,5 @@ module.exports = {
 
     LESSON_API_KEY: '9435c6503642d25c3f3bd66a4af7b56c',
 
-    USER_LIMIT_WORLD: 3, // 用户默认可以创建的世界数
+    USER_LIMIT_WORLD: 100, // 用户默认可以创建的世界数
 };
