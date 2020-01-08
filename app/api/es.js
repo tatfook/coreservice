@@ -150,6 +150,21 @@ module.exports = app => {
             const pageId = encodeURIComponent(getPageUrl(filePath));
             return Client.delete(`/pages/${pageId}`);
         },
+
+        async deleteFolder(repoName, username, folderPath) {
+            return Client.delete(
+                `/sites/${username}/${repoName}/folder/${encodeURIComponent(
+                    folderPath
+                )}`
+            );
+        },
+
+        async moveFolder(repoName, username, folderPath, newFolderPath) {
+            return Client.post(`/sites/${username}/${repoName}/rename_folder`, {
+                folder: folderPath,
+                new_folder: newFolderPath,
+            });
+        },
     };
 
     return esAPI;

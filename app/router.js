@@ -146,6 +146,7 @@ module.exports = app => {
     router.get('/projects/:id/star', project.isStar);
     router.post('/projects/:id/star', project.star);
     router.post('/projects/:id/unstar', project.unstar);
+    router.get('/projects/mostStar', project.mostStar);
     router.resources('/projects', project);
 
     // 项目评分
@@ -208,7 +209,8 @@ module.exports = app => {
 
     const order = controller.order;
     router.post('/orders/charge', order.charge);
-    router.resources('/orders', order);
+    router.post('/orders', order.create);
+    router.get('/orders/:id', order.show);
 
     const trade = controller.trade;
     router.post('/trades/search', trade._search);
@@ -239,12 +241,11 @@ module.exports = app => {
     router.delete('/repos/:repoPath/files/:filePath', repo.deleteFile);
     router.post('/repos/:repoPath/files/:filePath/rename', repo.renameFile);
     router.post('/repos/:repoPath/folders/:folderPath', repo.createFolder);
-    // TODO： 由于ES数据同步存在待解决的问题，文件夹的删除和改名操作暂不开放
-    // router.delete('/repos/:repoPath/folders/:folderPath', repo.deleteFolder);
-    // router.post(
-    //     '/repos/:repoPath/folders/:folderPath/rename',
-    //     repo.renameFolder
-    // );
+    router.delete('/repos/:repoPath/folders/:folderPath', repo.deleteFolder);
+    router.post(
+        '/repos/:repoPath/folders/:folderPath/rename',
+        repo.renameFolder
+    );
 
     const sensitiveWord = controller.sensitiveWord;
     router.get('/sensitiveWords/trim', sensitiveWord.trim);

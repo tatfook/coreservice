@@ -28,28 +28,17 @@ const Order = class extends Controller {
     get modelName() {
         return 'orders';
     }
-
-    async index() {
-        return this.success('OK');
-    }
-    async destroy() {
-        return this.success('OK');
-    }
-    async update() {
-        return this.success('OK');
-    }
-
     async create() {
         const { userId } = this.authenticated();
-        const params = this.validate({
-            amount: 'int',
-            channel: 'string', // wx_pub_qr   alipay_qr
-        });
+
+        const params = await this.ctx.validate(
+            this.app.validator.order.create,
+            this.getParams()
+        );
 
         let order = await this.model.orders
             .create({ userId })
             .then(o => o && o.toJSON());
-        if (!order) return this.throw(500, '创建订单记录失败');
 
         const channel = params.channel;
         const config = this.app.config.self;
@@ -71,13 +60,10 @@ const Order = class extends Controller {
             chargeData.extra = {
                 product_id: 'goodsId' + (params.goodsId || 0),
             };
-        } else if (channel === 'alipay_qr') {
-        } else {
-            return this.throw(400, '参数错误');
         }
 
         const charge = await this.ctx.service.pay
-            .chrage(chargeData)
+            .charge(chargeData)
             .catch(e => this.logger.error(e));
         if (!charge) return this.throw(500, '提交pingpp充值请求失败');
         const payQRUrl = charge.credential[params.channel];
@@ -111,7 +97,7 @@ const Order = class extends Controller {
 
     // pingpp充值回调接口  只处理充值逻辑
     async charge() {
-        const params = this.validate();
+        const params = this.getParams();
         const signature = this.ctx.headers['x-pingplusplus-signature'];
         const body = JSON.stringify(params);
 
@@ -150,9 +136,6 @@ const Order = class extends Controller {
         if (params.type === 'charge.succeeded') {
             state = ORDER_STATE_CHARGE_SUCCESS;
             description = '充值成功';
-            // } else if (params.type == "refund.succeeded") {
-            // state = ORDER_STATE_REFUND_SUCCESS;
-            // description = "退款成功";
         } else {
             await this.model.logs.create({ text: '参数错误' });
             await this.model.orders.update(
