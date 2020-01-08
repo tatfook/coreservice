@@ -11,11 +11,8 @@ module.exports = {
     },
 
     down: async (queryInterface, Sequelize) => {
-        await queryInterface.sequelize.query(
-            `update userLimits set world=3;`,
-            {
-                type: Sequelize.QueryTypes.UPDATE,
-            }
-        );
+        await queryInterface.sequelize.query(`update userLimits set world=3;`, {
+            type: Sequelize.QueryTypes.UPDATE,
+        });
     },
 };
