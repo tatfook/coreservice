@@ -37,4 +37,5 @@ new Err(17, '创建世界超过限制');
 new Err(18, '删除world失败');
 new Err(19, '短信验证码发送过频繁');
 new Err(20, '短信验证码超过当日限制(5次)');
+new Err(21, '该账号已绑定');
 module.exports = Err;
