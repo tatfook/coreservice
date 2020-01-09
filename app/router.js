@@ -72,6 +72,7 @@ module.exports = app => {
     router.get('/lessons/accountsAndRoles', lesson.accountsAndRoles);
     router.put('/lessons/accountsIncrement', lesson.accountsIncrement);
     router.get('/lessons/accounts', lesson.getAccounts);
+    router.get('/lessons/userProjectCount', lesson.getUserProjectCount);
     router.post('/lessons/createRecord', lesson.createRecord);
     router.post('/lessons/truncate', lesson.truncate);
     router.get('/lessons/projects', lesson.getAllPrjects);

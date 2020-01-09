@@ -6,6 +6,10 @@ const lessonApiKey = 'cda5ab42f101e9f739156e532f54db0d'; // lesson_api的md5值
 // api for lesson
 const Lesson = class extends Controller {
     // -----------api for lesson-api project--------------------
+    get validateRules() {
+        return this.app.validator.lesson;
+    }
+
     async getUserDatas() {
         const { id, apiKey } = this.validate({ id: 'int' });
         if (apiKey !== lessonApiKey) return this.fail(-1);
@@ -127,6 +131,23 @@ const Lesson = class extends Controller {
         }
         const result = await this.service.lesson.updateUserById(id, params);
         return this.success(result);
+    }
+
+    // 获取用户的项目数
+    async getUserProjectCount() {
+        const { userIds, apiKey } = this.getParams();
+
+        await this.ctx.validate(this.validateRules.userProjectCount, {
+            userIds,
+            apiKey,
+        });
+
+        if (apiKey !== lessonApiKey) return this.fail(-1);
+
+        const ret = await this.ctx.model.userRanks.findAll({
+            where: { userId: { $in: userIds } },
+        });
+        return this.success(ret);
     }
     // -----------api for lesson-api project--------------------
 };
