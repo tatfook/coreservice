@@ -231,11 +231,12 @@ module.exports = app => {
     // repo api
     const repo = controller.repo;
     router.get('/repos/:repoPath/tree', repo.getTree);
-    router.get('/repos/:repoPath/download', repo.download);
+    router.get('/repos/:repoPath/download', repo.download); // deprecated
     router.get('/repos/:repoPath/archive.zip', repo.download);
     router.get('/repos/:repoPath/commitInfo', repo.getCommitInfo);
     router.get('/repos/:repoPath/files/:filePath/info', repo.getFileInfo);
-    router.get('/repos/:repoPath/files/:filePath/raw', repo.getFileRaw);
+    router.get('/repos/:repoPath/files/:filePath/raw', repo.getFileRaw); // deprecated
+    router.get('/repos/:repoPath/files/:filePath', repo.getFileRaw);
     router.get('/repos/:repoPath/files/:filePath/history', repo.getFileHistory);
     router.post('/repos/:repoPath/files/:filePath', repo.createFile);
     router.put('/repos/:repoPath/files/:filePath', repo.updateFile);
