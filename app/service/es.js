@@ -15,6 +15,15 @@ class ESService extends Service {
         return false;
     }
 
+    getLiteContentByContent(content = '') {
+        // eslint-disable-next-line no-magic-numbers
+        if (content.length > 150) {
+            // eslint-disable-next-line no-magic-numbers
+            return content.slice(0, 150) + '...';
+        }
+        return content;
+    }
+
     async syncSitePages(site) {
         const { ctx, service, app } = this;
 
@@ -48,12 +57,13 @@ class ESService extends Service {
                 bulkBody.push({ create: { _id: id } });
                 bulkBody.push({
                     id,
-                    url: file.path,
+                    url: _.replace(file.path, '.md', ''),
                     site: site.sitename,
                     username: site.username,
                     title: _.replace(file.name, '.md', ''),
                     visibility: 'public',
                     content,
+                    lite_content: this.getLiteContentByContent(content),
                     created_at: info.date,
                     updated_at: info.date,
                 });
