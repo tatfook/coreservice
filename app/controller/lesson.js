@@ -128,6 +128,17 @@ const Lesson = class extends Controller {
         const result = await this.service.lesson.updateUserById(id, params);
         return this.success(result);
     }
+
+    // 获取用户的项目数
+    async getUserProjectCount() {
+        const { userIds, apiKey } = this.validate();
+        if (apiKey !== lessonApiKey) return this.fail(-1);
+
+        const ret = await this.ctx.model.userRanks.findAll({
+            where: { userId: { $in: userIds } },
+        });
+        return this.success(ret);
+    }
     // -----------api for lesson-api project--------------------
 };
 
