@@ -155,7 +155,7 @@ module.exports = app => {
         async getFileRaw(repoPath, filePath, commitId) {
             const mimeType = mime.getType(filePath);
             let responseType = 'json';
-            if (mimeType && mimeType.indexOf('text/') !== 0) {
+            if (mimeType && !mimeType.match('text') && !mimeType.match('xml')) {
                 responseType = 'stream';
             }
             const result = await Client.get('/files/raw', {

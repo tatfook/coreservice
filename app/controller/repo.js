@@ -58,7 +58,7 @@ const Repo = class extends Controller {
         const mimeType = mime.getType(filename);
         if (mimeType) {
             this.ctx.set('Content-Type', mimeType);
-            if (mimeType.indexOf('text/') !== 0) {
+            if (!mimeType.match('text') && !mimeType.match('xml')) {
                 if (mimeType.indexOf('image/') === 0) {
                     this.ctx.set(
                         'Content-Disposition',
