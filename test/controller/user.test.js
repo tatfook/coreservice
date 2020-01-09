@@ -193,7 +193,7 @@ describe('test/controller/user.test.js', () => {
             const { token } = await app.login();
             await app.model.contributions.create({
                 userId: 1,
-                year: 2019,
+                year: new Date().getFullYear(),
                 data: {},
             });
             await app
