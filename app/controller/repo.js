@@ -46,6 +46,17 @@ const Repo = class extends Controller {
         return this.success(result);
     }
 
+    async getFileData() {
+        const repo = await this.getRepoAndEnsureReadable();
+        const { filePath, commitId } = this.getParams();
+        const result = await this.service.repo.getFileData(
+            repo.path,
+            filePath,
+            commitId
+        );
+        return this.success(result);
+    }
+
     async getFileRaw() {
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = this.getParams();
@@ -58,18 +69,18 @@ const Repo = class extends Controller {
         const mimeType = mime.getType(filename);
         if (mimeType) {
             this.ctx.set('Content-Type', mimeType);
-            if (!mimeType.match('text') && !mimeType.match('xml')) {
-                if (mimeType.indexOf('image/') === 0) {
-                    this.ctx.set(
-                        'Content-Disposition',
-                        `inline; filename=${filename}`
-                    );
-                } else {
-                    this.ctx.set(
-                        'Content-Disposition',
-                        `attachment; filename=${filename}`
-                    );
-                }
+            this.ctx.set('Content-Description', 'File Transfer');
+            this.ctx.set('Content-Transfer-Encoding', 'binary');
+            if (mimeType.match('image') || mimeType.match('text')) {
+                this.ctx.set(
+                    'Content-Disposition',
+                    `inline; filename=${filename}`
+                );
+            } else {
+                this.ctx.set(
+                    'Content-Disposition',
+                    `attachment; filename=${filename}`
+                );
             }
         }
         return this.success(result);

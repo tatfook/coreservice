@@ -236,6 +236,10 @@ class RepoService extends Service {
         return this.app.api.git.getFileInfo(repoPath, filePath, commitId);
     }
 
+    async getFileData(repoPath, filePath, commitId) {
+        return this.app.api.git.getFileData(repoPath, filePath, commitId);
+    }
+
     async getFileRaw(repoPath, filePath, commitId) {
         return this.app.api.git.getFileRaw(repoPath, filePath, commitId);
     }
@@ -258,7 +262,7 @@ class RepoService extends Service {
             const site = await app.model.Site.findOne({
                 where: { id: repo.resourceId },
             });
-            const content = await service.repo.getFileRaw(
+            const content = await service.repo.getFileData(
                 repo.path,
                 newFilePath
             );
