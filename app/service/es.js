@@ -43,7 +43,7 @@ class ESService extends Service {
                 !this.isInIgnoreList(file.path)
             ) {
                 const id = uuid();
-                let content = await service.repo.getFileRaw(
+                let content = await service.repo.getFileData(
                     repo.path,
                     file.path
                 );

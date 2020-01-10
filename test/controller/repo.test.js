@@ -217,10 +217,60 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
+            describe('#getFileData', () => {
+                it('should return file data for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return file data for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return file data for visitor', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return file data for invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
             describe('#getFileRaw', () => {
                 it('should return file raw data for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -234,7 +284,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -246,7 +296,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -257,7 +307,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     await app
                         .httpRequest()
                         .get(
@@ -912,10 +962,58 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
+            describe('#getFileData', () => {
+                it('should return file data for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return file data for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(403);
+                });
+                it('should not return file data for visitor', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .expect(403);
+                });
+                it('should not return file data for invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
             describe('#getFileRaw', () => {
                 it('should return file raw data for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -929,7 +1027,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     await app
                         .httpRequest()
                         .get(
@@ -940,7 +1038,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     await app
                         .httpRequest()
                         .get(
@@ -950,7 +1048,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     await app
                         .httpRequest()
                         .get(
@@ -1600,10 +1698,60 @@ describe('test/controller/repo.test.js', () => {
                         .expect(404);
                 });
             });
+            describe('#getFileData', () => {
+                it('should return file data for owner', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return file data for stranger', async () => {
+                    const tmpUser = await app.login({ username: 'tmp' });
+                    token = tmpUser.token;
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should return file data for visitor', async () => {
+                    const encodedPath = encodeURIComponent(repo.path);
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const result = await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .expect(200);
+                    assert(result.body);
+                });
+                it('should not return file data for invalid repo path', async () => {
+                    const encodedPath = encodeURIComponent(repo.path + 'abc');
+                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    await app
+                        .httpRequest()
+                        .get(
+                            `/api/v0/repos/${encodedPath}/files/${encodedFilePath}`
+                        )
+                        .set('Authorization', `Bearer ${token}`)
+                        .expect(404);
+                });
+            });
             describe('#getFileRaw', () => {
                 it('should return file raw data for owner', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -1617,7 +1765,7 @@ describe('test/controller/repo.test.js', () => {
                     const tmpUser = await app.login({ username: 'tmp' });
                     token = tmpUser.token;
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -1629,7 +1777,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should return file raw data for visitor', async () => {
                     const encodedPath = encodeURIComponent(repo.path);
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     const result = await app
                         .httpRequest()
                         .get(
@@ -1640,7 +1788,7 @@ describe('test/controller/repo.test.js', () => {
                 });
                 it('should not return file raw data for invalid repo path', async () => {
                     const encodedPath = encodeURIComponent(repo.path + 'abc');
-                    const encodedFilePath = encodeURIComponent('test/abc.md');
+                    const encodedFilePath = encodeURIComponent('test/abc.zip');
                     await app
                         .httpRequest()
                         .get(
