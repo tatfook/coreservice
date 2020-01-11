@@ -45,7 +45,7 @@ class ESService extends Service {
         const syncBoardFile = async sourcePath => {
             const result = await axios.get(sourcePath);
             let xContent = result.data;
-            if (typeof xmlContent === 'object') {
+            if (typeof xContent === 'object') {
                 xContent = xContent.content;
             }
 
