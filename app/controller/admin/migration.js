@@ -4,6 +4,46 @@ const Controller = require('../../core/controller.js');
 const _path = require('path');
 
 const Migration = class extends Controller {
+    async fixAllBoardFiles() {
+        this.adminAuthenticated();
+
+        const { ctx, service } = this;
+        const pace = 10;
+        let step = 0;
+        const total = await ctx.model.Site.count();
+
+        while (step < total) {
+            const sites = await ctx.model.Site.findAll({
+                where: {
+                    visibility: 0,
+                },
+                offset: step,
+                limit: pace,
+            });
+            try {
+                await Promise.all(
+                    sites.map(site => {
+                        return service.es.fixBoardAndSync(site);
+                    })
+                );
+            } catch (e) {
+                ctx.logger.error(e);
+            }
+            step = step + pace;
+        }
+        ctx.body = 'success';
+    }
+
+    async fixSiteBoardFiles() {
+        this.adminAuthenticated();
+
+        const { ctx, service } = this;
+        const { siteId } = ctx.getParams();
+        const site = await ctx.model.sites.findOne({ where: { id: siteId } });
+        await service.es.fixBoardAndSync(site);
+        ctx.body = 'success';
+    }
+
     async fixWorldArchiveUrl() {
         this.adminAuthenticated();
 

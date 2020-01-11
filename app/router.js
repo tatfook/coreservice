@@ -315,6 +315,14 @@ module.exports = app => {
         '/admin/migration/esRebuildProject',
         migration.esRebuildProject
     );
+    router.post(
+        '/admin/migration/fixSiteBoardFiles',
+        migration.fixSiteBoardFiles
+    );
+    router.post(
+        '/admin/migration/fixAllBoardFiles',
+        migration.fixAllBoardFiles
+    );
 
     // wikicraft proxy
     router.all('/api/wiki/models/user/login', controller.proxyUser.login);
