@@ -44,13 +44,17 @@ class ESService extends Service {
 
         const syncBoardFile = async sourcePath => {
             const result = await axios.get(sourcePath);
-            const xmlContent = result.data;
+            let xContent = result.data;
+            if (typeof xmlContent === 'object') {
+                xContent = xContent.content;
+            }
+
             const filename = getFileName(sourcePath);
             const newFilePath = `${repo.path}/_config/board/${filename}`;
             await service.repo.createFile(
                 repo,
                 newFilePath,
-                Base64.encode(xmlContent),
+                Base64.encode(xContent),
                 'base64'
             );
             const fullFilePath =
