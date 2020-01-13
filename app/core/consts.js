@@ -146,5 +146,5 @@ module.exports = {
         'tLevel',
     ], // 返回的用户的属性
 
-    USER_LIMIT_WORLD: 3, // 用户默认可以创建的世界数
+    USER_LIMIT_WORLD: 100, // 用户默认可以创建的世界数
 };
