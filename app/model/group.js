@@ -35,7 +35,7 @@ module.exports = app => {
             indexes: [
                 {
                     unique: true,
-                    fields: [ 'userId', 'groupname' ],
+                    fields: ['userId', 'groupname'],
                 },
             ],
         }

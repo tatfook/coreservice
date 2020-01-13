@@ -65,7 +65,7 @@ module.exports = app => {
         indexes: [
             {
                 unique: true,
-                fields: [ 'userId', 'sitename' ],
+                fields: ['userId', 'sitename'],
             },
         ],
     };
@@ -207,8 +207,8 @@ module.exports = app => {
         level = level
             ? level
             : site.visibility === ENTITY_VISIBILITY_PRIVATE
-                ? USER_ACCESS_LEVEL_NONE
-                : USER_ACCESS_LEVEL_READ;
+            ? USER_ACCESS_LEVEL_NONE
+            : USER_ACCESS_LEVEL_READ;
 
         return level;
     };

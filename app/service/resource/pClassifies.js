@@ -1,7 +1,7 @@
 'use strict';
 const Model = require('./model.js');
 const _ = require('lodash');
-const fields = [ 'vip', 'commonUser', 't1', 't2', 't3', 't4', 't5' ];
+const fields = ['vip', 'commonUser', 't1', 't2', 't3', 't4', 't5'];
 class PBlocks extends Model {
     async setClassifyAccess(data) {
         if (!data.id) return;

@@ -11,13 +11,13 @@ module.exports = {
         },
         objectType: {
             type: 'integer',
-            enum: [ ENTITY_TYPE_PROJECT ],
+            enum: [ENTITY_TYPE_PROJECT],
         },
         applyType: {
             type: 'integer',
-            enum: [ APPLY_TYPE_MEMBER ],
+            enum: [APPLY_TYPE_MEMBER],
         },
     },
-    required: [ 'objectId', 'objectType', 'applyType' ],
+    required: ['objectId', 'objectType', 'applyType'],
     additionalProperties: false,
 };

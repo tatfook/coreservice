@@ -213,7 +213,7 @@ class ESService extends Service {
         for (let i = 0; i < users.length; i++) {
             const user = users[i];
             const userId = user.id;
-            let [ userRank ] = await app.model.userRanks.findOrCreate({
+            let [userRank] = await app.model.userRanks.findOrCreate({
                 where: { userId },
             });
             userRank = userRank.get({ plain: true });

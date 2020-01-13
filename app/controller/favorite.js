@@ -67,7 +67,7 @@ const Favorite = class extends Controller {
             };
             list = await this.model.favorites
                 .findAll({
-                    include: [ models[objectType] ],
+                    include: [models[objectType]],
                     where: { userId, objectType },
                 })
                 .then(l => _.map(l, o => o.toJSON()));

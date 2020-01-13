@@ -29,7 +29,7 @@ const GameWorks = class extends Controller {
 
     async search() {
         const query = this.getParams();
-        const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
+        const attributes = ['id', 'username', 'nickname', 'portrait'];
         const gameWhere = {};
         if (query.gameName) {
             gameWhere.name = query.gameName;
@@ -86,7 +86,7 @@ const GameWorks = class extends Controller {
         );
         if (ids.length === 0) return this.success('OK');
 
-        const attributes = [ 'id', 'username', 'nickname', 'portrait' ];
+        const attributes = ['id', 'username', 'nickname', 'portrait'];
         const list = await this.model.gameWorks
             .findAll({
                 include: [

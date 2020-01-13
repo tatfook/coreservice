@@ -26,12 +26,12 @@ module.exports = {
         },
         state: {
             type: 'integer',
-            enum: [ 0, 1 ],
+            enum: [0, 1],
             enumDesc: '0:开启\n1：关闭',
         },
         title: {
             type: 'string',
         },
     },
-    required: [ 'objectId', 'objectType' ],
+    required: ['objectId', 'objectType'],
 };

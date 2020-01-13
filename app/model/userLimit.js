@@ -34,7 +34,7 @@ module.exports = app => {
     model.getByUserId = async userId => {
         const data = await app.model.userLimits.findOne({
             where: { userId },
-            attributes: [ 'world' ],
+            attributes: ['world'],
         });
 
         return data && data.get({ plain: true });

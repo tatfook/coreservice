@@ -441,7 +441,7 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: [ 1, 2 ] })
+                .send({ tagIds: [1, 2] })
                 .expect(200)
                 .then(res => res.body);
             assert(result.length === 2 && result[0] === 1 && result[1] === 1);
@@ -449,7 +449,7 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: [ 1, 2 ] })
+                .send({ tagIds: [1, 2] })
                 .expect(200)
                 .then(res => res.body);
             assert(result.length === 2 && result[0] === 0 && result[1] === 0);
@@ -460,7 +460,7 @@ describe('test/controller/admin.test.js', () => {
                 .httpRequest()
                 .delete('/api/v0/admins/projects/1/systemTags')
                 .set('Authorization', `Bearer ${token}`)
-                .send({ tagIds: [ 'aaa', 2 ] })
+                .send({ tagIds: ['aaa', 2] })
                 .expect(400);
         });
     });

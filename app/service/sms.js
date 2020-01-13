@@ -69,7 +69,7 @@ class Sms extends Service {
     async sendCaptcha(cellphone, captcha, expire = 3) {
         captcha = captcha || _.times(4, () => _.random(0, 9, false)).join('');
         await this.model.caches.put(cellphone, { captcha }, 1000 * 60 * expire);
-        return await this.app.sendSms(cellphone, [ captcha, `${expire}分钟` ]);
+        return await this.app.sendSms(cellphone, [captcha, `${expire}分钟`]);
     }
 
     // 验证验证码

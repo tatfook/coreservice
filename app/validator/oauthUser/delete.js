@@ -9,5 +9,5 @@ module.exports = {
             type: 'integer',
         },
     },
-    required: [ 'password', 'id' ],
+    required: ['password', 'id'],
 };

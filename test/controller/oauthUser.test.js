@@ -5,43 +5,43 @@ describe('test/controller/oauthUser.test.js', () => {
         beforeEach(() => {
             mock(require('axios'), 'get', async function(url) {
                 switch (url) {
-                case 'https://graph.qq.com/oauth2.0/token':
-                    return {
-                        data:
+                    case 'https://graph.qq.com/oauth2.0/token':
+                        return {
+                            data:
                                 'access_token=FE04************************CCE2&expires_in=7776000&refresh_token=88E4************************BE14',
-                    };
-                case 'https://graph.qq.com/oauth2.0/me':
-                    return {
-                        data:
+                        };
+                    case 'https://graph.qq.com/oauth2.0/me':
+                        return {
+                            data:
                                 'callback( {"client_id":"YOUR_APPID","openid":"YOUR_OPENID"} ); ',
-                    };
-                case 'https://graph.qq.com/user/get_user_info':
-                    return {
-                        data: {
-                            ret: 0,
-                            msg: '',
-                            nickname: 'Peter',
-                            figureurl:
+                        };
+                    case 'https://graph.qq.com/user/get_user_info':
+                        return {
+                            data: {
+                                ret: 0,
+                                msg: '',
+                                nickname: 'Peter',
+                                figureurl:
                                     'http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/30',
-                            figureurl_1:
+                                figureurl_1:
                                     'http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/50',
-                            figureurl_2:
+                                figureurl_2:
                                     'http://qzapp.qlogo.cn/qzapp/111111/942FEA70050EEAFBD4DCE2C1FC775E56/100',
-                            figureurl_qq_1:
+                                figureurl_qq_1:
                                     'http://q.qlogo.cn/qqapp/100312990/DE1931D5330620DBD07FB4A5422917B6/40',
-                            figureurl_qq_2:
+                                figureurl_qq_2:
                                     'http://q.qlogo.cn/qqapp/100312990/DE1931D5330620DBD07FB4A5422917B6/100',
-                            gender: '男',
-                            is_yellow_vip: '1',
-                            vip: '1',
-                            yellow_vip_level: '7',
-                            level: '7',
-                            is_yellow_year_vip: '1',
-                        },
-                    };
+                                gender: '男',
+                                is_yellow_vip: '1',
+                                vip: '1',
+                                yellow_vip_level: '7',
+                                level: '7',
+                                is_yellow_year_vip: '1',
+                            },
+                        };
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
             });
         });
@@ -160,22 +160,22 @@ describe('test/controller/oauthUser.test.js', () => {
         beforeEach('mock serivce', () => {
             mock(require('axios'), 'get', async function(url) {
                 switch (url) {
-                case 'https://api.weixin.qq.com/sns/oauth2/access_token':
-                    return {
-                        data: {
-                            access_token: 'mock_access_token',
-                            openid: 'mock_openid',
-                        },
-                    };
-                case 'https://api.weixin.qq.com/sns/userinfo':
-                    return {
-                        data: {
-                            nickname: 'testweixin',
-                        },
-                    };
+                    case 'https://api.weixin.qq.com/sns/oauth2/access_token':
+                        return {
+                            data: {
+                                access_token: 'mock_access_token',
+                                openid: 'mock_openid',
+                            },
+                        };
+                    case 'https://api.weixin.qq.com/sns/userinfo':
+                        return {
+                            data: {
+                                nickname: 'testweixin',
+                            },
+                        };
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
             });
         });
@@ -205,18 +205,18 @@ describe('test/controller/oauthUser.test.js', () => {
         beforeEach('mock serivce', () => {
             mock(require('axios'), 'get', async function(url) {
                 switch (url) {
-                case 'https://github.com/login/oauth/access_token':
-                    return {
-                        data:
+                    case 'https://github.com/login/oauth/access_token':
+                        return {
+                            data:
                                 'access_token=aa035971e9864642500a7aaad8783c59c8111228&scope=user%3Aemail&token_type=bearer',
-                    };
-                case 'https://api.github.com/user':
-                    return {
-                        data: { id: '11922085', login: 'wxaxiaoyao' },
-                    };
+                        };
+                    case 'https://api.github.com/user':
+                        return {
+                            data: { id: '11922085', login: 'wxaxiaoyao' },
+                        };
 
-                default:
-                    break;
+                    default:
+                        break;
                 }
             });
         });

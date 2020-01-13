@@ -17,7 +17,7 @@ describe('test/controller/member.test.js', () => {
                 .set('Authorization', `Bearer ${user.token}`)
                 .send({
                     objectType: '5',
-                    memberIds: [ 5 ],
+                    memberIds: [5],
                 })
                 .expect(422);
         });
@@ -31,7 +31,7 @@ describe('test/controller/member.test.js', () => {
                 .send({
                     objectId: '1',
                     objectType: '5',
-                    memberIds: [ 5 ],
+                    memberIds: [5],
                 })
                 .expect(400);
         });
@@ -148,7 +148,7 @@ describe('test/controller/member.test.js', () => {
                 .then(res => {
                     assert(!res.body);
                 });
-            const memberIds = [ user.id ];
+            const memberIds = [user.id];
             await app
                 .httpRequest()
                 .post('/api/v0/members/bulk')
@@ -193,7 +193,7 @@ describe('test/controller/member.test.js', () => {
                 .send({
                     objectId: project.id,
                     objectType: '5',
-                    memberIds: [ user.id ],
+                    memberIds: [user.id],
                 })
                 .expect(200);
             const result = await app

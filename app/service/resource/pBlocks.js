@@ -22,7 +22,7 @@ class PBlocks extends Model {
     }
 
     async setBlockAccess(data) {
-        const fields = [ 'vip', 'commonUser', 't1', 't2', 't3', 't4', 't5' ];
+        const fields = ['vip', 'commonUser', 't1', 't2', 't3', 't4', 't5'];
         if (!data.id) return;
         // 无权限传过来则添加默认权限
         if (!data.pBlockAccesses) {

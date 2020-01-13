@@ -88,7 +88,7 @@ jwt.decode = function jwt_decode(token, key, noVerify, algorithm) {
         }
 
         // verify signature. `sign` will return base64 string.
-        const signingInput = [ headerSeg, payloadSeg ].join('.');
+        const signingInput = [headerSeg, payloadSeg].join('.');
         if (
             !verify(signingInput, key, signingMethod, signingType, signatureSeg)
         ) {

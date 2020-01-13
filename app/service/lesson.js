@@ -8,7 +8,7 @@ class Lesson extends Service {
         const user = await this.model.users.findOne({
             where: { id: userId },
             attributes: {
-                exclude: [ 'password' ],
+                exclude: ['password'],
             },
         });
         return user && user.get({ plain: true });

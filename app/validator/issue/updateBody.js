@@ -18,9 +18,9 @@ module.exports = {
         },
         state: {
             type: 'integer',
-            enum: [ 0, 1 ],
+            enum: [0, 1],
         },
     },
     additionalProperties: false,
-    required: [ 'id' ],
+    required: ['id'],
 };

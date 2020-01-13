@@ -6,9 +6,9 @@ module.exports = app => {
     const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
     const Client = Axios.create({
         baseURL: app.config.self.lessonBaseURL,
-        params:{apiKey: INTERNAL_API_KEY}
+        params: { apiKey: INTERNAL_API_KEY },
     });
-    
+
     const lessonApi = {
         async createRegisterMsg(user) {
             const result = await Client.post('/coreApi/registerMsg', {

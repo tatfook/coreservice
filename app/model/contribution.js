@@ -38,7 +38,7 @@ module.exports = app => {
             indexes: [
                 {
                     unique: true,
-                    fields: [ 'userId', 'year' ],
+                    fields: ['userId', 'year'],
                 },
             ],
         }
@@ -77,7 +77,7 @@ module.exports = app => {
         const date = new Date();
         const year = date.getFullYear();
 
-        years = years.length === 0 ? [ year, year - 1 ] : years;
+        years = years.length === 0 ? [year, year - 1] : years;
         const datas = await app.model.contributions.findAll({
             where: {
                 userId,

@@ -78,7 +78,7 @@ const Apply = class extends Controller {
         );
 
         const list = await this.model.applies.findAll({
-            order: [[ 'createdAt', 'desc' ]],
+            order: [['createdAt', 'desc']],
             where: params,
         });
 
