@@ -12,7 +12,7 @@ const Tag = class extends Controller {
         const ctx = this.ctx;
         const id = ctx.query.id;
 
-        await ctx.validate(this.app.validator.id, { id });
+        await ctx.validate(this.app.validator.id, { id: ~~id });
 
         const sysTag = await ctx.model.systemTags
             .findOne({ attributes: [ 'id', 'tagname' ], where: { id } })
