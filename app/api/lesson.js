@@ -3,16 +3,16 @@
 const Axios = require('axios');
 
 module.exports = app => {
+    const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
     const Client = Axios.create({
         baseURL: app.config.self.lessonBaseURL,
+        params:{apiKey: INTERNAL_API_KEY}
     });
-
-    const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
+    
     const lessonApi = {
         async createRegisterMsg(user) {
             const result = await Client.post('/coreApi/registerMsg', {
                 user,
-                apiKey: INTERNAL_API_KEY,
             });
             return result.data;
         },
@@ -21,13 +21,12 @@ module.exports = app => {
             return await Client.post('/coreApi/user', {
                 id,
                 username,
-                apiKey: INTERNAL_API_KEY,
             });
         },
 
         async getPackagesByCondition(condition) {
             const ret = await Client.get('/coreApi/packages', {
-                params: { condition, apiKey: INTERNAL_API_KEY },
+                params: { condition },
             });
             return ret.data.data;
         },
