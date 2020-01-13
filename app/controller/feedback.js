@@ -3,13 +3,12 @@
 const Controller = require('../core/controller.js');
 
 const Feedback = class extends Controller {
-    get modelName() {
-        return 'feedbacks';
-    }
-
     async create() {
-        const { userId, username } = this.getUser() || {};
-        const data = this.validate({ url: 'string' });
+        const { userId, username } = this.authenticated();
+        const data = await this.ctx.validate(
+            this.app.validator.feedback.create,
+            this.getParams()
+        );
 
         const ret = await this.model.feedbacks.create({
             ...data,

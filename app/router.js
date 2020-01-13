@@ -268,7 +268,7 @@ module.exports = app => {
 
     // 反馈 投诉 举报
     const feedback = controller.feedback;
-    router.resources('/feedbacks', feedback);
+    router.post('/feedbacks', feedback.create);
 
     // NPL 大赛
     const game = controller.game;
