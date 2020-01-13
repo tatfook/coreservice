@@ -1,12 +1,13 @@
 'use strict';
 
 const Axios = require('axios');
-const { INTERNAL_API_KEY } = require('../core/consts.js');
+
 module.exports = app => {
     const Client = Axios.create({
         baseURL: app.config.self.lessonBaseURL,
     });
 
+    const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
     const lessonApi = {
         async createRegisterMsg(user) {
             const result = await Client.post('/coreApi/registerMsg', {
