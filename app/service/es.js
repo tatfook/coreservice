@@ -91,18 +91,45 @@ class ESService extends Service {
 
                 for (let i = 0; i < blocks.length; i++) {
                     const block = blocks[i];
-                    if (block.cmd === 'Board') {
+                    if (
+                        block.cmd === 'Board' &&
+                        block.data &&
+                        block.data.board
+                    ) {
                         if (block.data.board.xml) {
-                            block.data.board.xml = await syncBoardFile(
-                                block.data.board.xml
-                            );
-                            changed = true;
+                            try {
+                                block.data.board.xml = await syncBoardFile(
+                                    block.data.board.xml
+                                );
+                                changed = true;
+                                if (block.data.board.data) {
+                                    delete block.data.board.data;
+                                }
+                            } catch (e) {
+                                ctx.logger.error(
+                                    'Invalid board! ',
+                                    'site: ',
+                                    repo.path,
+                                    ' xml:',
+                                    block.data.board.xml
+                                );
+                            }
                         }
                         if (block.data.board.svg) {
-                            block.data.board.svg = await syncBoardFile(
-                                block.data.board.svg
-                            );
-                            changed = true;
+                            try {
+                                block.data.board.svg = await syncBoardFile(
+                                    block.data.board.svg
+                                );
+                                changed = true;
+                            } catch (e) {
+                                ctx.logger.error(
+                                    'Invalid board! ',
+                                    'site: ',
+                                    repo.path,
+                                    ' svg:',
+                                    block.data.board.svg
+                                );
+                            }
                         }
                     }
                 }
