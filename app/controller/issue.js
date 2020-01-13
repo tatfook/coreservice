@@ -113,7 +113,7 @@ const Issue = class extends Controller {
         if (!isCanOper) return this.fail(7);
 
         const issue = await this.model.issues.findOne({
-            order: [['No', 'desc']],
+            order: [[ 'No', 'desc' ]],
             where: { objectId: params.objectId, objectType: params.objectType },
         });
         params.no = issue ? issue.no + 1 : 1;

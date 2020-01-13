@@ -46,13 +46,13 @@ const Lesson = class extends Controller {
         const { userId, apiKey } = this.validate();
         if (apiKey !== this.lessonApiKey) return this.fail(-1);
 
-        const [account = {}, allianceMember, tutor] = await Promise.all([
+        const [ account = {}, allianceMember, tutor ] = await Promise.all([
             this.model.accounts.getByUserId(userId),
             this.model.roles.getAllianceMemberByUserId(userId),
             this.model.roles.getTutorByUserId(userId),
         ]);
 
-        return this.success([account, allianceMember, tutor]);
+        return this.success([ account, allianceMember, tutor ]);
     }
 
     async accountsIncrement() {

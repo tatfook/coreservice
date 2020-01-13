@@ -11,9 +11,9 @@ module.exports = {
         },
         state: {
             type: 'integer',
-            enum: [APPLY_STATE_REFUSE, APPLY_STATE_AGREE],
+            enum: [ APPLY_STATE_REFUSE, APPLY_STATE_AGREE ],
         },
     },
-    required: ['state', 'id'],
+    required: [ 'state', 'id' ],
     additionalProperties: false,
 };

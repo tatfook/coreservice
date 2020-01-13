@@ -113,7 +113,7 @@ describe('/test/controller/project.test.js', () => {
             await app
                 .httpRequest()
                 .post('/api/v0/projects/searchForParacraft')
-                .send({ tagIds: ['aa', 2] })
+                .send({ tagIds: [ 'aa', 2 ] })
                 .expect(400);
         });
 
@@ -121,7 +121,7 @@ describe('/test/controller/project.test.js', () => {
             await app
                 .httpRequest()
                 .post('/api/v0/projects/searchForParacraft')
-                .send({ tagIds: [1, 2], sortTag: 1, projectId: 1 })
+                .send({ tagIds: [ 1, 2 ], sortTag: 1, projectId: 1 })
                 .expect(200);
         });
     });
@@ -219,7 +219,7 @@ describe('/test/controller/project.test.js', () => {
         it('## stared', async () => {
             const user = await app.login();
             const project = await app.factory.create('projects', {
-                stars: [user.id],
+                stars: [ user.id ],
             });
             const result = await app
                 .httpRequest()

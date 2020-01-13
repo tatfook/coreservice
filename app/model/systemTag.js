@@ -34,7 +34,7 @@ module.exports = app => {
             indexes: [
                 {
                     unique: true,
-                    fields: ['classify', 'tagname'],
+                    fields: [ 'classify', 'tagname' ],
                 },
             ],
         }

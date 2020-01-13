@@ -9,7 +9,7 @@ module.exports = {
                     type: 'integer',
                 },
             },
-            required: ['objectId', 'objectType', 'applyId', 'applyType'],
+            required: [ 'objectId', 'objectType', 'applyId', 'applyType' ],
         },
     },
 };

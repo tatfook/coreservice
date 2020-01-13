@@ -152,7 +152,7 @@ class Project extends Service {
                     'sn',
                     'desc',
                 ],
-                ['id', 'asc'],
+                [ 'id', 'asc' ],
             ],
             distinct: true,
         });
@@ -234,7 +234,7 @@ class Project extends Service {
             a.updatedAt <= DATE_SUB(NOW(), INTERVAL 1 WEEK)
         ORDER BY a.star DESC, a.updatedAt desc limit ?,?);`;
         let rows = await this.app.model.query(rowsSql, {
-            replacements: [offset, limit, offset, limit],
+            replacements: [ offset, limit, offset, limit ],
             type: this.app.model.QueryTypes.SELECT,
         });
         rows = rows.slice(0, limit);

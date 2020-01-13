@@ -40,7 +40,7 @@ module.exports = app => {
         },
         async upsertUser(user, transaction = null) {
             const userId = user.id;
-            let [userRank] = await app.model.userRanks.findOrCreate({
+            let [ userRank ] = await app.model.userRanks.findOrCreate({
                 where: { userId },
                 transaction,
             });

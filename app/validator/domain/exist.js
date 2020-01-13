@@ -7,5 +7,5 @@ module.exports = {
             type: 'string',
         },
     },
-    required: ['domain'],
+    required: [ 'domain' ],
 };

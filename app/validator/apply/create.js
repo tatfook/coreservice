@@ -13,7 +13,7 @@ module.exports = {
                     maxLength: 255,
                 },
             },
-            required: ['objectId', 'objectType', 'applyId', 'applyType'],
+            required: [ 'objectId', 'objectType', 'applyId', 'applyType' ],
             additionalProperties: false,
         },
     },

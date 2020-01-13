@@ -102,11 +102,11 @@ const Project = class extends Controller {
         );
         const projects = authUserId
             ? await this.model.members.findAll({
-                  where: {
-                      userId: authUserId,
-                      objectType: ENTITY_TYPE_PROJECT,
-                  },
-              })
+                where: {
+                    userId: authUserId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                },
+            })
             : [];
         list = _.filter(list, o => {
             if (
@@ -136,11 +136,11 @@ const Project = class extends Controller {
         });
         const projects = authUserId
             ? await this.model.members.findAll({
-                  where: {
-                      userId: authUserId,
-                      objectType: ENTITY_TYPE_PROJECT,
-                  },
-              })
+                where: {
+                    userId: authUserId,
+                    objectType: ENTITY_TYPE_PROJECT,
+                },
+            })
             : [];
         list = _.filter(list, o => {
             if (
@@ -345,7 +345,7 @@ const Project = class extends Controller {
         const transaction = await this.model.transaction();
         try {
             await this.model.projects.update(project, {
-                fields: ['stars'],
+                fields: [ 'stars' ],
                 where: { id },
                 transaction,
                 individualHooks: true,
@@ -375,7 +375,7 @@ const Project = class extends Controller {
         const transaction = await this.model.transaction();
         try {
             await this.model.projects.update(project, {
-                fields: ['stars'],
+                fields: [ 'stars' ],
                 where: { id },
                 transaction,
                 individualHooks: true,

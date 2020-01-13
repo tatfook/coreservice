@@ -98,7 +98,7 @@ describe('test/controller/gameWork.test.js', () => {
                 .httpRequest()
                 .post('/api/v0/gameWorks/snapshoot')
                 .send({
-                    ids: [gamework.id],
+                    ids: [ gamework.id ],
                 })
                 .expect(200);
 
@@ -108,7 +108,7 @@ describe('test/controller/gameWork.test.js', () => {
                 .httpRequest()
                 .post('/api/v0/gameWorks/snapshoot')
                 .send({
-                    ids: [gamework.id],
+                    ids: [ gamework.id ],
                 })
                 .expect(200);
         });

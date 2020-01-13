@@ -31,6 +31,6 @@ module.exports = {
             description: '优惠券ID',
         },
     },
-    required: ['type', 'goodsId', 'count'],
+    required: [ 'type', 'goodsId', 'count' ],
     additionalProperties: false,
 };

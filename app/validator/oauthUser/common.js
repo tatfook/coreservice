@@ -15,5 +15,5 @@ module.exports = {
             type: 'string',
         },
     },
-    required: ['clientId', 'code', 'redirectUri', 'state'],
+    required: [ 'clientId', 'code', 'redirectUri', 'state' ],
 };

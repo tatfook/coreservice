@@ -10,8 +10,8 @@ module.exports = {
         channel: {
             type: 'string',
             description: '渠道',
-            enum: ['wx_pub_qr', 'alipay_qr'],
+            enum: [ 'wx_pub_qr', 'alipay_qr' ],
         },
     },
-    required: ['amount', 'channel'],
+    required: [ 'amount', 'channel' ],
 };

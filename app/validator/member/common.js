@@ -13,8 +13,8 @@ module.exports = {
         },
         objectType: {
             type: 'integer',
-            enum: [ENTITY_TYPE_SITE, ENTITY_TYPE_GROUP, ENTITY_TYPE_PROJECT],
+            enum: [ ENTITY_TYPE_SITE, ENTITY_TYPE_GROUP, ENTITY_TYPE_PROJECT ],
         },
     },
-    required: ['objectId', 'objectType'],
+    required: [ 'objectId', 'objectType' ],
 };

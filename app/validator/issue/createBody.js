@@ -38,5 +38,5 @@ module.exports = {
             description: '指派给谁，id数组，用“|”符号分割',
         },
     },
-    required: ['objectType', 'objectId', 'title', 'content'],
+    required: [ 'objectType', 'objectId', 'title', 'content' ],
 };

@@ -82,11 +82,11 @@ module.exports = app => {
             indexes: [
                 {
                     unique: true,
-                    fields: ['userId', 'worldName'],
+                    fields: [ 'userId', 'worldName' ],
                 },
                 {
                     unique: true,
-                    fields: ['projectId'],
+                    fields: [ 'projectId' ],
                 },
             ],
         }
@@ -127,7 +127,7 @@ module.exports = app => {
         if (this.userId === userId) return true;
         const project = await app.model.Project.findOne({
             where: { id: this.projectId },
-            include: ['members'],
+            include: [ 'members' ],
         });
         if (project && project.visibility !== ENTITY_VISIBILITY_PUBLIC) {
             let canRead = false;
@@ -146,7 +146,7 @@ module.exports = app => {
         if (this.userId === userId) return true;
         const project = await app.model.Project.findOne({
             where: { id: this.projectId },
-            include: ['members'],
+            include: [ 'members' ],
         });
         let canWrite = false;
         _.forEach(project.members, member => {

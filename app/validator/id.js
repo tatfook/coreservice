@@ -8,5 +8,5 @@ module.exports = {
             type: 'integer',
         },
     },
-    required: ['id'],
+    required: [ 'id' ],
 };

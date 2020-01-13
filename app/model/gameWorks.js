@@ -84,7 +84,7 @@ module.exports = app => {
         indexes: [
             {
                 unique: true,
-                fields: ['projectId'],
+                fields: [ 'projectId' ],
             },
         ],
     };

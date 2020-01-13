@@ -14,7 +14,7 @@ module.exports = {
         },
         type: {
             type: 'number',
-            enum: [0, 1],
+            enum: [ 0, 1 ],
             enumDesc: '0网站；1世界',
         },
         visibility: {
@@ -27,5 +27,5 @@ module.exports = {
             type: 'string',
         },
     },
-    required: ['type', 'name'],
+    required: [ 'type', 'name' ],
 };

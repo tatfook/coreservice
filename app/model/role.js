@@ -53,7 +53,7 @@ module.exports = app => {
             indexes: [
                 {
                     unique: true,
-                    fields: ['userId', 'roleId'],
+                    fields: [ 'userId', 'roleId' ],
                 },
             ],
         }

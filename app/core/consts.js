@@ -137,7 +137,7 @@ module.exports = {
     CLASS_MEMBER_ROLE_ADMIN: 64, // 管理员
 
     USER_ATTRS: [
-        ['id', 'userId'],
+        [ 'id', 'userId' ],
         'username',
         'nickname',
         'portrait',

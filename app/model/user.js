@@ -108,7 +108,7 @@ module.exports = app => {
         const data = await app.model.users.findOne({
             where: { username },
             attributes: {
-                exclude: ['password'],
+                exclude: [ 'password' ],
             },
         });
 
@@ -132,7 +132,7 @@ module.exports = app => {
         const data = await app.model.users.findOne({
             where: { id: userId },
             attributes: {
-                exclude: ['password'],
+                exclude: [ 'password' ],
             },
             transaction,
         });

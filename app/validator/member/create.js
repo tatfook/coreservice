@@ -9,7 +9,7 @@ module.exports = {
                     type: 'integer',
                 },
             },
-            required: ['memberId', 'objectId', 'objectType'],
+            required: [ 'memberId', 'objectId', 'objectType' ],
             additionalProperties: false,
         },
     },

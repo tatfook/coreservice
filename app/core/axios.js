@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const axios = require('axios');
 
-const methods = ['get', 'post', 'put', 'delete', 'head', 'options', 'patch'];
+const methods = [ 'get', 'post', 'put', 'delete', 'head', 'options', 'patch' ];
 
 const mockAxios = {
     datas: {
