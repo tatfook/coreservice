@@ -9,11 +9,6 @@ exports.cors = {
     package: 'egg-cors',
 };
 
-exports.graphql = {
-    enable: true,
-    package: 'egg-graphql',
-};
-
 exports.redis = {
     enable: true,
     package: 'egg-redis',
