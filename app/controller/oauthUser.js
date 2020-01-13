@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 
-const wurl = require('wurl');
+const queryString = require('query-string');
 
 const Controller = require('../core/controller.js');
 const {
@@ -57,7 +57,7 @@ const OauthUsers = class extends Controller {
         const queryStr = await axios
             .get(accessTokenApiUrl, { params })
             .then(res => res.data);
-        const data = wurl('?', 'http://localhost/index?' + queryStr);
+        const data = queryString.parse(queryStr);
         const access_token = data.access_token;
         // 获取openid
         let result = await axios
@@ -84,7 +84,7 @@ const OauthUsers = class extends Controller {
         const type = OAUTH_SERVICE_TYPE_QQ;
         const token = externalId + type + access_token;
 
-        await this.oauthUser(
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
@@ -94,7 +94,14 @@ const OauthUsers = class extends Controller {
         );
     }
 
-    async oauthUser(externalId, externalUsername, type, userId, token, state) {
+    async getTokenByOauth(
+        externalId,
+        externalUsername,
+        type,
+        userId,
+        token,
+        state
+    ) {
         let oauthUser = await this.model.oauthUsers.findOne({
             where: { externalId, type },
         });
@@ -159,7 +166,7 @@ const OauthUsers = class extends Controller {
         const externalUsername = result.nickname;
         const type = OAUTH_SERVICE_TYPE_WEIXIN;
         const token = externalId + type + access_token;
-        await this.oauthUser(
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
@@ -185,7 +192,7 @@ const OauthUsers = class extends Controller {
         const queryStr = await axios
             .get(accessTokenApiUrl, { params })
             .then(res => res.data);
-        const data = wurl('?', 'http://localhost/index?' + queryStr);
+        const data = queryString.parse(queryStr);
 
         const access_token = data.access_token;
         const userinfo = await axios
@@ -196,7 +203,7 @@ const OauthUsers = class extends Controller {
         const type = OAUTH_SERVICE_TYPE_GITHUB;
 
         const token = externalId + type + access_token;
-        await this.oauthUser(
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
@@ -238,7 +245,7 @@ const OauthUsers = class extends Controller {
         const type = OAUTH_SERVICE_TYPE_XINLANG;
 
         const token = externalId + type + access_token;
-        await this.oauthUser(
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
