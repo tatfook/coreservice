@@ -7,8 +7,8 @@ module.exports = app => {
     const esConfig = app.config.elasticsearch;
     const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
     const Client = Axios.create({
-        params: {
-            apiKey: INTERNAL_API_KEY,
+        headers: {
+            'x-api-key': INTERNAL_API_KEY,
         },
         baseURL: `${esConfig.url}`,
     });
