@@ -146,7 +146,5 @@ module.exports = {
         'tLevel',
     ], // 返回的用户的属性
 
-    INTERNAL_API_KEY: '9435c6503642d25c3f3bd66a4af7b56c',
-
     USER_LIMIT_WORLD: 3, // 用户默认可以创建的世界数
 };
