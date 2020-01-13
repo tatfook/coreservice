@@ -31,9 +31,9 @@
         "pingpp": "^2.1.4",
         "qiniu": "^7.2.1",
         "qrcode": "^1.2.0",
+        "query-string": "^6.9.0",
         "svg-captcha": "^1.4.0",
-        "uuid": "^3.3.2",
-        "wurl": "^2.5.3"
+        "uuid": "^3.3.2"
     },
     "devDependencies": {
         "chance": "^1.0.18",
