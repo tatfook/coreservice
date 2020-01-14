@@ -58,6 +58,7 @@ const Repo = class extends Controller {
     }
 
     async getFileRaw() {
+        const { ctx } = this;
         const repo = await this.getRepoAndEnsureReadable();
         const { filePath, commitId } = this.getParams();
         const result = await this.service.repo.getFileRaw(
@@ -67,20 +68,14 @@ const Repo = class extends Controller {
         );
         const filename = _path.basename(filePath);
         const mimeType = mime.getType(filename);
+        ctx.set('Content-Disposition', `attachment; filename=${filename}`);
+        ctx.set('Content-Description', 'File Transfer');
+        ctx.set('Content-Transfer-Encoding', 'binary');
+        ctx.set('Content-Type', 'application/octet-stream');
         if (mimeType) {
-            this.ctx.set('Content-Type', mimeType);
-            this.ctx.set('Content-Description', 'File Transfer');
-            this.ctx.set('Content-Transfer-Encoding', 'binary');
+            ctx.set('Content-Type', mimeType);
             if (mimeType.match('image') || mimeType.match('text')) {
-                this.ctx.set(
-                    'Content-Disposition',
-                    `inline; filename=${filename}`
-                );
-            } else {
-                this.ctx.set(
-                    'Content-Disposition',
-                    `attachment; filename=${filename}`
-                );
+                ctx.set('Content-Disposition', `inline; filename=${filename}`);
             }
         }
         return this.success(result);
