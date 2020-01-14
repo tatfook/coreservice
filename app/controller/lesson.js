@@ -9,7 +9,10 @@ const Lesson = class extends Controller {
         return this.app.validator.lesson;
     }
     get checkApiKey() {
-        return this.app.config.self.INTERNAL_API_KEY === this.ctx.request.headers['x-api-key'];
+        return (
+            this.app.config.self.INTERNAL_API_KEY ===
+            this.ctx.request.headers['x-api-key']
+        );
     }
 
     async getUserDatas() {
