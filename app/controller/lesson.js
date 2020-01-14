@@ -8,13 +8,13 @@ const Lesson = class extends Controller {
     get validateRules() {
         return this.app.validator.lesson;
     }
-    get lessonApiKey() {
-        return this.app.config.self.INTERNAL_API_KEY;
+    get checkApiKey() {
+        return this.app.config.self.INTERNAL_API_KEY === this.ctx.request.headers['x-api-key'];
     }
 
     async getUserDatas() {
-        const { id, apiKey } = this.validate({ id: 'int' });
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { id } = this.validate({ id: 'int' });
+        if (!this.checkApiKey) return this.fail(-1);
 
         const res = await this.model.userdatas.get(id);
 
@@ -22,8 +22,8 @@ const Lesson = class extends Controller {
     }
 
     async setUserDatas() {
-        const { id, apiKey, ...params } = this.validate({ id: 'int' });
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { id, ...params } = this.validate({ id: 'int' });
+        if (!this.checkApiKey) return this.fail(-1);
 
         const res = await this.model.userdatas.set(id, params);
 
@@ -31,8 +31,8 @@ const Lesson = class extends Controller {
     }
 
     async update() {
-        const { condition, params, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { condition, params } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const resourceName = params.resources || '';
         this.resource = this.ctx.model[resourceName];
@@ -43,8 +43,8 @@ const Lesson = class extends Controller {
     }
 
     async accountsAndRoles() {
-        const { userId, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { userId } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const [ account = {}, allianceMember, tutor ] = await Promise.all([
             this.model.accounts.getByUserId(userId),
@@ -56,8 +56,8 @@ const Lesson = class extends Controller {
     }
 
     async accountsIncrement() {
-        const { incrementObj, userId, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { incrementObj, userId } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const ret = await this.model.accounts.increment(incrementObj, {
             where: { userId },
@@ -67,16 +67,16 @@ const Lesson = class extends Controller {
     }
 
     async getAccounts() {
-        const { userId, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { userId } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const ret = await this.model.accounts.findOne({ where: { userId } });
         return this.success(ret);
     }
 
     async createRecord() {
-        const { params, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { params } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const resourceName = params.resources || '';
         this.resource = this.ctx.model[resourceName];
@@ -86,8 +86,8 @@ const Lesson = class extends Controller {
     }
 
     async truncate() {
-        const { params, apiKey } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { params } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const resourceName = params.resources || '';
         this.resource = this.ctx.model[resourceName];
@@ -97,8 +97,8 @@ const Lesson = class extends Controller {
     }
 
     async getAllPrjects() {
-        const { condition, apiKey, order } = this.validate();
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { condition, order } = this.validate();
+        if (!this.checkApiKey) return this.fail(-1);
 
         const ret = await this.ctx.model.projects.findAll({
             order,
@@ -108,8 +108,8 @@ const Lesson = class extends Controller {
     }
 
     async getUserById() {
-        const { id, apiKey } = this.validate({ id: 'int' });
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { id } = this.validate({ id: 'int' });
+        if (!this.checkApiKey) return this.fail(-1);
 
         const user = await this.service.lesson.getUserById(id);
         if (!user) {
@@ -120,8 +120,8 @@ const Lesson = class extends Controller {
     }
 
     async updateUserById() {
-        const { id, apiKey, params } = this.validate({ id: 'int' });
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        const { id, params } = this.validate({ id: 'int' });
+        if (!this.checkApiKey) return this.fail(-1);
         const user = await this.service.lesson.getUserById(id);
         if (!user) {
             // eslint-disable-next-line no-magic-numbers
@@ -144,7 +144,7 @@ const Lesson = class extends Controller {
             apiKey,
         });
 
-        if (apiKey !== this.lessonApiKey) return this.fail(-1);
+        if (!this.checkApiKey) return this.fail(-1);
 
         const ret = await this.ctx.model.userRanks.findAll({
             where: { userId: { $in: userIds } },
