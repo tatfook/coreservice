@@ -239,6 +239,10 @@ module.exports = app => {
     router.get('/repos/:repoPath/files/:filePath/raw', repo.getFileRaw); // 二进制读取
     router.get('/repos/:repoPath/files/:filePath', repo.getFileData); // 文本文件读取
     router.get('/repos/:repoPath/files/:filePath/history', repo.getFileHistory);
+    router.post(
+        '/repos/:repoPath/files/:filePath/upsertBinary',
+        repo.upsertBinaryFile
+    );
     router.post('/repos/:repoPath/files/:filePath', repo.createFile);
     router.put('/repos/:repoPath/files/:filePath', repo.updateFile);
     router.delete('/repos/:repoPath/files/:filePath', repo.deleteFile);
