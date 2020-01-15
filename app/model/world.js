@@ -1,7 +1,5 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
-const { ENTITY_VISIBILITY_PUBLIC } = require('../core/consts.js');
-const _ = require('lodash');
 
 module.exports = app => {
     const { BIGINT, STRING, JSON } = app.Sequelize;
@@ -127,35 +125,16 @@ module.exports = app => {
         if (this.userId === userId) return true;
         const project = await app.model.Project.findOne({
             where: { id: this.projectId },
-            include: [ 'members' ],
         });
-        if (project && project.visibility !== ENTITY_VISIBILITY_PUBLIC) {
-            let canRead = false;
-            _.forEach(project.members, member => {
-                if (member.memberId === userId) {
-                    canRead = true; // TODO: member 具有自己的权限判断，待补充
-                    return false;
-                }
-            });
-            return canRead;
-        }
-        return true; // 公开项目允许陌生人访问
+        return project.canReadByUser(userId);
     };
 
     model.prototype.canWriteByUser = async function(userId) {
         if (this.userId === userId) return true;
         const project = await app.model.Project.findOne({
             where: { id: this.projectId },
-            include: [ 'members' ],
         });
-        let canWrite = false;
-        _.forEach(project.members, member => {
-            if (member.memberId === userId) {
-                canWrite = true; // TODO: member 具有自己的权限判断，待补充
-                return false;
-            }
-        });
-        return canWrite;
+        return project.canWriteByUser(userId);
     };
 
     app.model.worlds = model;

@@ -147,4 +147,12 @@ module.exports = {
     ], // 返回的用户的属性
 
     USER_LIMIT_WORLD: 100, // 用户默认可以创建的世界数
+
+    REDIS_PREFIX_WORLDLOCK: 'worldlock_', // worldlock在redis中的key 前缀
+    WORLDLOCK_LOCKTIME: {
+        // 心跳间隔，单位秒
+        share: 30,
+        exclusive: 120,
+    },
+    WORLDLOCK_TIME_FORMAT: 'YYYY-MM-DD HH:mm:ss',
 };
