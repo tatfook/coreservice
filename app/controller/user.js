@@ -289,7 +289,7 @@ const User = class extends Controller {
                 await this.ctx.service.user.register(user);
 
                 // 创建lesson用户
-                await this.app.lessonModel.users.create({
+                await this.app.api.lesson.createUser({
                     id: user.id,
                     username: user.username,
                 });
@@ -425,7 +425,7 @@ const User = class extends Controller {
         await this.ctx.service.user.register(user);
 
         // 创建lesson用户
-        await this.app.lessonModel.users.create({
+        await this.app.api.lesson.createUser({
             id: user.id,
             username: user.username,
         });

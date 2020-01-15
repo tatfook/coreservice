@@ -72,6 +72,7 @@ module.exports = app => {
     router.get('/lessons/accountsAndRoles', lesson.accountsAndRoles);
     router.put('/lessons/accountsIncrement', lesson.accountsIncrement);
     router.get('/lessons/accounts', lesson.getAccounts);
+    router.get('/lessons/userProjectCount', lesson.getUserProjectCount);
     router.post('/lessons/createRecord', lesson.createRecord);
     router.post('/lessons/truncate', lesson.truncate);
     router.get('/lessons/projects', lesson.getAllPrjects);
@@ -133,6 +134,7 @@ module.exports = app => {
     router.get('/qinius/token', qiniu.token);
 
     const tag = controller.tag;
+    router.get('/tags/packages', tag.getPackages);
     router.resources('/tags', tag);
 
     const project = controller.project;
@@ -145,6 +147,7 @@ module.exports = app => {
     router.get('/projects/:id/star', project.isStar);
     router.post('/projects/:id/star', project.star);
     router.post('/projects/:id/unstar', project.unstar);
+    router.get('/projects/mostStar', project.mostStar);
     router.resources('/projects', project);
 
     // 项目评分
@@ -207,7 +210,8 @@ module.exports = app => {
 
     const order = controller.order;
     router.post('/orders/charge', order.charge);
-    router.resources('/orders', order);
+    router.post('/orders', order.create);
+    router.get('/orders/:id', order.show);
 
     const trade = controller.trade;
     router.post('/trades/search', trade._search);
@@ -264,7 +268,7 @@ module.exports = app => {
 
     // 反馈 投诉 举报
     const feedback = controller.feedback;
-    router.resources('/feedbacks', feedback);
+    router.post('/feedbacks', feedback.create);
 
     // NPL 大赛
     const game = controller.game;
@@ -291,6 +295,11 @@ module.exports = app => {
     router.post('/pBlocks/:id/use', pBlock.use);
     router.resources('/pBlocks', pBlock);
 
+    // paracraft lobby worldlock
+    const worldlock = controller.worldlock;
+    router.post('/worldlocks', worldlock.upsert);
+    router.delete('/worldlocks', worldlock.destroy);
+
     // migration
     const migration = controller.admin.migration;
     router.post(
@@ -311,6 +320,14 @@ module.exports = app => {
     router.post(
         '/admin/migration/esRebuildProject',
         migration.esRebuildProject
+    );
+    router.post(
+        '/admin/migration/fixSiteBoardFiles',
+        migration.fixSiteBoardFiles
+    );
+    router.post(
+        '/admin/migration/fixAllBoardFiles',
+        migration.fixAllBoardFiles
     );
 
     // wikicraft proxy

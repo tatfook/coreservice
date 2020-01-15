@@ -1,6 +1,10 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
-const { ENTITY_TYPE_PROJECT } = require('../core/consts.js');
+const _ = require('lodash');
+const {
+    ENTITY_TYPE_PROJECT,
+    ENTITY_VISIBILITY_PUBLIC,
+} = require('../core/consts.js');
 
 module.exports = app => {
     const { BIGINT, INTEGER, STRING, FLOAT, TEXT, JSON } = app.Sequelize;
@@ -48,7 +52,7 @@ module.exports = app => {
         },
 
         type: {
-            // 评论对象类型  0 -- paracrfat  1 -- 网站
+            // 项目类型  0 -- 网站  1 -- paracrfat
             type: INTEGER,
             allowNull: false,
             defaultValue: 1,
@@ -268,7 +272,7 @@ module.exports = app => {
         project.lastStar = 0;
         project.lastComment = 0;
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 7; i++) {
             project.lastVisit += newStatistics[curTime - i * dayTime].visit;
             project.lastStar += newStatistics[curTime - i * dayTime].star;
             project.lastComment += newStatistics[curTime - i * dayTime].comment;
@@ -357,5 +361,43 @@ module.exports = app => {
             constraints: false,
         });
     };
+
+    model.prototype.canReadByUser = async function(userId) {
+        if (
+            this.userId === userId ||
+            this.visibility === ENTITY_VISIBILITY_PUBLIC
+        ) {
+            return true;
+        }
+        let canRead = false;
+        const members = await app.model.Member.findAll({
+            where: { objectId: this.id, objectType: ENTITY_TYPE_PROJECT },
+            attributes: [ 'memberId' ],
+        });
+        _.forEach(members, member => {
+            if (member.memberId === userId) {
+                canRead = true; // TODO: member 具有自己的权限判断，待补充
+                return false;
+            }
+        });
+        return canRead;
+    };
+
+    model.prototype.canWriteByUser = async function(userId) {
+        if (this.userId === userId) return true;
+        const members = await app.model.Member.findAll({
+            where: { objectId: this.id, objectType: ENTITY_TYPE_PROJECT },
+            attributes: [ 'memberId' ],
+        });
+        let canWrite = false;
+        _.forEach(members, member => {
+            if (member.memberId === userId) {
+                canWrite = true; // TODO: member 具有自己的权限判断，待补充
+                return false;
+            }
+        });
+        return canWrite;
+    };
+
     return model;
 };

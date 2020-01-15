@@ -146,7 +146,13 @@ module.exports = {
         'tLevel',
     ], // 返回的用户的属性
 
-    LESSON_API_KEY: '9435c6503642d25c3f3bd66a4af7b56c',
-
     USER_LIMIT_WORLD: 100, // 用户默认可以创建的世界数
+
+    REDIS_PREFIX_WORLDLOCK: 'worldlock_', // worldlock在redis中的key 前缀
+    WORLDLOCK_LOCKTIME: {
+        // 心跳间隔，单位秒
+        share: 30,
+        exclusive: 120,
+    },
+    WORLDLOCK_TIME_FORMAT: 'YYYY-MM-DD HH:mm:ss',
 };

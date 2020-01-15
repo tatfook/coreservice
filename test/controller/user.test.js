@@ -193,7 +193,7 @@ describe('test/controller/user.test.js', () => {
             const { token } = await app.login();
             await app.model.contributions.create({
                 userId: 1,
-                year: 2019,
+                year: new Date().getFullYear(),
                 data: {},
             });
             await app
@@ -605,9 +605,6 @@ describe('test/controller/user.test.js', () => {
                     result.username === 'test' &&
                     result.token
             );
-            // lessonUser创建成功
-            const lessonUser = await app.lessonModel.users.findOne();
-            assert(lessonUser && lessonUser.username === 'test');
             const account = await app.model.accounts.findOne();
             assert(account);
         });

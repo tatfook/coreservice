@@ -2,7 +2,10 @@
 
 const Service = require('egg').Service;
 const _ = require('lodash');
+const _path = require('path');
 const uuid = require('uuid/v4');
+const axios = require('axios');
+const Base64 = require('js-base64').Base64;
 
 class ESService extends Service {
     isInIgnoreList(filePath) {
@@ -22,6 +25,126 @@ class ESService extends Service {
             return content.slice(0, 150) + '...';
         }
         return content;
+    }
+
+    async fixBoardAndSync(site) {
+        const { ctx, service, app } = this;
+        const conf = app.config.self;
+
+        const repo = await ctx.model.Repo.findOne({
+            where: { resourceType: 'Site', resourceId: site.id },
+        });
+        const tree = await service.repo.getFolderFiles(repo.path, '', true);
+
+        const getFileName = sourcePath => {
+            let tmpArr = sourcePath.split('%2F');
+            tmpArr = tmpArr[tmpArr.length - 1].split('/');
+            return tmpArr[tmpArr.length - 1];
+        };
+
+        const syncBoardFile = async sourcePath => {
+            const result = await axios.get(sourcePath);
+            let xContent = result.data;
+            if (typeof xContent === 'object') {
+                xContent = xContent.content;
+            }
+
+            const filename = getFileName(sourcePath);
+            const newFilePath = `${repo.path}/_config/board/${filename}`;
+            await service.repo.createFile(
+                repo,
+                newFilePath,
+                Base64.encode(xContent),
+                'base64'
+            );
+            const fullFilePath =
+                conf.origin +
+                _path.join(
+                    conf.baseUrl,
+                    'repos',
+                    encodeURIComponent(repo.path),
+                    'files',
+                    encodeURIComponent(newFilePath)
+                );
+            return fullFilePath;
+        };
+
+        const fixContent = async file => {
+            if (file.isTree) {
+                file.children = file.children || [];
+                for (let i = 0; i < file.children.length; i++) {
+                    await fixContent(file.children[i]);
+                }
+            } else if (
+                _.endsWith(file.path, '.md') &&
+                !this.isInIgnoreList(file.path)
+            ) {
+                const content = await service.repo.getFileData(
+                    repo.path,
+                    file.path
+                );
+                const blocks = await app.api.keepwork.buildBlocks(
+                    content.toString()
+                );
+
+                let changed = false;
+
+                for (let i = 0; i < blocks.length; i++) {
+                    const block = blocks[i];
+                    if (
+                        block.cmd === 'Board' &&
+                        block.data &&
+                        block.data.board
+                    ) {
+                        if (block.data.board.xml) {
+                            try {
+                                block.data.board.xml = await syncBoardFile(
+                                    block.data.board.xml
+                                );
+                                changed = true;
+                                if (block.data.board.data) {
+                                    delete block.data.board.data;
+                                }
+                            } catch (e) {
+                                ctx.logger.error(
+                                    'Invalid board! ',
+                                    'site: ',
+                                    repo.path,
+                                    ' xml:',
+                                    block.data.board.xml
+                                );
+                            }
+                        }
+                        if (block.data.board.svg) {
+                            try {
+                                block.data.board.svg = await syncBoardFile(
+                                    block.data.board.svg
+                                );
+                                changed = true;
+                            } catch (e) {
+                                ctx.logger.error(
+                                    'Invalid board! ',
+                                    'site: ',
+                                    repo.path,
+                                    ' svg:',
+                                    block.data.board.svg
+                                );
+                            }
+                        }
+                    }
+                }
+                if (changed) {
+                    const newContent = await app.api.keepwork.buildContent(
+                        blocks
+                    );
+                    await service.repo.updateFile(repo, file.path, newContent);
+                }
+            }
+        };
+
+        for (let i = 0; i < tree.length; i++) {
+            await fixContent(tree[i]);
+        }
     }
 
     async syncSitePages(site) {
