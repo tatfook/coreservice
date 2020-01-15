@@ -295,6 +295,11 @@ module.exports = app => {
     router.post('/pBlocks/:id/use', pBlock.use);
     router.resources('/pBlocks', pBlock);
 
+    // paracraft lobby worldlock
+    const worldlock = controller.worldlock;
+    router.post('/worldlocks', worldlock.upsert);
+    router.delete('/worldlocks', worldlock.destroy);
+
     // migration
     const migration = controller.admin.migration;
     router.post(
