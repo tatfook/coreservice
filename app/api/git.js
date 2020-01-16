@@ -129,6 +129,24 @@ module.exports = app => {
 
             return result.data;
         },
+        async upsertBinaryFile(
+            streamData,
+            { repoPath, filePath, encoding, committer }
+        ) {
+            const result = await Client.post('/files/binary', streamData, {
+                params: {
+                    repoPath,
+                    filePath,
+                    encoding,
+                    committer,
+                },
+                headers: {
+                    'Content-Type': [ 'application/octet-stream' ],
+                },
+            });
+
+            return result.data;
+        },
         async deleteFile(repoPath, filePath, committer) {
             const result = await Client.delete('/files', {
                 data: {
