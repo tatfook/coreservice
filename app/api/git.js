@@ -5,6 +5,7 @@ const Axios = require('axios');
 module.exports = app => {
     const Client = Axios.create({
         baseURL: app.config.self.marshalUrl,
+        maxContentLength: 100 * 1024 * 1024, // eslint-disable-line
     });
 
     const gitAPI = {
