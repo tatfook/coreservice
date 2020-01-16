@@ -1,7 +1,7 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
 
-const wurl = require('wurl');
+const queryString = require('query-string');
 
 const Controller = require('../core/controller.js');
 const {
@@ -20,16 +20,12 @@ const OauthUsers = class extends Controller {
         return this.app.config.self;
     }
 
-    getRedirectUrl(serverName) {
-        return this.getConfig().apiUrlPrefix + 'oauth_users/' + serverName;
-    }
-
     async destroy() {
         const { userId } = this.authenticated();
-        const { id, password } = this.validate({
-            password: 'string',
-            id: 'int',
-        });
+        const { id, password } = await this.ctx.validate(
+            this.app.validator.oauthUser.delete,
+            this.getParams()
+        );
 
         const user = await this.model.users.findOne({
             where: { id: userId, password: this.app.util.md5(password) },
@@ -43,30 +39,26 @@ const OauthUsers = class extends Controller {
     }
 
     async qq() {
-        const { model, axios } = this;
+        const { axios } = this;
         const config = this.getConfig();
         const accessTokenApiUrl = 'https://graph.qq.com/oauth2.0/token';
         const openidApiUrl = 'https://graph.qq.com/oauth2.0/me';
         const userApiUrl = 'https://graph.qq.com/user/get_user_info';
-        const params = this.validate({
-            clientId: 'string',
-            code: 'string',
-            redirectUri: 'string',
-            state: 'string',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.oauthUser.common,
+            this.getParams()
+        );
         const userId = this.getUser().userId;
         params.grant_type = 'authorization_code';
         params.client_id = params.clientId || config.oauths.qq.clientId;
         params.client_secret = config.oauths.qq.clientSecret;
-        params.redirect_uri = params.redirectUri || this.getRedirectUrl('qq');
-        // console.log(params);
+        params.redirect_uri = params.redirectUri;
         // 获取token
         const queryStr = await axios
             .get(accessTokenApiUrl, { params })
             .then(res => res.data);
-        const data = wurl('?', 'http://localhost/index?' + queryStr);
+        const data = queryString.parse(queryStr);
         const access_token = data.access_token;
-        // console.log(data);
         // 获取openid
         let result = await axios
             .get(openidApiUrl, { params: { access_token } })
@@ -76,7 +68,6 @@ const OauthUsers = class extends Controller {
             result.lastIndexOf(')')
         );
         result = JSON.parse(result);
-        // console.log(result);
         // 获取用户信息
         const externalId = result.openid;
         result = await axios
@@ -88,41 +79,70 @@ const OauthUsers = class extends Controller {
                 },
             })
             .then(res => res.data);
-        // console.log(result);
         // 更新DB
         const externalUsername = result.nickname;
         const type = OAUTH_SERVICE_TYPE_QQ;
-        // console.log(externalUsername);
         const token = externalId + type + access_token;
-        await model.oauthUsers.upsert({
+
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
             userId,
             token,
-        });
-        let oauthUser = await model.oauthUsers.findOne({
+            params.state
+        );
+    }
+
+    async getTokenByOauth(
+        externalId,
+        externalUsername,
+        type,
+        userId,
+        token,
+        state
+    ) {
+        let oauthUser = await this.model.oauthUsers.findOne({
             where: { externalId, type },
         });
-        if (!oauthUser) return this.throw(500);
-        oauthUser = oauthUser.get({ plain: true });
-        // console.log(oauthUser);
 
-        return this.token(params.state, oauthUser);
+        if (oauthUser) {
+            if (userId && userId !== oauthUser.userId) {
+                return this.fail(21);
+            }
+            const updateBody = { externalUsername, type, userId, token };
+            if (!userId) {
+                delete updateBody.userId;
+            }
+            await this.model.oauthUsers.update(updateBody, {
+                where: { id: oauthUser.id },
+            });
+            oauthUser = await this.model.oauthUsers.findOne({
+                where: { id: oauthUser.id },
+            });
+        } else {
+            oauthUser = await this.model.oauthUsers.create({
+                externalId,
+                externalUsername,
+                type,
+                userId,
+                token,
+            });
+        }
+        oauthUser = oauthUser.get({ plain: true });
+        return this.token(state, oauthUser);
     }
 
     async weixin() {
-        const { model, axios } = this;
+        const { axios } = this;
         const config = this.getConfig();
         const accessTokenApiUrl =
             'https://api.weixin.qq.com/sns/oauth2/access_token';
         const userApiUrl = 'https://api.weixin.qq.com/sns/userinfo';
-        const params = this.validate({
-            clientId: 'string',
-            code: 'string',
-            redirectUri: 'string',
-            state: 'string',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.oauthUser.common,
+            this.getParams()
+        );
         const userId = this.getUser().userId;
         params.grant_type = 'authorization_code';
         params.client_id = params.clientId || config.oauths.weixin.clientId;
@@ -131,121 +151,83 @@ const OauthUsers = class extends Controller {
             config.oauths.weixin.appid ||
             config.oauths.weixin.clientId;
         params.secret = config.oauths.weixin.clientSecret;
-        params.redirect_uri =
-            params.redirectUri || this.getRedirectUrl('weixin');
-        // console.log(params);
+        params.redirect_uri = params.redirectUri;
         // 获取token
         const data = await axios
             .get(accessTokenApiUrl, { params })
             .then(res => res.data);
-        // console.log(data);
         const access_token = data.access_token;
         const externalId = data.openid;
         // // 获取用户信息
         const result = await axios
             .get(userApiUrl, { params: { access_token, openid: externalId } })
             .then(res => res.data);
-        // console.log(result);
         // 更新DB
         const externalUsername = result.nickname;
         const type = OAUTH_SERVICE_TYPE_WEIXIN;
-        // console.log(externalUsername);
         const token = externalId + type + access_token;
-        await model.oauthUsers.upsert({
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
             userId,
             token,
-        });
-        let oauthUser = await model.oauthUsers.findOne({
-            where: { externalId, type },
-        });
-        if (!oauthUser) return this.throw(500);
-        oauthUser = oauthUser.get({ plain: true });
-
-        return this.token(params.state, oauthUser);
+            params.state
+        );
     }
 
     async github() {
-        const { model, app, axios } = this;
+        const { axios } = this;
         const config = this.getConfig();
         const accessTokenApiUrl = 'https://github.com/login/oauth/access_token';
         const userApiUrl = 'https://api.github.com/user';
-        const params = this.validate({
-            clientId: 'string',
-            code: 'string',
-            redirectUri: 'string',
-            state: 'string',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.oauthUser.common,
+            this.getParams()
+        );
         const userId = this.getUser().userId;
-        // console.log("==================userId=============", userId);
         params.client_id = params.clientId || config.oauths.github.clientId;
         params.client_secret = config.oauths.github.clientSecret;
-        params.redirect_uri =
-            params.redirectUri || this.getRedirectUrl('github');
+        params.redirect_uri = params.redirectUri;
+        const queryStr = await axios
+            .get(accessTokenApiUrl, { params })
+            .then(res => res.data);
+        const data = queryString.parse(queryStr);
 
-        let queryStr =
-            'access_token=aa035971e9864642500a7aaad8783c59c8111228&scope=user%3Aemail&token_type=bearer';
-        if (!app.unittest) {
-            queryStr = await axios
-                .get(accessTokenApiUrl, { params })
-                .then(res => res.data);
-        }
-
-        const data = wurl('?', 'http://localhost/index?' + queryStr);
-        if (!data.access_token) return this.throw(500, '获取token失败');
         const access_token = data.access_token;
-
-        let userinfo = { id: '11922085', login: 'wxaxiaoyao' };
-        if (!app.unittest) {
-            userinfo = await axios
-                .get(userApiUrl, { params: { access_token } })
-                .then(res => res.data);
-        }
-
+        const userinfo = await axios
+            .get(userApiUrl, { params: { access_token } })
+            .then(res => res.data);
         const externalId = userinfo.id;
         const externalUsername = userinfo.login;
         const type = OAUTH_SERVICE_TYPE_GITHUB;
 
         const token = externalId + type + access_token;
-        await model.oauthUsers.upsert({
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
             userId,
             token,
-        });
-
-        let oauthUser = await model.oauthUsers.findOne({
-            where: { externalId, type },
-        });
-        if (!oauthUser) return this.throw(500);
-        oauthUser = oauthUser.get({ plain: true });
-
-        return this.token(params.state, oauthUser);
+            params.state
+        );
     }
 
     async xinlang() {
-        const { model, axios } = this;
+        const { axios } = this;
         const config = this.getConfig();
         const accessTokenApiUrl = 'https://api.weibo.com/oauth2/access_token';
         const userApiUrl = 'https://api.weibo.com/2/users/show.json';
-        const params = this.validate({
-            clientId: 'string',
-            code: 'string',
-            redirectUri: 'string',
-            state: 'string',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.oauthUser.common,
+            this.getParams()
+        );
         const userId = this.getUser().userId;
-        // console.log(params);
         params.grant_type = 'authorization_code';
         params.client_id = params.clientId || config.oauths.xinlang.clientId;
         params.client_secret = config.oauths.xinlang.clientSecret;
-        params.redirect_uri =
-            params.redirectUri || this.getRedirectUrl('xinlang');
+        params.redirect_uri = params.redirectUri;
 
-        // const data = await axios.get(accessTokenApiUrl, {params}).then(res => res.data);
         const data = await axios
             .post(
                 // eslint-disable-next-line max-len
@@ -253,67 +235,25 @@ const OauthUsers = class extends Controller {
                 params
             )
             .then(res => res.data);
-        if (!data.access_token) return this.throw(500, '获取token失败');
         const access_token = data.access_token;
         const externalId = data.uid;
-        // console.log(data);
 
         const userinfo = await axios
             .get(userApiUrl, { params: { access_token, uid: externalId } })
             .then(res => res.data);
         const externalUsername = userinfo.screen_name;
         const type = OAUTH_SERVICE_TYPE_XINLANG;
-        // console.log(userinfo);
 
         const token = externalId + type + access_token;
-        await model.oauthUsers.upsert({
+        await this.getTokenByOauth(
             externalId,
             externalUsername,
             type,
             userId,
             token,
-        });
-        let oauthUser = await model.oauthUsers.findOne({
-            where: { externalId, type },
-        });
-        if (!oauthUser) return this.throw(500);
-        oauthUser = oauthUser.get({ plain: true });
-
-        return this.token(params.state, oauthUser);
+            params.state
+        );
     }
-
-    async note() {
-        // const { app, axios } = this;
-        // const config = this.getConfig();
-        // const memoryCache = app.cache;
-        // const params = this.getParams();
-        // const userId = this.getUser().userId;
-        // const accessTokenApiUrl =
-        //     config.origin + config.baseUrl + 'oauthApps/token';
-        // const userApiUrl = config.apiUrlPrefix + 'users/' + userId;
-        // params.grant_type = 'authorization_code';
-        // params.client_id = params.client_id || config.oauths.note.clientId;
-        // params.client_secret =
-        //     params.client_secret || config.oauths.note.clientSecret;
-        // params.redirect_uri =
-        //     params.redirect_uri || this.getRedirectUrl('note');
-        // // 获取token
-        // const data = await axios
-        //     .post(accessTokenApiUrl, params)
-        //     .then(res => res.data);
-        // const access_token = data.access_token;
-        // const userinfo = await axios.get(userApiUrl).then(res => res.data);
-        // const externalId = userinfo.id;
-        // const externalUsername = userinfo.username;
-        // const key = params.code + params.client_id;
-        // memoryCache.put(
-        //     key,
-        //     { userId, externalId, externalUsername },
-        //     1000 * 60 * 10
-        // ); // 10 分钟
-        // return this.success('OK');
-    }
-    // 解绑删除记录即可
 
     async token(state, oauthUser) {
         // 绑定直接返回

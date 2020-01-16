@@ -1,13 +1,10 @@
 /* eslint-disable no-magic-numbers */
 'use strict';
-const joi = require('joi');
 const uuidv1 = require('uuid/v1');
 const axios = require('axios');
 
 const Controller = require('../core/controller.js');
 const {
-    TRADE_TYPE_DEFAULT,
-    TRADE_TYPE_HAQI_EXCHANGE,
     TRADE_TYPE_PACKAGE_BUY,
 
     DISCOUNT_STATE_UNUSE,
@@ -24,22 +21,10 @@ const Trade = class extends Controller {
 
     async create() {
         const { userId, username } = this.authenticated();
-        const params = this.validate({
-            type: joi
-                .number()
-                .valid([
-                    TRADE_TYPE_DEFAULT,
-                    TRADE_TYPE_HAQI_EXCHANGE,
-                    TRADE_TYPE_PACKAGE_BUY,
-                ]), // 交易类型  课程包购买  哈奇物品兑换
-            goodsId: 'int', // 物品id
-            count: 'int', // 购买量
-            discountId: 'int_optional', // 优惠券id
-            // TODO 移除这三个选项
-            rmb: 'int_optional',
-            coin: 'int_optional',
-            bean: 'int_optional',
-        });
+        const params = await this.ctx.validate(
+            this.app.validator.trade.create,
+            this.getParams()
+        );
         const { type, goodsId, count, discountId = 0, extra = {} } = params;
         // count 为10的整数倍
         if (count <= 0 || count % 10) return this.throw(400);
@@ -99,12 +84,6 @@ const Trade = class extends Controller {
             realCoin -= discount.rewardCoin;
             realBean -= discount.rewardBean;
         }
-
-        // if (realRmb > 200) {  // 验证手机验证码
-        // if (!user.cellphone) return this.fail(5);
-        // const cache = await this.model.caches.get(user.cellphone);
-        // if (!params.captcha || !cache || cache.captcha != params.captcha) return this.fail(5);
-        // }
 
         if (
             account.rmb < realRmb ||

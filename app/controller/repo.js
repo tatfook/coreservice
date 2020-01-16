@@ -92,6 +92,24 @@ const Repo = class extends Controller {
         return this.success(result);
     }
 
+    async upsertBinaryFile() {
+        const repo = await this.getRepoAndEnsureWritable();
+        const { ctx } = this;
+        const { filePath, encoding } = this.getParams();
+        const committer = this.getUser().username;
+        if (ctx.header['content-type'] === 'application/octet-stream') {
+            const streamData = ctx.req;
+            const result = await ctx.service.repo.upsertBinaryFile(streamData, {
+                repo,
+                filePath,
+                encoding,
+                committer,
+            });
+            return this.success(result);
+        }
+        ctx.throw('Content type must be application/octet-stream');
+    }
+
     async createFile() {
         const repo = await this.getRepoAndEnsureWritable();
         const { filePath, content, encoding } = this.getParams();

@@ -219,6 +219,19 @@ class RepoService extends Service {
         return result;
     }
 
+    async upsertBinaryFile(
+        streamData,
+        { repo, filePath, encoding, committer }
+    ) {
+        const result = await this.app.api.git.upsertBinaryFile(streamData, {
+            repoPath: repo.path,
+            filePath,
+            encoding,
+            committer,
+        });
+        return result;
+    }
+
     async deleteFile(repo, filePath, committer) {
         const result = await this.app.api.git.deleteFile(
             repo.path,

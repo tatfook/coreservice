@@ -559,4 +559,41 @@ describe('/test/controller/project.test.js', () => {
             });
         });
     });
+
+    describe('# GET /projects/mostStar', () => {
+        it('## success', async () => {
+            const user = await app.factory.create('users', {
+                realname: '124578945',
+            });
+            const project = await app.factory.create(
+                'projects',
+                {
+                    lastStar: 5,
+                },
+                { user }
+            );
+            const user2 = await app.factory.create('users', {
+                realname: null,
+            });
+            await app.factory.create(
+                'projects',
+                {
+                    lastStar: 5,
+                },
+                { user: user2 }
+            );
+            await app
+                .httpRequest()
+                .get('/api/v0/projects/mostStar')
+                .expect(200)
+                .then(res => {
+                    const { count, rows } = res.body;
+                    assert(count === 1);
+                    assert(
+                        rows[0].id === project.id &&
+                            rows[0].user.userId === user.id
+                    );
+                });
+        });
+    });
 });

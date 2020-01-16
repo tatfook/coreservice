@@ -6,7 +6,7 @@ exports.cors = {
     origin: '*',
 };
 
-exports.middleware = [ 'authenticated', 'pagination', 'graphql', 'organization' ];
+exports.middleware = [ 'authenticated', 'pagination', 'organization' ];
 
 exports.security = {
     xframe: {
@@ -45,6 +45,6 @@ exports.ajv = {
 };
 
 exports.bodyParser = {
-    jsonLimit: '10mb',
-    formLimit: '10mb',
+    jsonLimit: '100mb',
+    formLimit: '100mb',
 };

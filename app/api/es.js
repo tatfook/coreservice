@@ -5,10 +5,10 @@ const _ = require('lodash');
 
 module.exports = app => {
     const esConfig = app.config.elasticsearch;
-    const adminToken = esConfig.token;
+    const INTERNAL_API_KEY = app.config.self.INTERNAL_API_KEY;
     const Client = Axios.create({
         headers: {
-            Authorization: adminToken,
+            'x-api-key': INTERNAL_API_KEY,
         },
         baseURL: `${esConfig.url}`,
     });
