@@ -5,16 +5,12 @@ const _ = require('lodash');
 const Controller = require('../core/controller.js');
 
 const OauthApp = class extends Controller {
-    get modelName() {
-        return 'oauthApps';
-    }
-
     // 密码式认证
     async login() {
-        let { username, password } = this.validate({
-            username: 'string',
-            password: 'string',
-        });
+        let { username, password } = await this.ctx.validate(
+            this.app.validator.oauthApp.login,
+            this.getParams()
+        );
         username = username.toLowerCase();
 
         const user = await this.model.users
@@ -45,7 +41,10 @@ const OauthApp = class extends Controller {
     // 获取认证码
     async oauthCode() {
         const { userId, username } = this.authenticated();
-        const { client_id, state } = this.validate({ client_id: 'string' });
+        const { client_id, state } = await this.ctx.validate(
+            this.app.validator.oauthApp.oauthCode,
+            this.getParams()
+        );
 
         const app = await this.model.oauthApps
             .findOne({ where: { clientId: client_id } })
@@ -68,11 +67,10 @@ const OauthApp = class extends Controller {
 
     // 通过认证码获取token
     async oauthToken() {
-        const { client_id, code, client_secret } = this.validate({
-            client_id: 'string',
-            client_secret: 'string',
-            code: 'string',
-        });
+        const { client_id, code, client_secret } = await this.ctx.validate(
+            this.app.validator.oauthApp.oauthToken,
+            this.getParams()
+        );
 
         const cache = await this.model.caches.get(
             `oauth_code_${client_id}_${code}`

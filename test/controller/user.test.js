@@ -1290,7 +1290,7 @@ describe('test/controller/user.test.js', () => {
                 .set('Authorization', `Bearer ${user.token}`)
                 .expect(200)
                 .then(res => res.body);
-            assert(result.world === 3);
+            assert(result.world === 100);
             assert(result.usedWorld === 0);
         });
     });
